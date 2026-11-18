@@ -32,7 +32,9 @@ This repository is being bootstrapped with source and configuration scaffolding.
 3. Generate Xcode project files if needed, install the matching Xcode/iOS SDK, and configure an Apple development team.
 4. Build and deploy to a physical iPhone. The iOS Simulator is not a substitute for performance testing.
 
-See [Docs/ROADMAP.md](Docs/ROADMAP.md), [Docs/TECHNICAL_DESIGN.md](Docs/TECHNICAL_DESIGN.md), [Docs/DEVICE_BUDGETS.md](Docs/DEVICE_BUDGETS.md), [Docs/MAP_SETUP.md](Docs/MAP_SETUP.md), and [Docs/BUILD_STATUS.md](Docs/BUILD_STATUS.md).\n\nThe first graybox city generator, character capsule placeholder, native touch action HUD, and map bootstrap script are now in the repository. The map must be generated in Unreal Editor; source has not yet been compiled with Unreal Build Tool.
+See [Docs/ROADMAP.md](Docs/ROADMAP.md), [Docs/TECHNICAL_DESIGN.md](Docs/TECHNICAL_DESIGN.md), [Docs/DEVICE_BUDGETS.md](Docs/DEVICE_BUDGETS.md), [Docs/MAP_SETUP.md](Docs/MAP_SETUP.md), and [Docs/BUILD_STATUS.md](Docs/BUILD_STATUS.md).
+
+The first graybox city generator, character capsule placeholder, native touch action HUD, and map bootstrap script are now in the repository. The map must be generated in Unreal Editor; source has not yet been compiled with Unreal Build Tool.
 
 ## License
 
