@@ -20,8 +20,9 @@
 - [ ] Hide streaming transitions using overlap and sightline design.
 
 ## Milestone 3 — City simulation
+- [x] Add a basic streamed sidewalk-pedestrian patrol prototype with distance-tiered update frequency.
 - [ ] Modular road and building kits with original art direction.
-- [ ] Lightweight pedestrian and traffic simulation with distance-based update rates.
+- [ ] Expand pedestrian behavior and add traffic simulation with distance-based update rates.
 - [ ] Save/load, map, navigation, and mission framework.
 
 ## Milestone 4 — Environment and polish
