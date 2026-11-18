@@ -4,9 +4,9 @@
 #include "GameFramework/Actor.h"
 #include "VICECityChunk.generated.h"
 
-class UStaticMesh;
+class UHierarchicalInstancedStaticMeshComponent;
 class USceneComponent;
-class UStaticMeshComponent;
+class UStaticMesh;
 
 /** One streamed intersection and its north-east city block. */
 UCLASS()
@@ -20,17 +20,16 @@ public:
     void InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth);
 
 private:
-    UStaticMeshComponent* AddCube(
-        const FVector& LocalLocation,
-        const FVector& Dimensions,
-        const FName& ComponentName,
-        bool bBlocksMovement);
+    void AddCube(const FVector& LocalLocation, const FVector& Dimensions);
 
     UPROPERTY()
     TObjectPtr<USceneComponent> SceneRoot;
 
     UPROPERTY()
     TObjectPtr<UStaticMesh> CubeMesh;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> CityInstances;
 
     bool bInitialized = false;
 };
