@@ -16,6 +16,8 @@ jobs:
       - name: Verify core source files
         run: |
           test -f Source/ProjectVICE/ProjectVICE.Build.cs
+          test -f Source/ProjectVICTarget.cs
+          test -f Source/ProjectVICEEditorTarget.cs
           test -f Source/ProjectVICE/ProjectVICE.cpp
           test -f Source/ProjectVICE/VICECharacter.h
           test -f Source/ProjectVICE/VICECharacter.cpp
