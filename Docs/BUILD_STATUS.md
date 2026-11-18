@@ -2,27 +2,31 @@
 
 Last updated: 2026-11-18
 
-## Repository bootstrap
+## Implemented in source
 
-- Unreal project descriptor: committed.
-- C++ runtime module: committed.
-- Basic character movement and camera perspective toggle: committed.
-- Game mode: committed.
-- Initial mobile/iOS configuration: committed.
-- Default Unreal virtual joystick: configured as a temporary touch-control baseline.
-- Repository structure validation workflow: committed.
+- Unreal Engine 5.4 project descriptor and C++ runtime module.
+- Game mode bootstrap that creates a player start and runtime city blockout.
+- Procedural 7-by-7 road grid with primitive building masses.
+- Character movement, jump, sprint, and first-/third-person camera toggle.
+- Runtime touch HUD buttons for camera, jump, and sprint.
+- Default mobile virtual joystick configuration for movement and camera look.
+- Unreal Editor Python script to create the initial map with player start and basic lighting actors.
+- GitHub Actions repository structure and Python syntax checks.
 
-## Not yet built or verified
+## Current prototype limitations
 
-No Unreal Editor/Build Toolchain was run in this session. Therefore this repository has **not** yet been proven to compile, launch, or run on an iPhone. The iOS project still needs editor-generated assets/maps, a proper touch HUD, production character/vehicle/environment assets, World Partition setup, device profiling, and Apple signing.
+The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, not the final realistic character. There is no vehicle, NPC simulation, mission system, production animation, World Partition district content, or finished art/audio yet.
 
-The default virtual joystick is only a temporary input baseline; it is not the planned polished on-screen HUD.
+## Build and test status
 
-## Next engineering tasks
+The repository has **not** been compiled with Unreal Build Tool in this session and has **not** been launched on an iPhone. GitHub Actions checks project structure and Python syntax only; they do not compile Unreal C++.
 
-1. Open and compile with the project's selected Unreal Engine version on macOS.
-2. Fix any UHT/C++ or iOS SDK issues found by the real toolchain.
-3. Create the first playable test map and configure it as the startup map.
-4. Replace the default joystick with a purpose-built touch HUD.
-5. Add a first drivable vehicle and a streamed test district.
-6. Profile on the actual iPhone 12 mini before increasing visual complexity.
+The first map asset is generated locally by running the editor script described in [MAP_SETUP.md](MAP_SETUP.md). The iOS build still requires Unreal Engine with iOS support, Xcode, an Apple development team, and physical-device profiling.
+
+## Next milestone
+
+1. Run the editor bootstrap script and generate the map.
+2. Compile the C++ module with Unreal Engine 5.4 and fix toolchain-reported issues.
+3. Verify touch input and camera switching on an actual iPhone 12 mini.
+4. Replace graybox body and buildings with original production assets.
+5. Add a first drivable vehicle prototype and streamed district cells.
