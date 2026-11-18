@@ -38,3 +38,4 @@ jobs:
           test -f Docs/DEVICE_BUDGETS.md
           test -f Docs/BUILD_STATUS.md
           test -f Docs/MAP_SETUP.md
+          test -f Docs/VEHICLE_PROTOTYPE.md
