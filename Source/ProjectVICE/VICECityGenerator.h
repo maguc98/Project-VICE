@@ -29,6 +29,8 @@ private:
     UPROPERTY(Transient)
     TMap<FIntPoint, TObjectPtr<AVICECityChunk>> ActiveChunks;
 
+    TArray<FIntPoint> PendingCells;
+
     UPROPERTY(EditDefaultsOnly, Category="VICE|Streaming", meta=(ClampMin="1", ClampMax="32"))
     int32 GridRadius = 12;
 
