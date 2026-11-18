@@ -5,6 +5,7 @@
 #include "VICECityChunk.generated.h"
 
 class UHierarchicalInstancedStaticMeshComponent;
+class UMaterialInstanceDynamic;
 class USceneComponent;
 class UStaticMesh;
 
@@ -20,7 +21,10 @@ public:
     void InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth);
 
 private:
-    void AddCube(const FVector& LocalLocation, const FVector& Dimensions);
+    void AddCube(
+        UHierarchicalInstancedStaticMeshComponent* Target,
+        const FVector& LocalLocation,
+        const FVector& Dimensions);
 
     UPROPERTY()
     TObjectPtr<USceneComponent> SceneRoot;
@@ -29,7 +33,40 @@ private:
     TObjectPtr<UStaticMesh> CubeMesh;
 
     UPROPERTY()
-    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> CityInstances;
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> RoadInstances;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> SidewalkInstances;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> BuildingInstances;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> GlassInstances;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> MarkingInstances;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> TrimInstances;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> RoadMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> SidewalkMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> BuildingMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> GlassMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> MarkingMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> TrimMaterial;
 
     bool bInitialized = false;
 };
