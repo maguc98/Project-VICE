@@ -14,7 +14,7 @@ AVICEVehiclePawn::AVICEVehiclePawn()
     PrimaryActorTick.bCanEverTick = true;
 
     CollisionBody = CreateDefaultSubobject<UBoxComponent>(TEXT("VehicleCollision"));
-    SetRootComponent(CollisionBody);
+    RootComponent = CollisionBody;
     CollisionBody->SetBoxExtent(FVector(210.0f, 95.0f, 48.0f));
     CollisionBody->SetRelativeLocation(FVector(0.0f, 0.0f, 58.0f));
     CollisionBody->SetCollisionProfileName(TEXT("BlockAllDynamic"));
@@ -137,6 +137,8 @@ void AVICEVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
     PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AVICEVehiclePawn::ApplyThrottle);
     PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AVICEVehiclePawn::ApplySteering);
+    PlayerInputComponent->BindAxis(TEXT("LookYaw"), this, &AVICEVehiclePawn::LookYaw);
+    PlayerInputComponent->BindAxis(TEXT("LookPitch"), this, &AVICEVehiclePawn::LookPitch);
     PlayerInputComponent->BindAction(TEXT("VehicleBrake"), IE_Pressed, this, &AVICEVehiclePawn::BrakePressed);
     PlayerInputComponent->BindAction(TEXT("VehicleBrake"), IE_Released, this, &AVICEVehiclePawn::BrakeReleased);
     PlayerInputComponent->BindAction(TEXT("InteractVehicle"), IE_Pressed, this, &AVICEVehiclePawn::ExitInput);
@@ -234,4 +236,14 @@ void AVICEVehiclePawn::BrakeReleased()
 void AVICEVehiclePawn::ExitInput()
 {
     ExitVehicle();
+}
+
+void AVICEVehiclePawn::LookYaw(float Value)
+{
+    AddControllerYawInput(Value);
+}
+
+void AVICEVehiclePawn::LookPitch(float Value)
+{
+    AddControllerPitchInput(Value);
 }
