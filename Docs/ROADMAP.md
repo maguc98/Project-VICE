@@ -4,13 +4,13 @@
 - [x] Create Unreal project descriptor and C++ module skeleton.
 - [x] Add baseline character movement and perspective toggle.
 - [x] Add initial iOS/mobile configuration.
-- [ ] Verify project generation and compile against the selected Unreal Engine version on macOS.
+- [ ] Verify project generation and compile against Unreal Engine 5.4 on macOS.
 
 ## Milestone 1 — Playable vertical slice
-- [ ] Create a small original coastal-city test district.
-- [ ] Add a controllable third-person character and touch HUD (virtual stick, camera drag, jump, interact).
-- [ ] Add first-person camera with correct eye height, collision, and animation handling.
-- [ ] Add one drivable vehicle with enter/exit and a mobile-friendly driving HUD.
+- [x] Create a procedural graybox city test district (production art and authored .umap still pending).
+- [x] Add a controllable character, mobile virtual sticks, camera control, jump, sprint, and action HUD (graybox source implementation).
+- [x] Add first-/third-person camera toggles for the character and vehicle (initial blockout camera; eye height and camera collision still need device tuning).
+- [x] Add an arcade vehicle prototype with enter/exit, touch steering/throttle/brake, camera mode, and speed display (source implementation; not yet device-verified).
 - [ ] Profile on iPhone 12 mini; tune thermal behavior and frame pacing.
 
 ## Milestone 2 — World streaming
