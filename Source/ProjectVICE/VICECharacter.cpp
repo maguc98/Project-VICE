@@ -22,6 +22,7 @@ AVICECharacter::AVICECharacter()
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
     CameraBoom->SetupAttachment(RootComponent);
     CameraBoom->TargetArmLength = ThirdPersonArmLength;
+    CameraBoom->SocketOffset = FVector(0.0f, 0.0f, 70.0f);
     CameraBoom->bUsePawnControlRotation = true;
     CameraBoom->bEnableCameraLag = true;
     CameraBoom->CameraLagSpeed = 10.0f;
@@ -120,7 +121,7 @@ void AVICECharacter::ToggleCameraPerspective()
 {
     bFirstPerson = !bFirstPerson;
     CameraBoom->TargetArmLength = bFirstPerson ? FirstPersonArmLength : ThirdPersonArmLength;
-    FollowCamera->SetRelativeLocation(bFirstPerson ? FVector(0.0f, 0.0f, 68.0f) : FVector::ZeroVector);
+    FollowCamera->SetRelativeLocation(FVector::ZeroVector);
     FollowCamera->SetFieldOfView(bFirstPerson ? 90.0f : 85.0f);
     if (BlockoutBody)
     {
