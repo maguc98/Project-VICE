@@ -21,8 +21,13 @@ jobs:
           test -f Source/ProjectVICE/VICECharacter.cpp
           test -f Source/ProjectVICE/VICEGameMode.h
           test -f Source/ProjectVICE/VICEGameMode.cpp
+          test -f Source/ProjectVICE/VICECityGenerator.h
+          test -f Source/ProjectVICE/VICECityGenerator.cpp
+      - name: Validate editor bootstrap script
+        run: python3 -m py_compile Content/Python/create_vice_blockout_map.py
       - name: Verify project documentation
         run: |
           test -f Docs/ROADMAP.md
           test -f Docs/TECHNICAL_DESIGN.md
           test -f Docs/DEVICE_BUDGETS.md
+          test -f Docs/BUILD_STATUS.md
