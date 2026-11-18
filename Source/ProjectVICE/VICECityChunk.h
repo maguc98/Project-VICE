@@ -6,6 +6,7 @@
 
 class UHierarchicalInstancedStaticMeshComponent;
 class UMaterialInstanceDynamic;
+class UMaterialInterface;
 class USceneComponent;
 class UStaticMesh;
 
@@ -31,6 +32,11 @@ private:
 
     UPROPERTY()
     TObjectPtr<UStaticMesh> CubeMesh;
+
+    UPROPERTY()
+    TObjectPtr<UMaterialInterface> BaseColorMaterial;
+
+    void InitializeMaterials();
 
     UPROPERTY()
     TObjectPtr<UHierarchicalInstancedStaticMeshComponent> RoadInstances;
