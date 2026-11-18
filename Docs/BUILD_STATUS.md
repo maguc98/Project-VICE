@@ -5,8 +5,8 @@ Last updated: 2026-11-18
 ## Implemented in source
 
 - Unreal Engine 5.4 project descriptor, runtime module, and correctly named game/editor target files.
-- Game mode bootstrap that creates the player start, graybox city, and first vehicle.
-- Procedural 7-by-7 road grid with primitive building masses.
+- Game mode bootstrap that creates the player start, streamed graybox city manager, and first vehicle.\n- Custom city cell streaming for a 4.32 km × 4.32 km grid: 5 × 5 active cell window, nearest-first loading in batches of up to 3 chunks per 0.25-second update, and unloading outside the window.
+- Deterministic per-cell road segments and primitive building masses; streaming follows the active character or vehicle.
 - Character movement, jump, sprint, and first-/third-person camera toggle.
 - Runtime mobile touch HUD with camera, jump, sprint, vehicle interaction, and brake buttons.
 - Default virtual joystick axes mapped for movement, driving, and camera look.
@@ -16,7 +16,7 @@ Last updated: 2026-11-18
 
 ## Current prototype limitations
 
-The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. There are no NPCs, traffic simulation, missions, production character animations, production vehicle assets, authored World Partition district assets, or final art/audio yet.
+The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. There are no NPCs, traffic simulation, missions, production character animations, production vehicle assets, authored World Partition district assets, asynchronous asset streaming, or final art/audio yet. Cell actor creation/destruction currently runs on the game thread and may cause pop-in or hitches; no performance data has been collected.
 
 ## Build and test status
 
@@ -30,4 +30,4 @@ The first map asset is generated locally by running the editor script described 
 2. Fix any Unreal Header Tool, C++, or iOS SDK errors reported by the real toolchain.
 3. Verify on iPhone 12 mini that movement, entering/exiting, steering, braking, and camera switching work.
 4. Replace primitive character and vehicle meshes with original production assets.
-5. Establish World Partition district cells and stream around the player and car.
+5. Profile the custom cell streamer, then move to authored World Partition/HLOD and asynchronous asset streaming for production districts.
