@@ -27,6 +27,17 @@ The current implementation uses nine HISM material batches per streamed cell. Th
 - **Waterfront:** low-rise commercial buildings, open sightlines, palms and coastal planting, promenade spaces.
 - **Industrial edge:** warehouses, service yards, loading bays, utility structures and wider roads.
 
+## Current procedural district zoning
+
+The runtime blockout assigns a stable district from each cell coordinate:
+
+- **Downtown:** cells where both coordinate magnitudes are at most 2; taller and narrower tower masses.
+- **Waterfront:** non-downtown cells with Y ≤ -8; lower-rise blocks, pale sand-toned facades, and a cooler coastal glazing/canopy palette.
+- **Industrial:** non-downtown cells outside the waterfront band with X ≥ 8 and Y ≥ 5; broader, lower warehouse-like masses and a muted concrete palette.
+- **Residential:** all remaining cells; the baseline mid-rise proportions and warm neutral palette.
+
+These rules are deterministic and do not add HISM component batches. “Waterfront” is currently a visual district treatment only: a shoreline, water plane, beach, and promenade are not yet implemented.
+
 ## Production asset pipeline
 
 1. Model original modular building kits in Blender or an equivalent DCC.
