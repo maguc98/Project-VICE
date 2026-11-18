@@ -210,6 +210,7 @@ bool AVICEVehiclePawn::EnterVehicle(AVICECharacter* Character)
         Character->SetActorEnableCollision(true);
         Character->SetActorTickEnabled(true);
         Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+        PC->Possess(Character);
         OccupyingCharacter = nullptr;
         VehicleController = nullptr;
         return false;
