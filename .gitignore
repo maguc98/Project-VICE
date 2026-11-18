@@ -1,0 +1,17 @@
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.idea/
+*.sln
+*.xcodeproj/
+*.xcworkspace/
+*.xcuserstate
+*.ipa
+*.app
+*.dSYM/
+*.p12
+*.mobileprovision
+*.provisionprofile
+.DS_Store
