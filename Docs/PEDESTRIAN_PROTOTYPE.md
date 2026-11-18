@@ -6,7 +6,7 @@ The graybox city streamer spawns one lightweight pedestrian actor for each activ
 
 Each pedestrian:
 - Uses a capsule collision body and an engine capsule mesh placeholder.
-- Patrols a deterministic four-corner sidewalk loop inside its cell.
+- Patrols a deterministic four-corner loop aligned to the sidewalk centerlines inside its cell.
 - Uses swept movement and turns toward the next waypoint.
 - Skips a waypoint if a blocking collision interrupts the path.
 - Is spawned with a per-cell route seed so neighboring walkers do not all start at the same corner/direction.
