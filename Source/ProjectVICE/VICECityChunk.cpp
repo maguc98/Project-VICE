@@ -277,10 +277,10 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     // always recreates the same skyline after a cell is streamed back in.
     const float HeightBase = bDowntown ? 9000.0f : (bWaterfront ? 3200.0f : (bIndustrial ? 2600.0f : 4200.0f));
     const float HeightRange = bDowntown ? 15000.0f : (bWaterfront ? 5200.0f : (bIndustrial ? 3000.0f : 9500.0f));
-    const float WidthBase = bIndustrial ? 5400.0f : (bWaterfront ? 3000.0f : 2800.0f);
-    const float WidthRange = bIndustrial ? 1800.0f : (bWaterfront ? 1300.0f : 1800.0f);
-    const float DepthBase = bIndustrial ? 4600.0f : (bWaterfront ? 2800.0f : 2800.0f);
-    const float DepthRange = bIndustrial ? 1600.0f : (bWaterfront ? 1300.0f : 1800.0f);
+    const float WidthBase = bIndustrial ? 5000.0f : (bWaterfront ? 3000.0f : 2800.0f);
+    const float WidthRange = bIndustrial ? 1200.0f : (bWaterfront ? 1300.0f : 1800.0f);
+    const float DepthBase = bIndustrial ? 4800.0f : (bWaterfront ? 2800.0f : 2800.0f);
+    const float DepthRange = bIndustrial ? 1400.0f : (bWaterfront ? 1300.0f : 1800.0f);
 
     const FVector BuildingLocations[] =
     {
