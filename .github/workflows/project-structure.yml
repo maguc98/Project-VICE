@@ -50,3 +50,4 @@ jobs:
           test -f Docs/ENVIRONMENT_PROTOTYPE.md
           test -f Docs/PEDESTRIAN_PROTOTYPE.md
           test -f Docs/TRAFFIC_PROTOTYPE.md
+          test -f Docs/CITY_VISUAL_STYLE.md
