@@ -5,6 +5,7 @@
 #include "VICECharacter.generated.h"
 
 class UCameraComponent;
+class UVICETouchHUD;
 class USpringArmComponent;
 
 /**
@@ -20,6 +21,7 @@ class PROJECTVICE_API AVICECharacter : public ACharacter
 public:
     AVICECharacter();
 
+    virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     UFUNCTION(BlueprintCallable, Category="VICE|Camera")
@@ -49,6 +51,9 @@ protected:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="VICE|Camera")
     TObjectPtr<UCameraComponent> FollowCamera;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UVICETouchHUD> TouchHUD;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="VICE|Camera", meta=(ClampMin="0.0"))
     float ThirdPersonArmLength = 320.0f;
