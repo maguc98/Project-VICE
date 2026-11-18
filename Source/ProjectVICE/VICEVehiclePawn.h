@@ -58,6 +58,21 @@ private:
     TObjectPtr<UStaticMeshComponent> ChassisMesh;
 
     UPROPERTY(VisibleAnywhere, Category="VICE|Vehicle")
+    TObjectPtr<UStaticMeshComponent> CabinMesh;
+
+    UPROPERTY(VisibleAnywhere, Category="VICE|Vehicle")
+    TObjectPtr<UStaticMeshComponent> HoodMesh;
+
+    UPROPERTY(VisibleAnywhere, Category="VICE|Vehicle")
+    TObjectPtr<UStaticMeshComponent> TrunkMesh;
+
+    UPROPERTY(VisibleAnywhere, Category="VICE|Vehicle")
+    TObjectPtr<UStaticMeshComponent> FrontBumperMesh;
+
+    UPROPERTY(VisibleAnywhere, Category="VICE|Vehicle")
+    TObjectPtr<UStaticMeshComponent> RearBumperMesh;
+
+    UPROPERTY(VisibleAnywhere, Category="VICE|Vehicle")
     TArray<TObjectPtr<UStaticMeshComponent>> WheelMeshes;
 
     UPROPERTY(VisibleAnywhere, Category="VICE|Camera")
