@@ -1,110 +1,100 @@
 #include "VICECityGenerator.h"
-#include "Components/StaticMeshComponent.h"
-#include "Components/SceneComponent.h"
-#include "UObject/ConstructorHelpers.h"
+#include "VICECityChunk.h"
+#include "Engine/World.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
 
 AVICECityGenerator::AVICECityGenerator()
 {
-    PrimaryActorTick.bCanEverTick = false;
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
-    if (CubeAsset.Succeeded())
-    {
-        CubeMesh = CubeAsset.Object;
-    }
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.TickInterval = 0.35f;
 }
 
 void AVICECityGenerator::BeginPlay()
 {
     Super::BeginPlay();
-    GenerateCity();
+    UpdateStreaming();
 }
 
-UStaticMeshComponent* AVICECityGenerator::AddBlock(
-    const FVector& Location,
-    const FVector& Dimensions,
-    const FName& ComponentName)
+void AVICECityGenerator::Tick(float DeltaSeconds)
 {
-    if (!CubeMesh)
-    {
-        return nullptr;
-    }
-
-    UStaticMeshComponent* MeshComponent = NewObject<UStaticMeshComponent>(this, ComponentName);
-    if (!MeshComponent)
-    {
-        return nullptr;
-    }
-
-    MeshComponent->SetupAttachment(GetRootComponent());
-    MeshComponent->SetStaticMesh(CubeMesh);
-    MeshComponent->SetMobility(EComponentMobility::Static);
-    MeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
-    MeshComponent->SetWorldLocation(GetActorLocation() + Location);
-    MeshComponent->SetWorldScale3D(Dimensions / 100.0f);
-    MeshComponent->RegisterComponent();
-    GeneratedComponents.Add(MeshComponent);
-    return MeshComponent;
+    Super::Tick(DeltaSeconds);
+    UpdateStreaming();
 }
 
-void AVICECityGenerator::GenerateCity()
+void AVICECityGenerator::UpdateStreaming()
 {
-    if (!CubeMesh)
+    UWorld* World = GetWorld();
+    if (!World)
     {
-        UE_LOG(LogTemp, Error, TEXT("VICE city generator: engine cube mesh was not found."));
         return;
     }
 
-    const int32 GridCount = FMath::Clamp(RoadGridCount, 3, 11);
-    const float HalfSpan = (GridCount - 1) * BlockSpacing * 0.5f;
-    const float RoadLength = (GridCount - 1) * BlockSpacing + RoadWidth * 2.0f;
-
-    // Continuous road strips create a simple navigable street grid.
-    for (int32 Index = 0; Index < GridCount; ++Index)
+    APlayerController* PlayerController = World->GetFirstPlayerController();
+    APawn* PlayerPawn = PlayerController ? PlayerController->GetPawn() : nullptr;
+    if (!PlayerPawn)
     {
-        const float Coordinate = -HalfSpan + Index * BlockSpacing;
-
-        AddBlock(
-            FVector(Coordinate, 0.0f, -18.0f),
-            FVector(RoadWidth, RoadLength, 36.0f),
-            *FString::Printf(TEXT("Road_NS_%02d"), Index));
-
-        AddBlock(
-            FVector(0.0f, Coordinate, -18.0f),
-            FVector(RoadLength, RoadWidth, 36.0f),
-            *FString::Printf(TEXT("Road_EW_%02d"), Index));
+        return;
     }
 
-    // Deterministic blockout skyline. The origin remains a road intersection
-    // so the default player spawn is clear of building collision.
-    for (int32 X = 0; X < GridCount - 1; ++X)
+    const FVector PlayerLocation = PlayerPawn->GetActorLocation();
+    const FIntPoint CenterCell(
+        FMath::RoundToInt(PlayerLocation.X / BlockSpacing),
+        FMath::RoundToInt(PlayerLocation.Y / BlockSpacing));
+
+    TSet<FIntPoint> DesiredCells;
+    for (int32 OffsetX = -StreamingRadius; OffsetX <= StreamingRadius; ++OffsetX)
     {
-        for (int32 Y = 0; Y < GridCount - 1; ++Y)
+        for (int32 OffsetY = -StreamingRadius; OffsetY <= StreamingRadius; ++OffsetY)
         {
-            const float CenterX = -HalfSpan + (X + 0.5f) * BlockSpacing;
-            const float CenterY = -HalfSpan + (Y + 0.5f) * BlockSpacing;
-
-            for (int32 Building = 0; Building < 3; ++Building)
+            const FIntPoint Cell(CenterCell.X + OffsetX, CenterCell.Y + OffsetY);
+            if (FMath::Abs(Cell.X) <= GridRadius && FMath::Abs(Cell.Y) <= GridRadius)
             {
-                const float OffsetX = (Building - 1) * 4200.0f;
-                const float OffsetY = (Building % 2 == 0) ? -3600.0f : 3600.0f;
-                const float Width = 2600.0f + ((X * 17 + Y * 11 + Building * 7) % 5) * 420.0f;
-                const float Depth = 2600.0f + ((X * 13 + Y * 19 + Building * 3) % 4) * 500.0f;
-                const float Height = 4200.0f + ((X * 29 + Y * 23 + Building * 31) % 13) * 850.0f;
-
-                AddBlock(
-                    FVector(CenterX + OffsetX, CenterY + OffsetY, Height * 0.5f),
-                    FVector(Width, Depth, Height),
-                    *FString::Printf(TEXT("Building_%02d_%02d_%02d"), X, Y, Building));
+                DesiredCells.Add(Cell);
             }
         }
     }
 
-    UE_LOG(
-        LogTemp,
-        Log,
-        TEXT("VICE graybox city generated: %d roads per direction, %d building blocks."),
-        GridCount,
-        (GridCount - 1) * (GridCount - 1) * 3);
+    // Unload cells that have moved outside the active streaming window.
+    for (auto It = ActiveChunks.CreateIterator(); It; ++It)
+    {
+        if (!DesiredCells.Contains(It.Key()) || !IsValid(It.Value()))
+        {
+            if (IsValid(It.Value()))
+            {
+                It.Value()->Destroy();
+            }
+            It.RemoveCurrent();
+        }
+    }
+
+    // Load nearby cells asynchronously with respect to gameplay; no blocking
+    // level transition is shown to the player. Each chunk owns its own meshes.
+    for (const FIntPoint& Cell : DesiredCells)
+    {
+        if (ActiveChunks.Contains(Cell))
+        {
+            continue;
+        }
+
+        const FVector CellOrigin(
+            static_cast<float>(Cell.X) * BlockSpacing,
+            static_cast<float>(Cell.Y) * BlockSpacing,
+            0.0f);
+
+        FActorSpawnParameters SpawnParameters;
+        SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        AVICECityChunk* Chunk = World->SpawnActor<AVICECityChunk>(
+            AVICECityChunk::StaticClass(),
+            CellOrigin,
+            FRotator::ZeroRotator,
+            SpawnParameters);
+
+        if (Chunk)
+        {
+            Chunk->InitializeCell(Cell, BlockSpacing, RoadWidth);
+            ActiveChunks.Add(Cell, Chunk);
+        }
+    }
 }
