@@ -9,8 +9,7 @@ Last updated: 2026-11-18
 - Custom city cell streaming for a 4.32 km × 4.32 km grid: 5 × 5 active cell window, nearest-first loading in batches of up to 3 chunks per 0.25-second update, and unloading outside the window.
 - Deterministic per-cell road segments and primitive building masses, grouped into one HISM component per chunk; streaming follows the active character or vehicle.
 - One lightweight sidewalk pedestrian patrol per active cell (up to 25), with distance-tiered tick intervals.
-- Sparse ambient traffic cars following deterministic four-intersection road loops; traffic is spawned and removed with its owning streamed cell.
-- Sparse ambient traffic cars on deterministic four-intersection road loops, with distance-tiered tick intervals and streamed cleanup.
+- Sparse ambient traffic cars following deterministic four-intersection road loops, with distance-tiered tick intervals and streamed cleanup.
 - Character movement, jump, sprint, and first-/third-person camera toggle.
 - Runtime mobile touch HUD with camera, jump, sprint, vehicle interaction, and brake buttons.
 - Default virtual joystick axes mapped for movement, driving, and camera look.
