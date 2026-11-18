@@ -223,7 +223,23 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         }
     }
 
-    // Low-poly street trees sit on the outer edge of the sidewalk, leaving\n    // the pedestrian patrol line clear.\n    const FVector TreeLocations[] =\n    {\n        FVector(1650.0f, 5500.0f, 0.0f), FVector(1650.0f, 12500.0f, 0.0f),\n        FVector(16350.0f, 5500.0f, 0.0f), FVector(16350.0f, 12500.0f, 0.0f),\n        FVector(5500.0f, 1650.0f, 0.0f), FVector(12500.0f, 1650.0f, 0.0f),\n        FVector(5500.0f, 16350.0f, 0.0f), FVector(12500.0f, 16350.0f, 0.0f)\n    };\n\n    for (const FVector& TreeLocation : TreeLocations)\n    {\n        AddMeshInstance(TreeTrunkInstances, CylinderMesh, TreeLocation + FVector(0.0f, 0.0f, 228.0f), FVector(80.0f, 80.0f, 420.0f));\n        AddMeshInstance(TreeCanopyInstances, SphereMesh, TreeLocation + FVector(0.0f, 0.0f, 460.0f), FVector(560.0f, 560.0f, 440.0f));\n    }\n\n    // One deterministic north-east block per intersection.
+    // Low-poly street trees sit on the outer edge of the sidewalk, leaving
+    // the pedestrian patrol line clear.
+    const FVector TreeLocations[] =
+    {
+        FVector(1650.0f, 5500.0f, 0.0f), FVector(1650.0f, 12500.0f, 0.0f),
+        FVector(16350.0f, 5500.0f, 0.0f), FVector(16350.0f, 12500.0f, 0.0f),
+        FVector(5500.0f, 1650.0f, 0.0f), FVector(12500.0f, 1650.0f, 0.0f),
+        FVector(5500.0f, 16350.0f, 0.0f), FVector(12500.0f, 16350.0f, 0.0f)
+    };
+
+    for (const FVector& TreeLocation : TreeLocations)
+    {
+        AddMeshInstance(TreeTrunkInstances, CylinderMesh, TreeLocation + FVector(0.0f, 0.0f, 228.0f), FVector(80.0f, 80.0f, 420.0f));
+        AddMeshInstance(TreeCanopyInstances, SphereMesh, TreeLocation + FVector(0.0f, 0.0f, 460.0f), FVector(560.0f, 560.0f, 440.0f));
+    }
+
+    // One deterministic north-east block per intersection.
     const uint32 Seed = GetTypeHash(Coordinates) ^ 0x9E3779B9u;
     const bool bDowntown = FMath::Abs(Coordinates.X) <= 2 && FMath::Abs(Coordinates.Y) <= 2;
     const float HeightBase = bDowntown ? 9000.0f : 4200.0f;
