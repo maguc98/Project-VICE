@@ -35,10 +35,10 @@ AVICEVehiclePawn::AVICEVehiclePawn()
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderAsset(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     const FVector WheelLocations[] =
     {
-        FVector(132.0f, -100.0f, 28.0f),
-        FVector(132.0f,  100.0f, 28.0f),
-        FVector(-132.0f, -100.0f, 28.0f),
-        FVector(-132.0f,  100.0f, 28.0f)
+        FVector(132.0f, -100.0f, -32.0f),
+        FVector(132.0f,  100.0f, -32.0f),
+        FVector(-132.0f, -100.0f, -32.0f),
+        FVector(-132.0f,  100.0f, -32.0f)
     };
 
     for (int32 Index = 0; Index < UE_ARRAY_COUNT(WheelLocations); ++Index)
@@ -59,7 +59,7 @@ AVICEVehiclePawn::AVICEVehiclePawn()
 
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("VehicleCameraBoom"));
     CameraBoom->SetupAttachment(CollisionBody);
-    CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, 55.0f));
+    CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, -25.0f));
     CameraBoom->TargetArmLength = 560.0f;
     CameraBoom->SocketOffset = FVector(0.0f, 0.0f, 115.0f);
     CameraBoom->bUsePawnControlRotation = true;
