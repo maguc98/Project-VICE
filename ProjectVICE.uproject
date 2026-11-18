@@ -1,0 +1,10 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.4",
+  "Category": "Games",
+  "Description": "Project VICE - mobile open-world prototype",
+  "Modules": [
+    { "Name": "ProjectVICE", "Type": "Runtime", "LoadingPhase": "Default" }
+  ],
+  "TargetPlatforms": [ "IOS", "Windows", "Mac" ]
+}
