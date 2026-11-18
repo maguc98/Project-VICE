@@ -1,6 +1,7 @@
 #include "VICECityGenerator.h"
 #include "VICECityChunk.h"
 #include "VICEPedestrian.h"
+#include "VICETrafficVehicle.h"
 #include "Engine/World.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
@@ -73,6 +74,14 @@ void AVICECityGenerator::UpdateStreaming()
                 }
                 ActivePedestrians.Remove(It.Key());
             }
+            if (TObjectPtr<AVICETrafficVehicle>* Traffic = ActiveTraffic.Find(It.Key()))
+            {
+                if (IsValid(*Traffic))
+                {
+                    (*Traffic)->Destroy();
+                }
+                ActiveTraffic.Remove(It.Key());
+            }
             It.RemoveCurrent();
         }
     }
@@ -142,6 +151,22 @@ void AVICECityGenerator::UpdateStreaming()
             {
                 Pedestrian->InitializePatrol(CellOrigin, BlockSpacing, GetTypeHash(Cell));
                 ActivePedestrians.Add(Cell, Pedestrian);
+            }
+
+            // A sparse deterministic pattern keeps ambient traffic count low
+            // while making different active neighborhoods feel populated.
+            if (FMath::Abs(Cell.X * 7 + Cell.Y * 11) % 4 == 0)
+            {
+                AVICETrafficVehicle* TrafficVehicle = World->SpawnActor<AVICETrafficVehicle>(
+                    AVICETrafficVehicle::StaticClass(),
+                    CellOrigin + FVector(450.0f, 450.0f, 42.0f),
+                    FRotator::ZeroRotator,
+                    SpawnParameters);
+                if (TrafficVehicle)
+                {
+                    TrafficVehicle->InitializeRoute(CellOrigin, BlockSpacing, GetTypeHash(Cell));
+                    ActiveTraffic.Add(Cell, TrafficVehicle);
+                }
             }
 
             ++SpawnedThisUpdate;
