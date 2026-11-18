@@ -7,6 +7,7 @@
 class AVICECharacter;
 class UButton;
 class UCanvasPanel;
+class UTextBlock;
 
 /** Runtime-built touch action buttons; movement/look remain on virtual sticks. */
 UCLASS()
@@ -19,10 +20,14 @@ public:
 
 protected:
     virtual void NativeConstruct() override;
+    virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 private:
     UPROPERTY()
     TObjectPtr<AVICECharacter> ControlledCharacter;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UTextBlock> SpeedReadout;
 
     UFUNCTION()
     void OnCameraPressed();
