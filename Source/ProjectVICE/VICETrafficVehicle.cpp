@@ -3,6 +3,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/Pawn.h"
 
 AVICETrafficVehicle::AVICETrafficVehicle()
 {
