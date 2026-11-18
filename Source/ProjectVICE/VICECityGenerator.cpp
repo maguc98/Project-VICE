@@ -140,7 +140,7 @@ void AVICECityGenerator::UpdateStreaming()
                 SpawnParameters);
             if (Pedestrian)
             {
-                Pedestrian->InitializePatrol(CellOrigin, BlockSpacing, static_cast<int32>(GetTypeHash(Cell)));
+                Pedestrian->InitializePatrol(CellOrigin, BlockSpacing, GetTypeHash(Cell));
                 ActivePedestrians.Add(Cell, Pedestrian);
             }
 
