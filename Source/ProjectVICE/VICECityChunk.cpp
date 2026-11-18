@@ -30,6 +30,7 @@ AVICECityChunk::AVICECityChunk()
     PrimaryActorTick.bCanEverTick = false;
 
     SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+    SceneRoot->SetMobility(EComponentMobility::Static);
     RootComponent = SceneRoot;
 
     RoadInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("RoadInstances"));
@@ -121,22 +122,39 @@ AVICECityChunk::AVICECityChunk()
     }
 }
 
-void AVICECityChunk::InitializeMaterials()
+void AVICECityChunk::InitializeMaterials(const FIntPoint& Coordinates)
 {
     if (!BaseColorMaterial)
     {
         return;
     }
 
+    const bool bDowntown = FMath::Abs(Coordinates.X) <= 2 && FMath::Abs(Coordinates.Y) <= 2;
+    const bool bWaterfront = !bDowntown && Coordinates.Y <= -8;
+    const bool bIndustrial = !bDowntown && !bWaterfront && Coordinates.X >= 8 && Coordinates.Y >= 5;
+
+    const FLinearColor SidewalkColor = bWaterfront
+        ? FLinearColor(0.43f, 0.41f, 0.36f, 1.0f)
+        : (bIndustrial ? FLinearColor(0.29f, 0.31f, 0.32f, 1.0f) : FLinearColor(0.34f, 0.36f, 0.37f, 1.0f));
+    const FLinearColor BuildingColor = bWaterfront
+        ? FLinearColor(0.72f, 0.68f, 0.57f, 1.0f)
+        : (bIndustrial ? FLinearColor(0.43f, 0.45f, 0.43f, 1.0f) : FLinearColor(0.62f, 0.59f, 0.52f, 1.0f));
+    const FLinearColor GlassColor = bWaterfront
+        ? FLinearColor(0.08f, 0.19f, 0.22f, 1.0f)
+        : (bIndustrial ? FLinearColor(0.10f, 0.13f, 0.14f, 1.0f) : FLinearColor(0.055f, 0.12f, 0.17f, 1.0f));
+    const FLinearColor CanopyColor = bWaterfront
+        ? FLinearColor(0.16f, 0.34f, 0.25f, 1.0f)
+        : FLinearColor(0.12f, 0.28f, 0.16f, 1.0f);
+
     RoadMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.045f, 0.055f, 1.0f), 0.92f);
-    SidewalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.34f, 0.36f, 0.37f, 1.0f), 0.86f);
-    BuildingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.62f, 0.59f, 0.52f, 1.0f), 0.82f);
-    GlassMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.055f, 0.12f, 0.17f, 1.0f), 0.24f);
+    SidewalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, SidewalkColor, 0.86f);
+    BuildingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, BuildingColor, 0.82f);
+    GlassMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, GlassColor, 0.24f);
     LaneLineMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.96f, 0.72f, 0.18f, 1.0f), 0.72f);
     CrosswalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.92f, 0.93f, 0.88f, 1.0f), 0.78f);
     TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f), 0.82f);
     TreeTrunkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.22f, 0.14f, 0.09f, 1.0f), 0.94f);
-    TreeCanopyMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.12f, 0.28f, 0.16f, 1.0f), 0.9f);
+    TreeCanopyMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, CanopyColor, 0.9f);
 
     RoadInstances->SetMaterial(0, RoadMaterial);
     SidewalkInstances->SetMaterial(0, SidewalkMaterial);
@@ -183,7 +201,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         return;
     }
     bInitialized = true;
-    InitializeMaterials();
+    InitializeMaterials(Coordinates);
 
     const float RoadHalf = RoadWidth * 0.5f;
     const float HalfCell = CellSpacing * 0.5f;
@@ -252,8 +270,17 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     // One deterministic north-east block per intersection.
     const uint32 Seed = GetTypeHash(Coordinates) ^ 0x9E3779B9u;
     const bool bDowntown = FMath::Abs(Coordinates.X) <= 2 && FMath::Abs(Coordinates.Y) <= 2;
-    const float HeightBase = bDowntown ? 9000.0f : 4200.0f;
-    const float HeightRange = bDowntown ? 15000.0f : 9500.0f;
+    const bool bWaterfront = !bDowntown && Coordinates.Y <= -8;
+    const bool bIndustrial = !bDowntown && !bWaterfront && Coordinates.X >= 8 && Coordinates.Y >= 5;
+
+    // District identity is coordinate-derived, so the same world location
+    // always recreates the same skyline after a cell is streamed back in.
+    const float HeightBase = bDowntown ? 9000.0f : (bWaterfront ? 3200.0f : (bIndustrial ? 2600.0f : 4200.0f));
+    const float HeightRange = bDowntown ? 15000.0f : (bWaterfront ? 5200.0f : (bIndustrial ? 3000.0f : 9500.0f));
+    const float WidthBase = bIndustrial ? 5400.0f : (bWaterfront ? 3000.0f : 2800.0f);
+    const float WidthRange = bIndustrial ? 1800.0f : (bWaterfront ? 1300.0f : 1800.0f);
+    const float DepthBase = bIndustrial ? 4600.0f : (bWaterfront ? 2800.0f : 2800.0f);
+    const float DepthRange = bIndustrial ? 1600.0f : (bWaterfront ? 1300.0f : 1800.0f);
 
     const FVector BuildingLocations[] =
     {
@@ -265,8 +292,8 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     for (int32 Index = 0; Index < UE_ARRAY_COUNT(BuildingLocations); ++Index)
     {
         const uint32 BuildingSeed = Seed + static_cast<uint32>(Index) * 0x85EBCA6Bu;
-        const float Width = 2800.0f + static_cast<float>((BuildingSeed >> 3) % 1800u);
-        const float Depth = 2800.0f + static_cast<float>((BuildingSeed >> 11) % 1800u);
+        const float Width = WidthBase + static_cast<float>((BuildingSeed >> 3) % static_cast<uint32>(WidthRange));
+        const float Depth = DepthBase + static_cast<float>((BuildingSeed >> 11) % static_cast<uint32>(DepthRange));
         const float Height = HeightBase + static_cast<float>((BuildingSeed >> 19) % static_cast<uint32>(HeightRange));
 
         FVector BuildingLocation = BuildingLocations[Index];
