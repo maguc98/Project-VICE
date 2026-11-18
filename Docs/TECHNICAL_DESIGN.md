@@ -13,7 +13,7 @@ Project VICE is an original fictional coastal metropolis. Its art direction aims
 - **World (production target):** evaluate Unreal World Partition / HLOD and asset streaming once the actual district art and authored map exist; do not call the current prototype true asynchronous asset streaming.
 - **Vehicles:** current prototype uses swept arcade movement; evaluate Chaos Vehicles only after a lightweight mobile vehicle prototype is profiled.
 - **Environment:** a one-second day/night controller updates the map Directional Light and Sky Light; sky capture is not forced each tick.
-- **Simulation (prototype):** one capsule-placeholder sidewalk walker per active city cell; distant walkers tick less frequently. Traffic, crowd reactions, navmesh and skeletal animation remain future systems.
+- **Simulation (prototype):** one capsule-placeholder sidewalk walker per active city cell and sparse primitive-mesh traffic cars following block loops; distant agents tick less frequently. Traffic lights, lane-changing, following distances, crowd reactions, navmesh and skeletal animation remain future systems.
 - **Persistence:** SaveGame snapshots for player, vehicles, mission state, and world changes.
 
 ## Visual strategy for iPhone 12 mini
