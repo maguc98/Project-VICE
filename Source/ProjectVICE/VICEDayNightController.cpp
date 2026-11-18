@@ -4,6 +4,7 @@
 #include "Components/DirectionalLightComponent.h"
 #include "Components/SkyLightComponent.h"
 #include "EngineUtils.h"
+#include "EngineUtils.h"
 
 AVICEDayNightController::AVICEDayNightController()
 {
