@@ -7,7 +7,8 @@ Last updated: 2026-11-18
 - Unreal Engine 5.4 project descriptor, runtime module, and correctly named game/editor target files.
 - Game mode bootstrap that creates the player start, streamed graybox city manager, and first vehicle.
 - Custom city cell streaming for a 4.32 km × 4.32 km grid: 5 × 5 active cell window, nearest-first loading in batches of up to 3 chunks per 0.25-second update, and unloading outside the window.
-- Deterministic per-cell road segments and primitive building masses, grouped into one HISM component per chunk; streaming follows the active character or vehicle.
+- Deterministic per-cell city visuals split into HISM batches for asphalt, sidewalks/curbs, building masses, glazing, markings, and facade trim; streaming follows the active character or vehicle.
+- Procedural road center lines, zebra crossings, connected block sidewalks, and simple low-poly facade window/roof details.
 - One lightweight sidewalk pedestrian patrol per active cell (up to 25), with distance-tiered tick intervals.
 - Sparse ambient traffic cars following deterministic four-intersection road loops, with distance-tiered tick intervals and streamed cleanup.
 - Character movement, jump, sprint, and first-/third-person camera toggle.
