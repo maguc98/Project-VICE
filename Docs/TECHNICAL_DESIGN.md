@@ -11,7 +11,8 @@ Project VICE is an original fictional coastal metropolis. Its art direction aims
 - **Input:** Gameplay functions are callable from UMG touch controls. Enhanced Input can replace legacy bindings as the touch HUD is implemented.
 - **World (prototype):** custom actor-cell streaming follows the currently possessed pawn, so it follows either the on-foot character or vehicle. A 5 × 5 active window is maintained in a deterministic 25 × 25 intersection grid. Current chunk actors group primitive road/building cube instances into one HISM component per cell and are spawned/destroyed in small game-thread batches.
 - **World (production target):** evaluate Unreal World Partition / HLOD and asset streaming once the actual district art and authored map exist; do not call the current prototype true asynchronous asset streaming.
-- **Vehicles:** Chaos Vehicles only after a lightweight mobile vehicle prototype is profiled.
+- **Vehicles:** current prototype uses swept arcade movement; evaluate Chaos Vehicles only after a lightweight mobile vehicle prototype is profiled.
+- **Environment:** a one-second day/night controller updates the map Directional Light and Sky Light; sky capture is not forced each tick.
 - **Simulation:** NPC and traffic updates are distance/visibility tiered; distant agents use simplified representations.
 - **Persistence:** SaveGame snapshots for player, vehicles, mission state, and world changes.
 
