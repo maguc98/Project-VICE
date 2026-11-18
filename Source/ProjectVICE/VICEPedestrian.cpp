@@ -2,6 +2,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameFramework/PlayerController.h"
 
 AVICEPedestrian::AVICEPedestrian()
 {
@@ -65,6 +66,16 @@ void AVICEPedestrian::InitializePatrol(const FVector& CellOrigin, float CellSpac
 void AVICEPedestrian::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+    // Distant walkers update less often to reduce background simulation cost.
+    if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+    {
+        if (APawn* PlayerPawn = PlayerController->GetPawn())
+        {
+            const float DistanceSquared = FVector::DistSquared(GetActorLocation(), PlayerPawn->GetActorLocation());
+            SetActorTickInterval(DistanceSquared > FMath::Square(22000.0f) ? 0.20f : 0.05f);
+        }
+    }
 
     if (PatrolPoints.Num() < 2 || !PatrolPoints.IsValidIndex(CurrentPatrolPoint))
     {
