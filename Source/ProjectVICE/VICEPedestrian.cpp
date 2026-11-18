@@ -28,7 +28,7 @@ AVICEPedestrian::AVICEPedestrian()
     }
 }
 
-void AVICEPedestrian::InitializePatrol(const FVector& CellOrigin, float CellSpacing, int32 RouteSeed)
+void AVICEPedestrian::InitializePatrol(const FVector& CellOrigin, float CellSpacing, uint32 RouteSeed)
 {
     const float SidewalkInset = 1800.0f;
     const float FarSidewalk = CellSpacing - SidewalkInset;
@@ -44,7 +44,7 @@ void AVICEPedestrian::InitializePatrol(const FVector& CellOrigin, float CellSpac
         CellOrigin + FVector(SidewalkInset, FarSidewalk, Height)
     };
 
-    const int32 StartCorner = FMath::Abs(RouteSeed) % UE_ARRAY_COUNT(Corners);
+    const int32 StartCorner = static_cast<int32>(RouteSeed % UE_ARRAY_COUNT(Corners));
     const bool bReverse = (RouteSeed & 1) != 0;
 
     PatrolPoints.Reset();
