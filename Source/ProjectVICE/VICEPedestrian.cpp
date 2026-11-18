@@ -32,9 +32,9 @@ AVICEPedestrian::AVICEPedestrian()
 
 void AVICEPedestrian::InitializePatrol(const FVector& CellOrigin, float CellSpacing, uint32 RouteSeed)
 {
-    const float SidewalkInset = 1800.0f;
+    const float SidewalkInset = 1300.0f;
     const float FarSidewalk = CellSpacing - SidewalkInset;
-    const float Height = 96.0f;
+    const float Height = 110.0f;
 
     // Deterministic route direction/starting corner per cell avoids every
     // pedestrian in the streamed view moving in lockstep.
