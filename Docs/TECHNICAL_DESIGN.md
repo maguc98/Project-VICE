@@ -17,7 +17,7 @@ Project VICE is an original fictional coastal metropolis. Its art direction aims
 
 ## Visual strategy for iPhone 12 mini
 
-- Use mobile forward rendering and Metal.
+- Use mobile forward rendering, Metal, mobile HDR, and a conservative 2x MSAA starting point; profile before raising sample count.
 - Avoid desktop-only assumptions such as Lumen, hardware ray tracing, and Nanite as required runtime features.
 - Bake static lighting where possible; reserve dynamic shadows for nearby/high-value actors.
 - Use material complexity budgets, texture streaming, ASTC textures, mipmaps, and limited translucent layers.
