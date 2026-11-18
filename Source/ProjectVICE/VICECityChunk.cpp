@@ -142,7 +142,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     // Raised sidewalks frame the block perimeter without covering the road.
     const float SidewalkWidth = 900.0f;
     const float SidewalkCenter = RoadHalf + SidewalkWidth * 0.5f + 50.0f;
-    const float SidewalkLength = CellSpacing - RoadWidth - 2.0f * SidewalkWidth;
+    const float SidewalkLength = CellSpacing - RoadWidth - 50.0f;
     const float FarSidewalkCenter = CellSpacing - SidewalkCenter;
 
     AddCube(SidewalkInstances, FVector(SidewalkCenter, HalfCell, 9.0f), FVector(SidewalkWidth, SidewalkLength, 18.0f));
