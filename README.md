@@ -32,9 +32,9 @@ This repository is being bootstrapped with source and configuration scaffolding.
 3. Generate Xcode project files if needed, install the matching Xcode/iOS SDK, and configure an Apple development team.
 4. Build and deploy to a physical iPhone. The iOS Simulator is not a substitute for performance testing.
 
-See [Docs/ROADMAP.md](Docs/ROADMAP.md), [Docs/TECHNICAL_DESIGN.md](Docs/TECHNICAL_DESIGN.md), [Docs/DEVICE_BUDGETS.md](Docs/DEVICE_BUDGETS.md), [Docs/MAP_SETUP.md](Docs/MAP_SETUP.md), [Docs/VEHICLE_PROTOTYPE.md](Docs/VEHICLE_PROTOTYPE.md), [Docs/ENVIRONMENT_PROTOTYPE.md](Docs/ENVIRONMENT_PROTOTYPE.md), and [Docs/BUILD_STATUS.md](Docs/BUILD_STATUS.md).
+See [Docs/ROADMAP.md](Docs/ROADMAP.md), [Docs/TECHNICAL_DESIGN.md](Docs/TECHNICAL_DESIGN.md), [Docs/DEVICE_BUDGETS.md](Docs/DEVICE_BUDGETS.md), [Docs/MAP_SETUP.md](Docs/MAP_SETUP.md), [Docs/VEHICLE_PROTOTYPE.md](Docs/VEHICLE_PROTOTYPE.md), [Docs/ENVIRONMENT_PROTOTYPE.md](Docs/ENVIRONMENT_PROTOTYPE.md), [Docs/PEDESTRIAN_PROTOTYPE.md](Docs/PEDESTRIAN_PROTOTYPE.md), and [Docs/BUILD_STATUS.md](Docs/BUILD_STATUS.md).
 
-The repository now includes a procedural streamed city-cell prototype, character capsule placeholder, arcade sedan with enter/exit driving, native touch action HUD, and map bootstrap script. The map must be generated in Unreal Editor; source has not yet been compiled with Unreal Build Tool.
+The repository now includes a procedural streamed city-cell prototype, capsule-placeholder sidewalk pedestrians, character capsule placeholder, arcade sedan with enter/exit driving, native touch action HUD, and map bootstrap script. The map must be generated in Unreal Editor; source has not yet been compiled with Unreal Build Tool.
 
 ## License
 
