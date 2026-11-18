@@ -7,7 +7,7 @@
 
 namespace VICECityVisuals
 {
-    static UMaterialInstanceDynamic* MakeColorMaterial(UMaterialInterface* Parent, UObject* Outer, const FLinearColor& Color)
+    static UMaterialInstanceDynamic* MakeColorMaterial(UMaterialInterface* Parent, UObject* Outer, const FLinearColor& Color, float Roughness)
     {
         if (!Parent || !Outer)
         {
@@ -18,6 +18,7 @@ namespace VICECityVisuals
         if (Material)
         {
             Material->SetVectorParameterValue(TEXT("Color"), Color);
+            Material->SetScalarParameterValue(TEXT("Roughness"), Roughness);
         }
         return Material;
     }
@@ -50,10 +51,15 @@ AVICECityChunk::AVICECityChunk()
     GlassInstances->SetMobility(EComponentMobility::Static);
     GlassInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-    MarkingInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("MarkingInstances"));
-    MarkingInstances->SetupAttachment(SceneRoot);
-    MarkingInstances->SetMobility(EComponentMobility::Static);
-    MarkingInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    LaneLineInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("LaneLineInstances"));
+    LaneLineInstances->SetupAttachment(SceneRoot);
+    LaneLineInstances->SetMobility(EComponentMobility::Static);
+    LaneLineInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    CrosswalkInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("CrosswalkInstances"));
+    CrosswalkInstances->SetupAttachment(SceneRoot);
+    CrosswalkInstances->SetMobility(EComponentMobility::Static);
+    CrosswalkInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     TrimInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("TrimInstances"));
     TrimInstances->SetupAttachment(SceneRoot);
@@ -70,7 +76,8 @@ AVICECityChunk::AVICECityChunk()
         SidewalkInstances->SetStaticMesh(CubeMesh);
         BuildingInstances->SetStaticMesh(CubeMesh);
         GlassInstances->SetStaticMesh(CubeMesh);
-        MarkingInstances->SetStaticMesh(CubeMesh);
+        LaneLineInstances->SetStaticMesh(CubeMesh);
+        CrosswalkInstances->SetStaticMesh(CubeMesh);
         TrimInstances->SetStaticMesh(CubeMesh);
     }
 
@@ -87,18 +94,20 @@ void AVICECityChunk::InitializeMaterials()
         return;
     }
 
-    RoadMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.045f, 0.055f, 1.0f));
-    SidewalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.34f, 0.36f, 0.37f, 1.0f));
-    BuildingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.62f, 0.59f, 0.52f, 1.0f));
-    GlassMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.055f, 0.12f, 0.17f, 1.0f));
-    MarkingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.92f, 0.92f, 0.86f, 1.0f));
-    TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f));
+    RoadMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.045f, 0.055f, 1.0f), 0.92f);
+    SidewalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.34f, 0.36f, 0.37f, 1.0f), 0.86f);
+    BuildingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.62f, 0.59f, 0.52f, 1.0f), 0.82f);
+    GlassMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.055f, 0.12f, 0.17f, 1.0f), 0.24f);
+    LaneLineMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.96f, 0.72f, 0.18f, 1.0f), 0.72f);
+    CrosswalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.92f, 0.93f, 0.88f, 1.0f), 0.78f);
+    TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f), 0.82f);
 
     RoadInstances->SetMaterial(0, RoadMaterial);
     SidewalkInstances->SetMaterial(0, SidewalkMaterial);
     BuildingInstances->SetMaterial(0, BuildingMaterial);
     GlassInstances->SetMaterial(0, GlassMaterial);
-    MarkingInstances->SetMaterial(0, MarkingMaterial);
+    LaneLineInstances->SetMaterial(0, LaneLineMaterial);
+    CrosswalkInstances->SetMaterial(0, CrosswalkMaterial);
     TrimInstances->SetMaterial(0, TrimMaterial);
 }
 
@@ -122,7 +131,7 @@ void AVICECityChunk::AddCube(
 
 void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth)
 {
-    if (bInitialized || !RoadInstances || !SidewalkInstances || !BuildingInstances || !CubeMesh)
+    if (bInitialized || !RoadInstances || !SidewalkInstances || !BuildingInstances || !LaneLineInstances || !CrosswalkInstances || !CubeMesh)
     {
         return;
     }
@@ -160,10 +169,10 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     // Dashed center lines on the roads. All markings share one HISM/material.
     for (float Position = 1200.0f; Position < HalfCell - 900.0f; Position += 950.0f)
     {
-        AddCube(MarkingInstances, FVector(Position, 0.0f, 1.0f), FVector(420.0f, 42.0f, 3.0f));
-        AddCube(MarkingInstances, FVector(-Position, 0.0f, 1.0f), FVector(420.0f, 42.0f, 3.0f));
-        AddCube(MarkingInstances, FVector(0.0f, Position, 1.0f), FVector(42.0f, 420.0f, 3.0f));
-        AddCube(MarkingInstances, FVector(0.0f, -Position, 1.0f), FVector(42.0f, 420.0f, 3.0f));
+        AddCube(LaneLineInstances, FVector(Position, 0.0f, 1.0f), FVector(420.0f, 42.0f, 3.0f));
+        AddCube(LaneLineInstances, FVector(-Position, 0.0f, 1.0f), FVector(420.0f, 42.0f, 3.0f));
+        AddCube(LaneLineInstances, FVector(0.0f, Position, 1.0f), FVector(42.0f, 420.0f, 3.0f));
+        AddCube(LaneLineInstances, FVector(0.0f, -Position, 1.0f), FVector(42.0f, 420.0f, 3.0f));
     }
 
     // Zebra crossings on all four approaches.
@@ -172,8 +181,8 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         const float Offset = 1100.0f + static_cast<float>(Stripe) * 155.0f;
         for (int32 Side : { -1, 1 })
         {
-            AddCube(MarkingInstances, FVector(Side * Offset, 0.0f, 2.0f), FVector(88.0f, RoadWidth - 180.0f, 4.0f));
-            AddCube(MarkingInstances, FVector(0.0f, Side * Offset, 2.0f), FVector(RoadWidth - 180.0f, 88.0f, 4.0f));
+            AddCube(CrosswalkInstances, FVector(Side * Offset, 0.0f, 2.0f), FVector(88.0f, RoadWidth - 180.0f, 4.0f));
+            AddCube(CrosswalkInstances, FVector(0.0f, Side * Offset, 2.0f), FVector(RoadWidth - 180.0f, 88.0f, 4.0f));
         }
     }
 
