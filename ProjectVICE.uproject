@@ -4,7 +4,25 @@
   "Category": "Games",
   "Description": "Project VICE - mobile open-world prototype",
   "Modules": [
-    { "Name": "ProjectVICE", "Type": "Runtime", "LoadingPhase": "Default" }
+    {
+      "Name": "ProjectVICE",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
   ],
-  "TargetPlatforms": [ "IOS", "Windows", "Mac" ]
+  "TargetPlatforms": [
+    "IOS",
+    "Windows",
+    "Mac"
+  ],
+  "Plugins": [
+    {
+      "Name": "PythonScriptPlugin",
+      "Enabled": true
+    },
+    {
+      "Name": "EditorScriptingUtilities",
+      "Enabled": true
+    }
+  ]
 }
