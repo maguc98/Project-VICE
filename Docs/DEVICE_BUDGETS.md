@@ -9,7 +9,7 @@ Target device: iPhone 12 mini (A14). These are starting engineering budgets, not
 | Memory | Keep a conservative resident asset budget; avoid loading multiple districts at full detail |
 | Rendering | Mobile forward, Metal, dynamic resolution |
 | Geometry | LOD/HLOD and instancing; nine material-batched HISM components per graybox cell; no Nanite dependency |
-| Lighting | Mostly baked/static; tightly limit dynamic shadow casters |
+| Lighting | Mostly baked/static; current city graybox lets building masses cast shadows while disabling shadows on small decorative batches |
 | Textures | ASTC, mipmaps, streaming, platform-specific max sizes |
 | Effects | Low overdraw; cap particles and translucency |
 | Streaming | Target: 25 active city chunks, up to 25 placeholder pedestrians, and sparse traffic actors; at most 3 chunks spawned per 0.25-second update in the current prototype |
