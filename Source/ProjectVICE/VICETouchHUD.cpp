@@ -50,7 +50,7 @@ void UVICETouchHUD::NativeConstruct()
         BrakeButton->OnReleased.AddDynamic(this, &UVICETouchHUD::OnBrakeReleased);
     }
 
-    UButton* SprintButton = AddActionButton(TEXT("奔跑"), FVector2D(-238.0f, -88.0f), FVector2D(104.0f, 72.0f));
+    UButton* SprintButton = AddActionButton(TEXT("奔跑"), FVector2D(-360.0f, -112.0f), FVector2D(104.0f, 72.0f));
     if (SprintButton)
     {
         SprintButton->OnPressed.AddDynamic(this, &UVICETouchHUD::OnSprintPressed);
@@ -82,7 +82,16 @@ UButton* UVICETouchHUD::AddActionButton(const FString& Label, const FVector2D& P
 
 void UVICETouchHUD::OnCameraPressed()
 {
-    if (ControlledCharacter)
+    if (!ControlledCharacter)
+    {
+        return;
+    }
+
+    if (AVICEVehiclePawn* Vehicle = ControlledCharacter->GetCurrentVehicle())
+    {
+        Vehicle->ToggleCameraPerspective();
+    }
+    else
     {
         ControlledCharacter->ToggleCameraPerspective();
     }
@@ -90,7 +99,7 @@ void UVICETouchHUD::OnCameraPressed()
 
 void UVICETouchHUD::OnJumpPressed()
 {
-    if (ControlledCharacter)
+    if (ControlledCharacter && !ControlledCharacter->GetCurrentVehicle())
     {
         ControlledCharacter->Jump();
     }
@@ -98,7 +107,7 @@ void UVICETouchHUD::OnJumpPressed()
 
 void UVICETouchHUD::OnJumpReleased()
 {
-    if (ControlledCharacter)
+    if (ControlledCharacter && !ControlledCharacter->GetCurrentVehicle())
     {
         ControlledCharacter->StopJumping();
     }
@@ -106,7 +115,7 @@ void UVICETouchHUD::OnJumpReleased()
 
 void UVICETouchHUD::OnSprintPressed()
 {
-    if (ControlledCharacter)
+    if (ControlledCharacter && !ControlledCharacter->GetCurrentVehicle())
     {
         ControlledCharacter->StartSprint();
     }
@@ -114,7 +123,7 @@ void UVICETouchHUD::OnSprintPressed()
 
 void UVICETouchHUD::OnSprintReleased()
 {
-    if (ControlledCharacter)
+    if (ControlledCharacter && !ControlledCharacter->GetCurrentVehicle())
     {
         ControlledCharacter->StopSprint();
     }
