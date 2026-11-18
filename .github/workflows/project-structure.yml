@@ -29,6 +29,8 @@ jobs:
           test -f Source/ProjectVICE/VICECityChunk.cpp
           test -f Source/ProjectVICE/VICEPedestrian.h
           test -f Source/ProjectVICE/VICEPedestrian.cpp
+          test -f Source/ProjectVICE/VICETrafficVehicle.h
+          test -f Source/ProjectVICE/VICETrafficVehicle.cpp
           test -f Source/ProjectVICE/VICETouchHUD.h
           test -f Source/ProjectVICE/VICETouchHUD.cpp
           test -f Source/ProjectVICE/VICEVehiclePawn.h
@@ -47,3 +49,4 @@ jobs:
           test -f Docs/VEHICLE_PROTOTYPE.md
           test -f Docs/ENVIRONMENT_PROTOTYPE.md
           test -f Docs/PEDESTRIAN_PROTOTYPE.md
+          test -f Docs/TRAFFIC_PROTOTYPE.md
