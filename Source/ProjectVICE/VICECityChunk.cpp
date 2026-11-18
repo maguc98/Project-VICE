@@ -1,6 +1,6 @@
 #include "VICECityChunk.h"
 #include "Components/SceneComponent.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
 AVICECityChunk::AVICECityChunk()
@@ -10,47 +10,37 @@ AVICECityChunk::AVICECityChunk()
     SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
     RootComponent = SceneRoot;
 
+    CityInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("CityInstances"));
+    CityInstances->SetupAttachment(SceneRoot);
+    CityInstances->SetMobility(EComponentMobility::Movable);
+    CityInstances->SetCollisionProfileName(TEXT("BlockAll"));
+
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
     if (CubeAsset.Succeeded())
     {
         CubeMesh = CubeAsset.Object;
+        CityInstances->SetStaticMesh(CubeMesh);
     }
 }
 
-UStaticMeshComponent* AVICECityChunk::AddCube(
-    const FVector& LocalLocation,
-    const FVector& Dimensions,
-    const FName& ComponentName,
-    bool bBlocksMovement)
+void AVICECityChunk::AddCube(const FVector& LocalLocation, const FVector& Dimensions)
 {
-    if (!CubeMesh)
+    if (!CityInstances || !CubeMesh)
     {
-        return nullptr;
+        return;
     }
 
-    UStaticMeshComponent* MeshComponent = NewObject<UStaticMeshComponent>(this, ComponentName);
-    if (!MeshComponent)
-    {
-        return nullptr;
-    }
+    const FTransform InstanceTransform(
+        FRotator::ZeroRotator,
+        LocalLocation,
+        Dimensions / 100.0f);
 
-    MeshComponent->SetupAttachment(SceneRoot);
-    MeshComponent->SetStaticMesh(CubeMesh);
-    MeshComponent->SetMobility(EComponentMobility::Static);
-    MeshComponent->SetRelativeLocation(LocalLocation);
-    MeshComponent->SetRelativeScale3D(Dimensions / 100.0f);
-    MeshComponent->SetCollisionEnabled(bBlocksMovement ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
-    if (bBlocksMovement)
-    {
-        MeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
-    }
-    MeshComponent->RegisterComponent();
-    return MeshComponent;
+    CityInstances->AddInstance(InstanceTransform);
 }
 
 void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth)
 {
-    if (bInitialized || !CubeMesh)
+    if (bInitialized || !CityInstances || !CubeMesh)
     {
         return;
     }
@@ -65,21 +55,15 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     // cross intersection without overlapping coplanar road surfaces.
     AddCube(
         FVector(0.0f, 0.0f, -18.0f),
-        FVector(RoadWidth, CellSpacing, 36.0f),
-        TEXT("RoadNorthSouth"),
-        true);
+        FVector(RoadWidth, CellSpacing, 36.0f));
 
     AddCube(
         FVector(-HorizontalSegmentCenter, 0.0f, -18.0f),
-        FVector(HorizontalSegmentLength, RoadWidth, 36.0f),
-        TEXT("RoadWest"),
-        true);
+        FVector(HorizontalSegmentLength, RoadWidth, 36.0f));
 
     AddCube(
         FVector(HorizontalSegmentCenter, 0.0f, -18.0f),
-        FVector(HorizontalSegmentLength, RoadWidth, 36.0f),
-        TEXT("RoadEast"),
-        true);
+        FVector(HorizontalSegmentLength, RoadWidth, 36.0f));
 
     // Every intersection owns exactly one north-east block. Neighboring
     // chunks therefore never create duplicate buildings for the same block.
@@ -107,8 +91,6 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
 
         AddCube(
             BuildingLocation,
-            FVector(Width, Depth, Height),
-            FName(*FString::Printf(TEXT("Building_%02d_%d_%d"), Index, Coordinates.X, Coordinates.Y)),
-            true);
+            FVector(Width, Depth, Height));
     }
 }
