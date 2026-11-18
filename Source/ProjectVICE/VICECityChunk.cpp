@@ -66,7 +66,19 @@ AVICECityChunk::AVICECityChunk()
     TrimInstances->SetMobility(EComponentMobility::Static);
     TrimInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+    TreeTrunkInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("TreeTrunkInstances"));
+    TreeTrunkInstances->SetupAttachment(SceneRoot);
+    TreeTrunkInstances->SetMobility(EComponentMobility::Static);
+    TreeTrunkInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    TreeCanopyInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("TreeCanopyInstances"));
+    TreeCanopyInstances->SetupAttachment(SceneRoot);
+    TreeCanopyInstances->SetMobility(EComponentMobility::Static);
+    TreeCanopyInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderAsset(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereAsset(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> BasicMaterial(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
 
     if (CubeAsset.Succeeded())
@@ -79,6 +91,18 @@ AVICECityChunk::AVICECityChunk()
         LaneLineInstances->SetStaticMesh(CubeMesh);
         CrosswalkInstances->SetStaticMesh(CubeMesh);
         TrimInstances->SetStaticMesh(CubeMesh);
+    }
+
+    if (CylinderAsset.Succeeded())
+    {
+        CylinderMesh = CylinderAsset.Object;
+        TreeTrunkInstances->SetStaticMesh(CylinderMesh);
+    }
+
+    if (SphereAsset.Succeeded())
+    {
+        SphereMesh = SphereAsset.Object;
+        TreeCanopyInstances->SetStaticMesh(SphereMesh);
     }
 
     if (BasicMaterial.Succeeded())
@@ -101,6 +125,8 @@ void AVICECityChunk::InitializeMaterials()
     LaneLineMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.96f, 0.72f, 0.18f, 1.0f), 0.72f);
     CrosswalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.92f, 0.93f, 0.88f, 1.0f), 0.78f);
     TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f), 0.82f);
+    TreeTrunkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.22f, 0.14f, 0.09f, 1.0f), 0.94f);
+    TreeCanopyMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.12f, 0.28f, 0.16f, 1.0f), 0.9f);
 
     RoadInstances->SetMaterial(0, RoadMaterial);
     SidewalkInstances->SetMaterial(0, SidewalkMaterial);
@@ -109,14 +135,17 @@ void AVICECityChunk::InitializeMaterials()
     LaneLineInstances->SetMaterial(0, LaneLineMaterial);
     CrosswalkInstances->SetMaterial(0, CrosswalkMaterial);
     TrimInstances->SetMaterial(0, TrimMaterial);
+    TreeTrunkInstances->SetMaterial(0, TreeTrunkMaterial);
+    TreeCanopyInstances->SetMaterial(0, TreeCanopyMaterial);
 }
 
-void AVICECityChunk::AddCube(
+void AVICECityChunk::AddMeshInstance(
     UHierarchicalInstancedStaticMeshComponent* Target,
+    UStaticMesh* Mesh,
     const FVector& LocalLocation,
     const FVector& Dimensions)
 {
-    if (!Target || !CubeMesh)
+    if (!Target || !Mesh)
     {
         return;
     }
@@ -127,6 +156,14 @@ void AVICECityChunk::AddCube(
         Dimensions / 100.0f);
 
     Target->AddInstance(InstanceTransform);
+}
+
+void AVICECityChunk::AddCube(
+    UHierarchicalInstancedStaticMeshComponent* Target,
+    const FVector& LocalLocation,
+    const FVector& Dimensions)
+{
+    AddMeshInstance(Target, CubeMesh, LocalLocation, Dimensions);
 }
 
 void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth)
@@ -186,7 +223,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         }
     }
 
-    // One deterministic north-east block per intersection.
+    // Low-poly street trees sit on the outer edge of the sidewalk, leaving\n    // the pedestrian patrol line clear.\n    const FVector TreeLocations[] =\n    {\n        FVector(1650.0f, 5500.0f, 0.0f), FVector(1650.0f, 12500.0f, 0.0f),\n        FVector(16350.0f, 5500.0f, 0.0f), FVector(16350.0f, 12500.0f, 0.0f),\n        FVector(5500.0f, 1650.0f, 0.0f), FVector(12500.0f, 1650.0f, 0.0f),\n        FVector(5500.0f, 16350.0f, 0.0f), FVector(12500.0f, 16350.0f, 0.0f)\n    };\n\n    for (const FVector& TreeLocation : TreeLocations)\n    {\n        AddMeshInstance(TreeTrunkInstances, CylinderMesh, TreeLocation + FVector(0.0f, 0.0f, 228.0f), FVector(80.0f, 80.0f, 420.0f));\n        AddMeshInstance(TreeCanopyInstances, SphereMesh, TreeLocation + FVector(0.0f, 0.0f, 460.0f), FVector(560.0f, 560.0f, 440.0f));\n    }\n\n    // One deterministic north-east block per intersection.
     const uint32 Seed = GetTypeHash(Coordinates) ^ 0x9E3779B9u;
     const bool bDowntown = FMath::Abs(Coordinates.X) <= 2 && FMath::Abs(Coordinates.Y) <= 2;
     const float HeightBase = bDowntown ? 9000.0f : 4200.0f;
