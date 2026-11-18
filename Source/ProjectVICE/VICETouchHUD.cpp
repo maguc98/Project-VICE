@@ -26,7 +26,7 @@ void UVICETouchHUD::NativeConstruct()
 
     SpeedReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("SpeedReadout"));
     SpeedReadout->SetText(FText::FromString(TEXT("VICE CITY")));
-    SpeedReadout->SetJustification(ETextJustify::Right);
+    SpeedReadout->SetJustification(ETextJustify::Left);
     UCanvasPanelSlot* SpeedSlot = RootCanvas->AddChildToCanvas(SpeedReadout);
     SpeedSlot->SetAnchors(FAnchors(0.0f, 0.0f, 0.0f, 0.0f));
     SpeedSlot->SetAlignment(FVector2D(0.0f, 0.0f));
