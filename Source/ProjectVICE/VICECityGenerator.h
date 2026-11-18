@@ -6,6 +6,7 @@
 
 class AVICECityChunk;
 class AVICEPedestrian;
+class AVICETrafficVehicle;
 
 /**
  * Streams a deterministic graybox city around the currently possessed pawn.
@@ -32,6 +33,9 @@ private:
 
     UPROPERTY(Transient)
     TMap<FIntPoint, TObjectPtr<AVICEPedestrian>> ActivePedestrians;
+
+    UPROPERTY(Transient)
+    TMap<FIntPoint, TObjectPtr<AVICETrafficVehicle>> ActiveTraffic;
 
     TArray<FIntPoint> PendingCells;
 
