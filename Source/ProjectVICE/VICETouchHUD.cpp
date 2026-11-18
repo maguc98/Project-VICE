@@ -24,6 +24,15 @@ void UVICETouchHUD::NativeConstruct()
     UCanvasPanel* RootCanvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("TouchRoot"));
     WidgetTree->RootWidget = RootCanvas;
 
+    SpeedReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("SpeedReadout"));
+    SpeedReadout->SetText(FText::FromString(TEXT("VICE CITY")));
+    SpeedReadout->SetJustification(ETextJustify::Right);
+    UCanvasPanelSlot* SpeedSlot = RootCanvas->AddChildToCanvas(SpeedReadout);
+    SpeedSlot->SetAnchors(FAnchors(1.0f, 0.0f, 1.0f, 0.0f));
+    SpeedSlot->SetAlignment(FVector2D(1.0f, 0.0f));
+    SpeedSlot->SetPosition(FVector2D(-30.0f, 28.0f));
+    SpeedSlot->SetSize(FVector2D(210.0f, 48.0f));
+
     UButton* CameraButton = AddActionButton(TEXT("视角"), FVector2D(-112.0f, -220.0f), FVector2D(96.0f, 64.0f));
     if (CameraButton)
     {
@@ -156,5 +165,25 @@ void UVICETouchHUD::OnBrakeReleased()
         {
             Vehicle->SetBrakeInput(false);
         }
+    }
+}
+
+void UVICETouchHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+    Super::NativeTick(MyGeometry, InDeltaTime);
+
+    if (!SpeedReadout || !ControlledCharacter)
+    {
+        return;
+    }
+
+    if (const AVICEVehiclePawn* Vehicle = ControlledCharacter->GetCurrentVehicle())
+    {
+        SpeedReadout->SetText(FText::FromString(
+            FString::Printf(TEXT("%03.0f km/h"), Vehicle->GetSpeedKmh())));
+    }
+    else
+    {
+        SpeedReadout->SetText(FText::FromString(TEXT("VICE CITY")));
     }
 }
