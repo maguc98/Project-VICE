@@ -7,7 +7,7 @@
 AVICECityGenerator::AVICECityGenerator()
 {
     PrimaryActorTick.bCanEverTick = true;
-    PrimaryActorTick.TickInterval = 0.35f;
+    PrimaryActorTick.TickInterval = 0.25f;
 }
 
 void AVICECityGenerator::BeginPlay()
@@ -68,11 +68,39 @@ void AVICECityGenerator::UpdateStreaming()
         }
     }
 
-    // Load nearby cells asynchronously with respect to gameplay; no blocking
-    // level transition is shown to the player. Each chunk owns its own meshes.
-    for (const FIntPoint& Cell : DesiredCells)
+    // Discard queued cells that are no longer needed, then queue new cells
+    // nearest-first so the road beneath the player is always the first to load.
+    PendingCells.RemoveAll([&](const FIntPoint& Cell)
     {
-        if (ActiveChunks.Contains(Cell))
+        return !DesiredCells.Contains(Cell) || ActiveChunks.Contains(Cell);
+    });
+
+    TArray<FIntPoint> SortedDesiredCells = DesiredCells.Array();
+    SortedDesiredCells.Sort([&](const FIntPoint& A, const FIntPoint& B)
+    {
+        const int32 DistanceA = FMath::Square(A.X - CenterCell.X) + FMath::Square(A.Y - CenterCell.Y);
+        const int32 DistanceB = FMath::Square(B.X - CenterCell.X) + FMath::Square(B.Y - CenterCell.Y);
+        return DistanceA < DistanceB;
+    });
+
+    for (const FIntPoint& Cell : SortedDesiredCells)
+    {
+        if (!ActiveChunks.Contains(Cell) && !PendingCells.Contains(Cell))
+        {
+            PendingCells.Add(Cell);
+        }
+    }
+
+    // Spawn a small batch each update to reduce single-frame spikes on A14.
+    constexpr int32 MaxChunksPerUpdate = 3;
+    int32 SpawnedThisUpdate = 0;
+
+    while (PendingCells.Num() > 0 && SpawnedThisUpdate < MaxChunksPerUpdate)
+    {
+        const FIntPoint Cell = PendingCells[0];
+        PendingCells.RemoveAt(0);
+
+        if (!DesiredCells.Contains(Cell) || ActiveChunks.Contains(Cell))
         {
             continue;
         }
@@ -95,6 +123,7 @@ void AVICECityGenerator::UpdateStreaming()
         {
             Chunk->InitializeCell(Cell, BlockSpacing, RoadWidth);
             ActiveChunks.Add(Cell, Chunk);
+            ++SpawnedThisUpdate;
         }
     }
 }
