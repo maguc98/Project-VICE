@@ -108,7 +108,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         AddCube(
             BuildingLocation,
             FVector(Width, Depth, Height),
-            *FString::Printf(TEXT("Building_%02d_%d_%d"), Index, Coordinates.X, Coordinates.Y),
+            FName(*FString::Printf(TEXT("Building_%02d_%d_%d"), Index, Coordinates.X, Coordinates.Y)),
             true);
     }
 }
