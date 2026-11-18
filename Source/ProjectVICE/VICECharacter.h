@@ -37,6 +37,12 @@ public:
     UFUNCTION(BlueprintCallable, Category="VICE|Movement")
     void LookPitch(float Value);
 
+    UFUNCTION(BlueprintCallable, Category="VICE|Movement")
+    void StartSprint();
+
+    UFUNCTION(BlueprintCallable, Category="VICE|Movement")
+    void StopSprint();
+
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="VICE|Camera")
     TObjectPtr<USpringArmComponent> CameraBoom;
@@ -49,6 +55,12 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="VICE|Camera", meta=(ClampMin="0.0"))
     float FirstPersonArmLength = 0.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="VICE|Movement", meta=(ClampMin="100.0"))
+    float SprintSpeed = 650.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="VICE|Movement", meta=(ClampMin="100.0"))
+    float WalkSpeed = 420.0f;
 
 private:
     bool bFirstPerson = false;
