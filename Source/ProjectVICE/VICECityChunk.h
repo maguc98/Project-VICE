@@ -51,7 +51,10 @@ private:
     TObjectPtr<UHierarchicalInstancedStaticMeshComponent> GlassInstances;
 
     UPROPERTY()
-    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> MarkingInstances;
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> LaneLineInstances;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> CrosswalkInstances;
 
     UPROPERTY()
     TObjectPtr<UHierarchicalInstancedStaticMeshComponent> TrimInstances;
@@ -69,7 +72,10 @@ private:
     TObjectPtr<UMaterialInstanceDynamic> GlassMaterial;
 
     UPROPERTY(Transient)
-    TObjectPtr<UMaterialInstanceDynamic> MarkingMaterial;
+    TObjectPtr<UMaterialInstanceDynamic> LaneLineMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> CrosswalkMaterial;
 
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> TrimMaterial;
