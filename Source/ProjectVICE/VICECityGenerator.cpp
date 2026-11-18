@@ -1,5 +1,6 @@
 #include "VICECityGenerator.h"
 #include "VICECityChunk.h"
+#include "VICEPedestrian.h"
 #include "Engine/World.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
@@ -64,6 +65,14 @@ void AVICECityGenerator::UpdateStreaming()
             {
                 It.Value()->Destroy();
             }
+            if (TObjectPtr<AVICEPedestrian>* Pedestrian = ActivePedestrians.Find(It.Key()))
+            {
+                if (IsValid(*Pedestrian))
+                {
+                    (*Pedestrian)->Destroy();
+                }
+                ActivePedestrians.Remove(It.Key());
+            }
             It.RemoveCurrent();
         }
     }
@@ -123,6 +132,18 @@ void AVICECityGenerator::UpdateStreaming()
         {
             Chunk->InitializeCell(Cell, BlockSpacing, RoadWidth);
             ActiveChunks.Add(Cell, Chunk);
+
+            AVICEPedestrian* Pedestrian = World->SpawnActor<AVICEPedestrian>(
+                AVICEPedestrian::StaticClass(),
+                CellOrigin + FVector(1800.0f, 1800.0f, 96.0f),
+                FRotator::ZeroRotator,
+                SpawnParameters);
+            if (Pedestrian)
+            {
+                Pedestrian->InitializePatrol(CellOrigin, BlockSpacing, static_cast<int32>(GetTypeHash(Cell)));
+                ActivePedestrians.Add(Cell, Pedestrian);
+            }
+
             ++SpawnedThisUpdate;
         }
     }
