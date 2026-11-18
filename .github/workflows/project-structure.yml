@@ -31,6 +31,8 @@ jobs:
           test -f Source/ProjectVICE/VICETouchHUD.cpp
           test -f Source/ProjectVICE/VICEVehiclePawn.h
           test -f Source/ProjectVICE/VICEVehiclePawn.cpp
+          test -f Source/ProjectVICE/VICEDayNightController.h
+          test -f Source/ProjectVICE/VICEDayNightController.cpp
       - name: Validate editor bootstrap script
         run: python3 -m py_compile Content/Python/create_vice_blockout_map.py
       - name: Verify project documentation
@@ -41,3 +43,4 @@ jobs:
           test -f Docs/BUILD_STATUS.md
           test -f Docs/MAP_SETUP.md
           test -f Docs/VEHICLE_PROTOTYPE.md
+          test -f Docs/ENVIRONMENT_PROTOTYPE.md
