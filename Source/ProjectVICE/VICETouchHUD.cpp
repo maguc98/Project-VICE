@@ -1,5 +1,6 @@
 #include "VICETouchHUD.h"
 #include "VICECharacter.h"
+#include "VICEVehiclePawn.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -29,11 +30,24 @@ void UVICETouchHUD::NativeConstruct()
         CameraButton->OnClicked.AddDynamic(this, &UVICETouchHUD::OnCameraPressed);
     }
 
+    UButton* VehicleButton = AddActionButton(TEXT("上车 / 下车"), FVector2D(-238.0f, -220.0f), FVector2D(112.0f, 64.0f));
+    if (VehicleButton)
+    {
+        VehicleButton->OnClicked.AddDynamic(this, &UVICETouchHUD::OnVehiclePressed);
+    }
+
     UButton* JumpButton = AddActionButton(TEXT("跳跃"), FVector2D(-116.0f, -112.0f), FVector2D(104.0f, 88.0f));
     if (JumpButton)
     {
         JumpButton->OnPressed.AddDynamic(this, &UVICETouchHUD::OnJumpPressed);
         JumpButton->OnReleased.AddDynamic(this, &UVICETouchHUD::OnJumpReleased);
+    }
+
+    UButton* BrakeButton = AddActionButton(TEXT("刹车"), FVector2D(-238.0f, -112.0f), FVector2D(104.0f, 72.0f));
+    if (BrakeButton)
+    {
+        BrakeButton->OnPressed.AddDynamic(this, &UVICETouchHUD::OnBrakePressed);
+        BrakeButton->OnReleased.AddDynamic(this, &UVICETouchHUD::OnBrakeReleased);
     }
 
     UButton* SprintButton = AddActionButton(TEXT("奔跑"), FVector2D(-238.0f, -88.0f), FVector2D(104.0f, 72.0f));
@@ -103,5 +117,35 @@ void UVICETouchHUD::OnSprintReleased()
     if (ControlledCharacter)
     {
         ControlledCharacter->StopSprint();
+    }
+}
+
+void UVICETouchHUD::OnVehiclePressed()
+{
+    if (ControlledCharacter)
+    {
+        ControlledCharacter->InteractWithVehicle();
+    }
+}
+
+void UVICETouchHUD::OnBrakePressed()
+{
+    if (ControlledCharacter)
+    {
+        if (AVICEVehiclePawn* Vehicle = ControlledCharacter->GetCurrentVehicle())
+        {
+            Vehicle->SetBrakeInput(true);
+        }
+    }
+}
+
+void UVICETouchHUD::OnBrakeReleased()
+{
+    if (ControlledCharacter)
+    {
+        if (AVICEVehiclePawn* Vehicle = ControlledCharacter->GetCurrentVehicle())
+        {
+            Vehicle->SetBrakeInput(false);
+        }
     }
 }
