@@ -1,0 +1,28 @@
+name: Project structure validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Unreal project descriptor
+        run: python3 -m json.tool ProjectVICE.uproject > /dev/null
+      - name: Verify core source files
+        run: |
+          test -f Source/ProjectVICE/ProjectVICE.Build.cs
+          test -f Source/ProjectVICE/ProjectVICE.cpp
+          test -f Source/ProjectVICE/VICECharacter.h
+          test -f Source/ProjectVICE/VICECharacter.cpp
+          test -f Source/ProjectVICE/VICEGameMode.h
+          test -f Source/ProjectVICE/VICEGameMode.cpp
+      - name: Verify project documentation
+        run: |
+          test -f Docs/ROADMAP.md
+          test -f Docs/TECHNICAL_DESIGN.md
+          test -f Docs/DEVICE_BUDGETS.md
