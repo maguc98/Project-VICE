@@ -19,7 +19,7 @@ Last updated: 2026-11-18
 
 ## Current prototype limitations
 
-The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. There are no NPCs, traffic simulation, missions, production character animations, production vehicle assets, authored World Partition district assets, asynchronous asset streaming, or final art/audio yet. Cell actor creation/destruction currently runs on the game thread and may cause pop-in or hitches; no performance data has been collected.
+The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. The pedestrian system is currently a small capsule-placeholder patrol prototype only; there is no full NPC behavior/animation, traffic simulation, missions, production character animations, production vehicle assets, authored World Partition district assets, asynchronous asset streaming, or final art/audio yet. Cell actor creation/destruction currently runs on the game thread and may cause pop-in or hitches; no performance data has been collected.
 
 ## Build and test status
 
