@@ -28,38 +28,38 @@ void UVICETouchHUD::NativeConstruct()
     SpeedReadout->SetText(FText::FromString(TEXT("VICE CITY")));
     SpeedReadout->SetJustification(ETextJustify::Right);
     UCanvasPanelSlot* SpeedSlot = RootCanvas->AddChildToCanvas(SpeedReadout);
-    SpeedSlot->SetAnchors(FAnchors(1.0f, 0.0f, 1.0f, 0.0f));
-    SpeedSlot->SetAlignment(FVector2D(1.0f, 0.0f));
-    SpeedSlot->SetPosition(FVector2D(-30.0f, 28.0f));
+    SpeedSlot->SetAnchors(FAnchors(0.0f, 0.0f, 0.0f, 0.0f));
+    SpeedSlot->SetAlignment(FVector2D(0.0f, 0.0f));
+    SpeedSlot->SetPosition(FVector2D(28.0f, 26.0f));
     SpeedSlot->SetSize(FVector2D(210.0f, 48.0f));
 
-    UButton* CameraButton = AddActionButton(TEXT("视角"), FVector2D(-112.0f, -220.0f), FVector2D(96.0f, 64.0f));
+    UButton* CameraButton = AddActionButton(TEXT("视角"), FVector2D(-16.0f, 24.0f), FVector2D(92.0f, 56.0f));
     if (CameraButton)
     {
         CameraButton->OnClicked.AddDynamic(this, &UVICETouchHUD::OnCameraPressed);
     }
 
-    UButton* VehicleButton = AddActionButton(TEXT("上车 / 下车"), FVector2D(-238.0f, -220.0f), FVector2D(112.0f, 64.0f));
+    UButton* VehicleButton = AddActionButton(TEXT("上车 / 下车"), FVector2D(-118.0f, 24.0f), FVector2D(100.0f, 56.0f));
     if (VehicleButton)
     {
         VehicleButton->OnClicked.AddDynamic(this, &UVICETouchHUD::OnVehiclePressed);
     }
 
-    UButton* JumpButton = AddActionButton(TEXT("跳跃"), FVector2D(-116.0f, -112.0f), FVector2D(104.0f, 88.0f));
+    UButton* JumpButton = AddActionButton(TEXT("跳跃"), FVector2D(-16.0f, 88.0f), FVector2D(92.0f, 56.0f));
     if (JumpButton)
     {
         JumpButton->OnPressed.AddDynamic(this, &UVICETouchHUD::OnJumpPressed);
         JumpButton->OnReleased.AddDynamic(this, &UVICETouchHUD::OnJumpReleased);
     }
 
-    UButton* BrakeButton = AddActionButton(TEXT("刹车"), FVector2D(-238.0f, -112.0f), FVector2D(104.0f, 72.0f));
+    UButton* BrakeButton = AddActionButton(TEXT("刹车"), FVector2D(-118.0f, 88.0f), FVector2D(100.0f, 56.0f));
     if (BrakeButton)
     {
         BrakeButton->OnPressed.AddDynamic(this, &UVICETouchHUD::OnBrakePressed);
         BrakeButton->OnReleased.AddDynamic(this, &UVICETouchHUD::OnBrakeReleased);
     }
 
-    UButton* SprintButton = AddActionButton(TEXT("奔跑"), FVector2D(-360.0f, -112.0f), FVector2D(104.0f, 72.0f));
+    UButton* SprintButton = AddActionButton(TEXT("奔跑"), FVector2D(-16.0f, 152.0f), FVector2D(92.0f, 56.0f));
     if (SprintButton)
     {
         SprintButton->OnPressed.AddDynamic(this, &UVICETouchHUD::OnSprintPressed);
@@ -82,8 +82,8 @@ UButton* UVICETouchHUD::AddActionButton(const FString& Label, const FVector2D& P
     Button->AddChild(Text);
 
     UCanvasPanelSlot* Slot = RootCanvas->AddChildToCanvas(Button);
-    Slot->SetAnchors(FAnchors(1.0f, 1.0f, 1.0f, 1.0f));
-    Slot->SetAlignment(FVector2D(1.0f, 1.0f));
+    Slot->SetAnchors(FAnchors(1.0f, 0.0f, 1.0f, 0.0f));
+    Slot->SetAlignment(FVector2D(1.0f, 0.0f));
     Slot->SetPosition(Position);
     Slot->SetSize(Size);
     return Button;
