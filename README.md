@@ -34,7 +34,7 @@ This repository is being bootstrapped with source and configuration scaffolding.
 
 See [Docs/ROADMAP.md](Docs/ROADMAP.md), [Docs/TECHNICAL_DESIGN.md](Docs/TECHNICAL_DESIGN.md), [Docs/DEVICE_BUDGETS.md](Docs/DEVICE_BUDGETS.md), [Docs/MAP_SETUP.md](Docs/MAP_SETUP.md), [Docs/VEHICLE_PROTOTYPE.md](Docs/VEHICLE_PROTOTYPE.md), and [Docs/BUILD_STATUS.md](Docs/BUILD_STATUS.md).
 
-The first graybox city generator, character capsule placeholder, native touch action HUD, and map bootstrap script are now in the repository. The map must be generated in Unreal Editor; source has not yet been compiled with Unreal Build Tool.
+The repository now includes a procedural streamed city-cell prototype, character capsule placeholder, arcade sedan with enter/exit driving, native touch action HUD, and map bootstrap script. The map must be generated in Unreal Editor; source has not yet been compiled with Unreal Build Tool.
 
 ## License
 
