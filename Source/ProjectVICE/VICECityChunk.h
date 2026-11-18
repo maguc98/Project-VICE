@@ -22,10 +22,13 @@ public:
     void InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth);
 
 private:
-    void AddCube(
+    void AddMeshInstance(
         UHierarchicalInstancedStaticMeshComponent* Target,
+        UStaticMesh* Mesh,
         const FVector& LocalLocation,
         const FVector& Dimensions);
+
+    void AddCube(UHierarchicalInstancedStaticMeshComponent* Target, const FVector& LocalLocation, const FVector& Dimensions);
 
     UPROPERTY()
     TObjectPtr<USceneComponent> SceneRoot;
@@ -59,6 +62,12 @@ private:
     UPROPERTY()
     TObjectPtr<UHierarchicalInstancedStaticMeshComponent> TrimInstances;
 
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> TreeTrunkInstances;
+
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> TreeCanopyInstances;
+
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> RoadMaterial;
 
@@ -79,6 +88,12 @@ private:
 
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> TrimMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> TreeTrunkMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> TreeCanopyMaterial;
 
     bool bInitialized = false;
 };
