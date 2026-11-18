@@ -7,7 +7,7 @@ public class ProjectVICE : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new string[]
         {
-            "Core", "CoreUObject", "Engine", "InputCore"
+            "Core", "CoreUObject", "Engine", "InputCore", "UMG", "Slate", "SlateCore"
         });
         PrivateDependencyModuleNames.AddRange(new string[] { });
         if (Target.Platform == UnrealTargetPlatform.IOS)
