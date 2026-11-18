@@ -18,7 +18,7 @@ Last updated: 2026-11-19
 - Arcade sedan prototype with throttle, reverse, steering, swept collision, camera toggle, enter/exit possession flow, and speed readout.
 - Mobile day/night controller that animates the map Directional Light and Sky Light using a 20-minute in-game day.
 - Unreal Editor Python script to create the initial map with player start and basic lighting actors.
-- GitHub Actions repository structure and Python syntax checks.
+- GitHub Actions repository structure, project JSON, Python syntax, and city source-level invariant checks (not an Unreal C++ compile).
 
 ## Current prototype limitations
 
