@@ -1,10 +1,12 @@
 #include "VICECityGenerator.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
 AVICECityGenerator::AVICECityGenerator()
 {
     PrimaryActorTick.bCanEverTick = false;
+    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
     if (CubeAsset.Succeeded())
