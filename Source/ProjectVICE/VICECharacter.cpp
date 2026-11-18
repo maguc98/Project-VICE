@@ -47,7 +47,8 @@ void AVICECharacter::MoveForward(float Value)
 {
     if (Controller && FMath::Abs(Value) > KINDA_SMALL_NUMBER)
     {
-        const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);\n        AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X), Value);
+        const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+        AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X), Value);
     }
 }
 
@@ -55,7 +56,8 @@ void AVICECharacter::MoveRight(float Value)
 {
     if (Controller && FMath::Abs(Value) > KINDA_SMALL_NUMBER)
     {
-        const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);\n        AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y), Value);
+        const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+        AddMovementInput(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y), Value);
     }
 }
 
@@ -69,7 +71,17 @@ void AVICECharacter::LookPitch(float Value)
     AddControllerPitchInput(Value);
 }
 
-void AVICECharacter::StartSprint()\n{\n    GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;\n}\n\nvoid AVICECharacter::StopSprint()\n{\n    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;\n}\n\nvoid AVICECharacter::ToggleCameraPerspective()
+void AVICECharacter::StartSprint()
+{
+    GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+}
+
+void AVICECharacter::StopSprint()
+{
+    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void AVICECharacter::ToggleCameraPerspective()
 {
     bFirstPerson = !bFirstPerson;
     CameraBoom->TargetArmLength = bFirstPerson ? FirstPersonArmLength : ThirdPersonArmLength;
