@@ -5,6 +5,7 @@
 #include "VICECityGenerator.generated.h"
 
 class AVICECityChunk;
+class AVICEPedestrian;
 
 /**
  * Streams a deterministic graybox city around the currently possessed pawn.
@@ -28,6 +29,9 @@ private:
 
     UPROPERTY(Transient)
     TMap<FIntPoint, TObjectPtr<AVICECityChunk>> ActiveChunks;
+
+    UPROPERTY(Transient)
+    TMap<FIntPoint, TObjectPtr<AVICEPedestrian>> ActivePedestrians;
 
     TArray<FIntPoint> PendingCells;
 
