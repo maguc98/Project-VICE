@@ -144,7 +144,7 @@ void AVICECityGenerator::UpdateStreaming()
 
             AVICEPedestrian* Pedestrian = World->SpawnActor<AVICEPedestrian>(
                 AVICEPedestrian::StaticClass(),
-                CellOrigin + FVector(1800.0f, 1800.0f, 96.0f),
+                CellOrigin + FVector(1300.0f, 1300.0f, 110.0f),
                 FRotator::ZeroRotator,
                 SpawnParameters);
             if (Pedestrian)
