@@ -32,6 +32,41 @@ AVICEVehiclePawn::AVICEVehiclePawn()
         ChassisMesh->SetStaticMesh(CubeAsset.Object);
     }
 
+    CabinMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cabin"));
+    CabinMesh->SetupAttachment(CollisionBody);
+    CabinMesh->SetRelativeLocation(FVector(-18.0f, 0.0f, 55.0f));
+    CabinMesh->SetRelativeScale3D(FVector(1.9f, 1.55f, 0.46f));
+    CabinMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    if (CubeAsset.Succeeded()) CabinMesh->SetStaticMesh(CubeAsset.Object);
+
+    HoodMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hood"));
+    HoodMesh->SetupAttachment(CollisionBody);
+    HoodMesh->SetRelativeLocation(FVector(132.0f, 0.0f, 20.0f));
+    HoodMesh->SetRelativeScale3D(FVector(1.3f, 1.72f, 0.28f));
+    HoodMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    if (CubeAsset.Succeeded()) HoodMesh->SetStaticMesh(CubeAsset.Object);
+
+    TrunkMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Trunk"));
+    TrunkMesh->SetupAttachment(CollisionBody);
+    TrunkMesh->SetRelativeLocation(FVector(-160.0f, 0.0f, 20.0f));
+    TrunkMesh->SetRelativeScale3D(FVector(0.9f, 1.72f, 0.28f));
+    TrunkMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    if (CubeAsset.Succeeded()) TrunkMesh->SetStaticMesh(CubeAsset.Object);
+
+    FrontBumperMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FrontBumper"));
+    FrontBumperMesh->SetupAttachment(CollisionBody);
+    FrontBumperMesh->SetRelativeLocation(FVector(215.0f, 0.0f, -10.0f));
+    FrontBumperMesh->SetRelativeScale3D(FVector(0.3f, 1.9f, 0.24f));
+    FrontBumperMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    if (CubeAsset.Succeeded()) FrontBumperMesh->SetStaticMesh(CubeAsset.Object);
+
+    RearBumperMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RearBumper"));
+    RearBumperMesh->SetupAttachment(CollisionBody);
+    RearBumperMesh->SetRelativeLocation(FVector(-215.0f, 0.0f, -10.0f));
+    RearBumperMesh->SetRelativeScale3D(FVector(0.3f, 1.9f, 0.24f));
+    RearBumperMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    if (CubeAsset.Succeeded()) RearBumperMesh->SetStaticMesh(CubeAsset.Object);
+
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderAsset(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     const FVector WheelLocations[] =
     {
@@ -47,8 +82,8 @@ AVICEVehiclePawn::AVICEVehiclePawn()
             *FString::Printf(TEXT("Wheel_%d"), Index));
         Wheel->SetupAttachment(CollisionBody);
         Wheel->SetRelativeLocation(WheelLocations[Index]);
-        Wheel->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
-        Wheel->SetRelativeScale3D(FVector(0.42f, 0.18f, 0.42f));
+        Wheel->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
+        Wheel->SetRelativeScale3D(FVector(0.42f, 0.42f, 0.18f));
         Wheel->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         if (CylinderAsset.Succeeded())
         {
@@ -125,7 +160,7 @@ void AVICEVehiclePawn::Tick(float DeltaSeconds)
         if (UStaticMeshComponent* Wheel = WheelMeshes[Index])
         {
             const float SteeringYaw = Index < 2 ? SteeringInput * 24.0f : 0.0f;
-            Wheel->SetRelativeRotation(FRotator(WheelSpinDegrees, 0.0f, SteeringYaw + 90.0f));
+            Wheel->SetRelativeRotation(FRotator(WheelSpinDegrees, SteeringYaw, 90.0f));
         }
     }
 }
