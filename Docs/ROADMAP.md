@@ -25,7 +25,7 @@
 - [ ] Save/load, map, navigation, and mission framework.
 
 ## Milestone 4 — Environment and polish
-- [ ] Time-of-day system with mobile-friendly lighting.
+- [x] Prototype a mobile-friendly time-of-day cycle for the map sun and sky light (device profiling and atmospheric polish pending).
 - [ ] Weather presets and scalable effects.
 - [ ] Audio, UI, accessibility, localization, and performance tiers.
 
