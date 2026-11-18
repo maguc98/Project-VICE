@@ -45,7 +45,7 @@ private:
     UPROPERTY()
     TObjectPtr<UMaterialInterface> BaseColorMaterial;
 
-    void InitializeMaterials();
+    void InitializeMaterials(const FIntPoint& Coordinates);
 
     UPROPERTY()
     TObjectPtr<UHierarchicalInstancedStaticMeshComponent> RoadInstances;
