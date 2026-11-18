@@ -2,6 +2,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameFramework/PlayerController.h"
 
 AVICETrafficVehicle::AVICETrafficVehicle()
 {
@@ -11,7 +12,7 @@ AVICETrafficVehicle::AVICETrafficVehicle()
     CollisionBody = CreateDefaultSubobject<UBoxComponent>(TEXT("TrafficCollision"));
     RootComponent = CollisionBody;
     CollisionBody->SetBoxExtent(FVector(210.0f, 95.0f, 42.0f));
-    CollisionBody->SetCollisionProfileName(TEXT("Vehicle"));
+    CollisionBody->SetCollisionProfileName(TEXT("BlockAllDynamic"));
     CollisionBody->SetGenerateOverlapEvents(true);
 
     ChassisMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TrafficChassis"));
@@ -70,6 +71,15 @@ void AVICETrafficVehicle::InitializeRoute(const FVector& CellOrigin, float CellS
 void AVICETrafficVehicle::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+    if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+    {
+        if (APawn* PlayerPawn = PlayerController->GetPawn())
+        {
+            const float DistanceSquared = FVector::DistSquared(GetActorLocation(), PlayerPawn->GetActorLocation());
+            SetActorTickInterval(DistanceSquared > FMath::Square(22000.0f) ? 0.15f : 0.05f);
+        }
+    }
 
     if (RoutePoints.Num() < 2 || !RoutePoints.IsValidIndex(CurrentRoutePoint))
     {
