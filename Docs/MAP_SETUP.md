@@ -34,7 +34,7 @@ The script creates a map, sets the Project VICE game mode, places a PlayerStart,
 
 The cell actors are created and destroyed on the game thread. This is a bounded prototype streaming system, not yet Unreal World Partition or true asynchronous asset streaming. Fast movement may reveal cell pop-in or a frame-time spike and must be profiled on the iPhone 12 mini.
 
-This is a color-separated low-poly graybox prototype, not final city art. It currently uses engine primitive cubes and has no final character mesh, vehicle mesh, animation set, NPCs, missions, traffic simulation, authored World Partition landscape, or final art/audio.
+This is a color-separated low-poly graybox prototype, not final city art. It currently uses engine primitive cubes and has no final character mesh, vehicle mesh, animation set, full NPC behavior, traffic-light/lane AI, missions, authored World Partition landscape, or final art/audio.
 
 ## Build validation
 
