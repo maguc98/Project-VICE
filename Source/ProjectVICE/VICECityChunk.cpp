@@ -203,7 +203,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     AddCube(SidewalkInstances, FVector(HalfCell, SidewalkCenter - SidewalkWidth * 0.5f + 45.0f, 20.0f), FVector(SidewalkLength, 90.0f, 22.0f));
     AddCube(SidewalkInstances, FVector(HalfCell, FarSidewalkCenter + SidewalkWidth * 0.5f - 45.0f, 20.0f), FVector(SidewalkLength, 90.0f, 22.0f));
 
-    // Dashed center lines on the roads. All markings share one HISM/material.
+    // Dashed yellow center lines and white zebra crossings use separate HISM batches.
     for (float Position = 1200.0f; Position < HalfCell - 900.0f; Position += 950.0f)
     {
         AddCube(LaneLineInstances, FVector(Position, 0.0f, 1.0f), FVector(420.0f, 42.0f, 3.0f));
