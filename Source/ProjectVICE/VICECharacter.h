@@ -5,6 +5,7 @@
 #include "VICECharacter.generated.h"
 
 class UCameraComponent;
+class UStaticMeshComponent;
 class UVICETouchHUD;
 class USpringArmComponent;
 
@@ -51,6 +52,9 @@ protected:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="VICE|Camera")
     TObjectPtr<UCameraComponent> FollowCamera;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="VICE|Character", meta=(AllowPrivateAccess="true"))
+    TObjectPtr<UStaticMeshComponent> BlockoutBody;
 
     UPROPERTY(Transient)
     TObjectPtr<UVICETouchHUD> TouchHUD;
