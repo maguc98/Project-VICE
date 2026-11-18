@@ -8,7 +8,7 @@ Target device: iPhone 12 mini (A14). These are starting engineering budgets, not
 | Frame time | 33.3 ms total frame budget |
 | Memory | Keep a conservative resident asset budget; avoid loading multiple districts at full detail |
 | Rendering | Mobile forward, Metal, dynamic resolution |
-| Geometry | LOD/HLOD and instancing; no Nanite dependency |
+| Geometry | LOD/HLOD and instancing; one HISM component per graybox cell; no Nanite dependency |
 | Lighting | Mostly baked/static; tightly limit dynamic shadow casters |
 | Textures | ASTC, mipmaps, streaming, platform-specific max sizes |
 | Effects | Low overdraw; cap particles and translucency |
