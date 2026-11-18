@@ -8,6 +8,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "VICEVehiclePawn.h"
+#include "EngineUtils.h"
 
 AVICECharacter::AVICECharacter()
 {
@@ -48,18 +50,33 @@ AVICECharacter::AVICECharacter()
 void AVICECharacter::BeginPlay()
 {
     Super::BeginPlay();
+    EnsureTouchHUD();
+}
 
-    if (IsLocallyControlled())
+void AVICECharacter::PawnClientRestart()
+{
+    Super::PawnClientRestart();
+    EnsureTouchHUD();
+}
+
+void AVICECharacter::EnsureTouchHUD()
+{
+    if (!IsLocallyControlled() || TouchHUD)
     {
-        if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-        {
-            TouchHUD = CreateWidget<UVICETouchHUD>(PlayerController, UVICETouchHUD::StaticClass());
-            if (TouchHUD)
-            {
-                TouchHUD->SetControlledCharacter(this);
-                TouchHUD->AddToViewport(10);
-            }
-        }
+        return;
+    }
+
+    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+    if (!PlayerController)
+    {
+        return;
+    }
+
+    TouchHUD = CreateWidget<UVICETouchHUD>(PlayerController, UVICETouchHUD::StaticClass());
+    if (TouchHUD)
+    {
+        TouchHUD->SetControlledCharacter(this);
+        TouchHUD->AddToViewport(10);
     }
 }
 
@@ -77,6 +94,7 @@ void AVICECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
     PlayerInputComponent->BindAction(TEXT("ToggleCamera"), IE_Pressed, this, &AVICECharacter::ToggleCameraPerspective);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Pressed, this, &AVICECharacter::StartSprint);
     PlayerInputComponent->BindAction(TEXT("Sprint"), IE_Released, this, &AVICECharacter::StopSprint);
+    PlayerInputComponent->BindAction(TEXT("InteractVehicle"), IE_Pressed, this, &AVICECharacter::InteractWithVehicle);
 }
 
 void AVICECharacter::MoveForward(float Value)
@@ -126,5 +144,33 @@ void AVICECharacter::ToggleCameraPerspective()
     if (BlockoutBody)
     {
         BlockoutBody->SetVisibility(!bFirstPerson, true);
+    }
+}
+
+void AVICECharacter::InteractWithVehicle()
+{
+    if (CurrentVehicle)
+    {
+        CurrentVehicle->ExitVehicle();
+        return;
+    }
+
+    AVICEVehiclePawn* NearestVehicle = nullptr;
+    float NearestDistanceSquared = FMath::Square(850.0f);
+
+    for (TActorIterator<AVICEVehiclePawn> It(GetWorld()); It; ++It)
+    {
+        AVICEVehiclePawn* Vehicle = *It;
+        const float DistanceSquared = FVector::DistSquared(GetActorLocation(), Vehicle->GetActorLocation());
+        if (DistanceSquared < NearestDistanceSquared)
+        {
+            NearestDistanceSquared = DistanceSquared;
+            NearestVehicle = Vehicle;
+        }
+    }
+
+    if (NearestVehicle && NearestVehicle->EnterVehicle(this))
+    {
+        CurrentVehicle = NearestVehicle;
     }
 }
