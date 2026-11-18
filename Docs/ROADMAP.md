@@ -22,7 +22,8 @@
 ## Milestone 3 — City simulation
 - [x] Add a basic streamed sidewalk-pedestrian patrol prototype with distance-tiered update frequency.
 - [ ] Modular road and building kits with original art direction.
-- [ ] Expand pedestrian behavior and add traffic simulation with distance-based update rates.
+- [x] Add sparse ambient road-loop traffic prototype with distance-tiered update frequency.
+- [ ] Expand pedestrian behavior, add traffic lights, lane following, intersection logic, and traffic avoidance.
 - [ ] Save/load, map, navigation, and mission framework.
 
 ## Milestone 4 — Environment and polish
