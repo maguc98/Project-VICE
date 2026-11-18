@@ -1,13 +1,13 @@
 # Current build status
 
-Last updated: 2026-11-18
+Last updated: 2026-11-19
 
 ## Implemented in source
 
 - Unreal Engine 5.4 project descriptor, runtime module, and correctly named game/editor target files.
 - Game mode bootstrap that creates the player start, streamed graybox city manager, and first vehicle.
 - Custom city cell streaming for a 4.32 km × 4.32 km grid: 5 × 5 active cell window, nearest-first loading in batches of up to 3 chunks per 0.25-second update, and unloading outside the window.
-- Deterministic per-cell city visuals split into HISM batches for asphalt, sidewalks/curbs, building masses, glazing, markings, and facade trim; streaming follows the active character or vehicle.
+- Deterministic per-cell city visuals split into seven HISM batches for asphalt, sidewalks/curbs, building masses, glazing, yellow lane lines, white crosswalks, and facade trim; streaming follows the active character or vehicle.
 - Procedural road center lines, zebra crossings, connected block sidewalks, and simple low-poly facade window/roof details.
 - One lightweight sidewalk pedestrian patrol per active cell (up to 25), with distance-tiered tick intervals.
 - Sparse ambient traffic cars following deterministic four-intersection road loops, with distance-tiered tick intervals and streamed cleanup.
@@ -21,7 +21,7 @@ Last updated: 2026-11-18
 
 ## Current prototype limitations
 
-The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. The pedestrian system is currently a small capsule-placeholder patrol prototype only, and traffic is a sparse primitive-mesh road-loop prototype; there is no full NPC behavior/animation, traffic lights or lane AI, missions, production character animations, production vehicle assets, authored World Partition district assets, asynchronous asset streaming, or final art/audio yet. Cell actor creation/destruction currently runs on the game thread and may cause pop-in or hitches; no performance data has been collected.
+The city is now a color-separated low-poly graybox made from engine primitive cubes, not a finished photorealistic environment. The current visual pass adds asphalt/concrete/building/glass material tints, road markings, zebra crossings, connected sidewalk loops, and simple facade details; original high-resolution art assets are still pending. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. The pedestrian system is currently a small capsule-placeholder patrol prototype only, and traffic is a sparse primitive-mesh road-loop prototype; there is no full NPC behavior/animation, traffic lights or lane AI, missions, production character animations, production vehicle assets, authored World Partition district assets, asynchronous asset streaming, or final art/audio yet. Cell actor creation/destruction currently runs on the game thread and may cause pop-in or hitches; no performance data has been collected.
 
 ## Build and test status
 
