@@ -9,6 +9,7 @@ Last updated: 2026-11-18
 - Custom city cell streaming for a 4.32 km × 4.32 km grid: 5 × 5 active cell window, nearest-first loading in batches of up to 3 chunks per 0.25-second update, and unloading outside the window.
 - Deterministic per-cell road segments and primitive building masses, grouped into one HISM component per chunk; streaming follows the active character or vehicle.
 - One lightweight sidewalk pedestrian patrol per active cell (up to 25), with distance-tiered tick intervals.
+- Sparse ambient traffic cars on deterministic four-intersection road loops, with distance-tiered tick intervals and streamed cleanup.
 - Character movement, jump, sprint, and first-/third-person camera toggle.
 - Runtime mobile touch HUD with camera, jump, sprint, vehicle interaction, and brake buttons.
 - Default virtual joystick axes mapped for movement, driving, and camera look.
@@ -19,7 +20,7 @@ Last updated: 2026-11-18
 
 ## Current prototype limitations
 
-The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. The pedestrian system is currently a small capsule-placeholder patrol prototype only; there is no full NPC behavior/animation, traffic simulation, missions, production character animations, production vehicle assets, authored World Partition district assets, asynchronous asset streaming, or final art/audio yet. Cell actor creation/destruction currently runs on the game thread and may cause pop-in or hitches; no performance data has been collected.
+The city is a graybox made from engine primitive cubes, not a finished photorealistic environment. The player body is a capsule placeholder, and the sedan is built from primitive meshes. Vehicle movement is kinematic rather than Chaos suspension/traction physics. The pedestrian system is currently a small capsule-placeholder patrol prototype only, and traffic is a sparse primitive-mesh road-loop prototype; there is no full NPC behavior/animation, traffic lights or lane AI, missions, production character animations, production vehicle assets, authored World Partition district assets, asynchronous asset streaming, or final art/audio yet. Cell actor creation/destruction currently runs on the game thread and may cause pop-in or hitches; no performance data has been collected.
 
 ## Build and test status
 
