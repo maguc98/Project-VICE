@@ -12,7 +12,7 @@ Target device: iPhone 12 mini (A14). These are starting engineering budgets, not
 | Lighting | Mostly baked/static; tightly limit dynamic shadow casters |
 | Textures | ASTC, mipmaps, streaming, platform-specific max sizes |
 | Effects | Low overdraw; cap particles and translucency |
-| Streaming | Async cell loading with overlap and hysteresis |
+| Streaming | Target: 25 active city chunks; at most 3 chunks spawned per 0.25-second update in the current prototype |
 | Thermal | Profile sustained sessions, not only short benchmark runs |
 
 ## Quality tiers
