@@ -11,4 +11,6 @@ class PROJECTVICE_API AVICEGameMode : public AGameModeBase
 
 public:
     AVICEGameMode();
+
+    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 };
