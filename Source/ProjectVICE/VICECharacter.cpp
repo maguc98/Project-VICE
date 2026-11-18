@@ -6,6 +6,8 @@
 #include "VICETouchHUD.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/StaticMeshComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 AVICECharacter::AVICECharacter()
 {
@@ -28,6 +30,18 @@ AVICECharacter::AVICECharacter()
     FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
     FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
     FollowCamera->bUsePawnControlRotation = false;
+
+    BlockoutBody = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BlockoutBody"));
+    BlockoutBody->SetupAttachment(RootComponent);
+    BlockoutBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    BlockoutBody->SetRelativeLocation(FVector(0.0f, 0.0f, -4.0f));
+    BlockoutBody->SetRelativeScale3D(FVector(0.82f, 0.82f, 0.92f));
+
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> CapsuleAsset(TEXT("/Engine/BasicShapes/Capsule.Capsule"));
+    if (CapsuleAsset.Succeeded())
+    {
+        BlockoutBody->SetStaticMesh(CapsuleAsset.Object);
+    }
 }
 
 void AVICECharacter::BeginPlay()
@@ -108,4 +122,8 @@ void AVICECharacter::ToggleCameraPerspective()
     CameraBoom->TargetArmLength = bFirstPerson ? FirstPersonArmLength : ThirdPersonArmLength;
     FollowCamera->SetRelativeLocation(bFirstPerson ? FVector(0.0f, 0.0f, 68.0f) : FVector::ZeroVector);
     FollowCamera->SetFieldOfView(bFirstPerson ? 90.0f : 85.0f);
+    if (BlockoutBody)
+    {
+        BlockoutBody->SetVisibility(!bFirstPerson, true);
+    }
 }
