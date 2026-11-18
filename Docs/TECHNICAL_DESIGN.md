@@ -9,7 +9,7 @@ Project VICE is an original fictional coastal metropolis. Its art direction aims
 - **Game framework:** C++ gameplay foundation with Blueprint extension points.
 - **Player:** CharacterMovement-based locomotion; camera boom supports third-/first-person modes.
 - **Input:** Gameplay functions are callable from UMG touch controls. Enhanced Input can replace legacy bindings as the touch HUD is implemented.
-- **World:** World Partition with runtime grid streaming; streaming sources follow the player and active vehicle.
+- **World (prototype):** custom actor-cell streaming follows the currently possessed pawn, so it follows either the on-foot character or vehicle. A 5 × 5 active window is maintained in a deterministic 25 × 25 intersection grid. Current chunk actors build primitive road/building meshes and are spawned/destroyed in small game-thread batches.\n- **World (production target):** evaluate Unreal World Partition / HLOD and asset streaming once the actual district art and authored map exist; do not call the current prototype true asynchronous asset streaming.
 - **Vehicles:** Chaos Vehicles only after a lightweight mobile vehicle prototype is profiled.
 - **Simulation:** NPC and traffic updates are distance/visibility tiered; distant agents use simplified representations.
 - **Persistence:** SaveGame snapshots for player, vehicles, mission state, and world changes.
@@ -26,7 +26,7 @@ Project VICE is an original fictional coastal metropolis. Its art direction aims
 
 ## World continuity
 
-Outdoor traversal should avoid hard loading screens. Stream cells asynchronously with a safety radius and overlap. Use skyline silhouettes and occlusion to maintain the sense of a continuous city. Interior spaces may be separate streamed levels or data layers; short transitions are acceptable when necessary.
+Outdoor traversal should avoid hard loading screens. Maintain a safety radius around the player/vehicle and overlap visible district silhouettes. Current cell actors are created in bounded game-thread batches, so profile cell transitions and visual pop-in; they are not asynchronous asset loads. Use skyline silhouettes and occlusion to maintain the sense of a continuous city. Interior spaces may be separate streamed levels or data layers; short transitions are acceptable when necessary.
 
 ## Camera
 
