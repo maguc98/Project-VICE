@@ -20,7 +20,7 @@ Project VICE is an original fictional coastal metropolis. Its art direction aims
 
 - Use mobile forward rendering, Metal, mobile HDR, and a conservative 2x MSAA starting point; profile before raising sample count.
 - Avoid desktop-only assumptions such as Lumen, hardware ray tracing, and Nanite as required runtime features.
-- Bake static lighting where possible; reserve dynamic shadows for nearby/high-value actors.
+- Bake static lighting where possible; reserve dynamic shadows for nearby/high-value actors. The current city graybox only allows building masses to cast shadows; road paint, glazing, trim, sidewalks and placeholder trees do not cast dynamic shadows.
 - Use material complexity budgets, texture streaming, ASTC textures, mipmaps, and limited translucent layers.
 - Use mesh LODs and HLODs, instancing, occlusion culling, and aggressive distance culling.
 - Keep particle counts, real-time lights, reflection captures, and post-processing conservative.
