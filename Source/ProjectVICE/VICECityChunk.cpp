@@ -35,46 +35,55 @@ AVICECityChunk::AVICECityChunk()
     RoadInstances->SetupAttachment(SceneRoot);
     RoadInstances->SetMobility(EComponentMobility::Static);
     RoadInstances->SetCollisionProfileName(TEXT("BlockAll"));
+    RoadInstances->SetCastShadow(false);
 
     SidewalkInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("SidewalkInstances"));
     SidewalkInstances->SetupAttachment(SceneRoot);
     SidewalkInstances->SetMobility(EComponentMobility::Static);
     SidewalkInstances->SetCollisionProfileName(TEXT("BlockAll"));
+    SidewalkInstances->SetCastShadow(false);
 
     BuildingInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("BuildingInstances"));
     BuildingInstances->SetupAttachment(SceneRoot);
     BuildingInstances->SetMobility(EComponentMobility::Static);
     BuildingInstances->SetCollisionProfileName(TEXT("BlockAll"));
+    BuildingInstances->SetCastShadow(true);
 
     GlassInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("GlassInstances"));
     GlassInstances->SetupAttachment(SceneRoot);
     GlassInstances->SetMobility(EComponentMobility::Static);
     GlassInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    GlassInstances->SetCastShadow(false);
 
     LaneLineInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("LaneLineInstances"));
     LaneLineInstances->SetupAttachment(SceneRoot);
     LaneLineInstances->SetMobility(EComponentMobility::Static);
     LaneLineInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    LaneLineInstances->SetCastShadow(false);
 
     CrosswalkInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("CrosswalkInstances"));
     CrosswalkInstances->SetupAttachment(SceneRoot);
     CrosswalkInstances->SetMobility(EComponentMobility::Static);
     CrosswalkInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    CrosswalkInstances->SetCastShadow(false);
 
     TrimInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("TrimInstances"));
     TrimInstances->SetupAttachment(SceneRoot);
     TrimInstances->SetMobility(EComponentMobility::Static);
     TrimInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    TrimInstances->SetCastShadow(false);
 
     TreeTrunkInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("TreeTrunkInstances"));
     TreeTrunkInstances->SetupAttachment(SceneRoot);
     TreeTrunkInstances->SetMobility(EComponentMobility::Static);
     TreeTrunkInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    TreeTrunkInstances->SetCastShadow(false);
 
     TreeCanopyInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("TreeCanopyInstances"));
     TreeCanopyInstances->SetupAttachment(SceneRoot);
     TreeCanopyInstances->SetMobility(EComponentMobility::Static);
     TreeCanopyInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    TreeCanopyInstances->SetCastShadow(false);
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderAsset(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
