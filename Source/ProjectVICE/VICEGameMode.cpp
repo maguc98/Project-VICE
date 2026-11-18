@@ -3,7 +3,6 @@
 #include "VICECityGenerator.h"
 #include "VICEVehiclePawn.h"
 #include "Engine/World.h"
-#include "GameFramework/PlayerStart.h"
 
 AVICEGameMode::AVICEGameMode()
 {
@@ -32,8 +31,4 @@ void AVICEGameMode::InitGame(const FString& MapName, const FString& Options, FSt
         FVector(550.0f, 0.0f, -4.0f),
         FRotator::ZeroRotator);
 
-    World->SpawnActor<APlayerStart>(
-        APlayerStart::StaticClass(),
-        FVector(0.0f, 0.0f, 120.0f),
-        FRotator::ZeroRotator);
 }
