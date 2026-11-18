@@ -28,6 +28,15 @@ private:
     void OnCameraPressed();
 
     UFUNCTION()
+    void OnVehiclePressed();
+
+    UFUNCTION()
+    void OnBrakePressed();
+
+    UFUNCTION()
+    void OnBrakeReleased();
+
+    UFUNCTION()
     void OnJumpPressed();
 
     UFUNCTION()
