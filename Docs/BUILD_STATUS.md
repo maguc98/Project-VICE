@@ -5,7 +5,8 @@ Last updated: 2026-11-18
 ## Implemented in source
 
 - Unreal Engine 5.4 project descriptor, runtime module, and correctly named game/editor target files.
-- Game mode bootstrap that creates the player start, streamed graybox city manager, and first vehicle.\n- Custom city cell streaming for a 4.32 km × 4.32 km grid: 5 × 5 active cell window, nearest-first loading in batches of up to 3 chunks per 0.25-second update, and unloading outside the window.
+- Game mode bootstrap that creates the player start, streamed graybox city manager, and first vehicle.
+- Custom city cell streaming for a 4.32 km × 4.32 km grid: 5 × 5 active cell window, nearest-first loading in batches of up to 3 chunks per 0.25-second update, and unloading outside the window.
 - Deterministic per-cell road segments and primitive building masses; streaming follows the active character or vehicle.
 - Character movement, jump, sprint, and first-/third-person camera toggle.
 - Runtime mobile touch HUD with camera, jump, sprint, vehicle interaction, and brake buttons.
