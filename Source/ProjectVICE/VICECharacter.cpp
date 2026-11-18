@@ -3,6 +3,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/InputComponent.h"
+#include "VICETouchHUD.h"
+#include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
 
 AVICECharacter::AVICECharacter()
 {
@@ -25,6 +28,24 @@ AVICECharacter::AVICECharacter()
     FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
     FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
     FollowCamera->bUsePawnControlRotation = false;
+}
+
+void AVICECharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    if (IsLocallyControlled())
+    {
+        if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+        {
+            TouchHUD = CreateWidget<UVICETouchHUD>(PlayerController, UVICETouchHUD::StaticClass());
+            if (TouchHUD)
+            {
+                TouchHUD->SetControlledCharacter(this);
+                TouchHUD->AddToViewport(10);
+            }
+        }
+    }
 }
 
 void AVICECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
