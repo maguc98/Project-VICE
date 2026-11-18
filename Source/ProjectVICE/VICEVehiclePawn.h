@@ -45,6 +45,8 @@ protected:
 private:
     void ApplyThrottle(float Value);
     void ApplySteering(float Value);
+    void LookYaw(float Value);
+    void LookPitch(float Value);
     void BrakePressed();
     void BrakeReleased();
     void ExitInput();
