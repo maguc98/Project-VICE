@@ -25,7 +25,7 @@ The script creates a map, sets the Project VICE game mode, places a PlayerStart,
 - The custom city streamer tracks the currently possessed pawn, so streaming follows the player on foot or while driving.
 - A 5 × 5 neighborhood of cell actors is desired around the player; new cells are spawned nearest-first, up to 3 per 0.25-second update. Cells outside the radius are destroyed.
 - Each cell creates separate instanced batches for dark asphalt, concrete sidewalks/curbs, building masses, dark glazing, road markings, and facade trim.
-- Roads receive dashed center markings and zebra crossings; each block receives a connected sidewalk loop, three deterministic building masses, repeated facade glazing, and roof/belt trim.
+- Roads receive dashed center markings and zebra crossings; each block receives a connected sidewalk loop, three deterministic building masses, repeated facade glazing, roof/belt trim, and eight low-poly sidewalk trees grouped into trunk/canopy batches.
 - One simple sidewalk pedestrian patrol is spawned per active cell; this is capped by the 5 × 5 streaming window.
 - A sparse deterministic pattern also spawns ambient road-loop cars; these are removed with their owning streamed cells.
 - The player can walk, jump, sprint, and switch first-/third-person view.
