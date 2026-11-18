@@ -2,6 +2,7 @@
 #include "VICECharacter.h"
 #include "VICECityGenerator.h"
 #include "VICEVehiclePawn.h"
+#include "VICEDayNightController.h"
 #include "Engine/World.h"
 
 AVICEGameMode::AVICEGameMode()
@@ -29,6 +30,11 @@ void AVICEGameMode::InitGame(const FString& MapName, const FString& Options, FSt
     World->SpawnActor<AVICEVehiclePawn>(
         AVICEVehiclePawn::StaticClass(),
         FVector(550.0f, 0.0f, -4.0f),
+        FRotator::ZeroRotator);
+
+    World->SpawnActor<AVICEDayNightController>(
+        AVICEDayNightController::StaticClass(),
+        FVector::ZeroVector,
         FRotator::ZeroRotator);
 
 }
