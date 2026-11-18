@@ -25,6 +25,8 @@ jobs:
           test -f Source/ProjectVICE/VICEGameMode.cpp
           test -f Source/ProjectVICE/VICECityGenerator.h
           test -f Source/ProjectVICE/VICECityGenerator.cpp
+          test -f Source/ProjectVICE/VICECityChunk.h
+          test -f Source/ProjectVICE/VICECityChunk.cpp
           test -f Source/ProjectVICE/VICETouchHUD.h
           test -f Source/ProjectVICE/VICETouchHUD.cpp
           test -f Source/ProjectVICE/VICEVehiclePawn.h
