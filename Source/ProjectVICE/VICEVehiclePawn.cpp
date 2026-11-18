@@ -79,7 +79,7 @@ AVICEVehiclePawn::AVICEVehiclePawn()
     for (int32 Index = 0; Index < UE_ARRAY_COUNT(WheelLocations); ++Index)
     {
         UStaticMeshComponent* Wheel = CreateDefaultSubobject<UStaticMeshComponent>(
-            *FString::Printf(TEXT("Wheel_%d"), Index));
+            FName(*FString::Printf(TEXT("Wheel_%d"), Index)));
         Wheel->SetupAttachment(CollisionBody);
         Wheel->SetRelativeLocation(WheelLocations[Index]);
         Wheel->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
