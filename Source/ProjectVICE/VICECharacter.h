@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "VICECharacter.generated.h"
 
+class AVICEVehiclePawn;
 class UCameraComponent;
 class UStaticMeshComponent;
 class UVICETouchHUD;
@@ -23,6 +24,7 @@ public:
     AVICECharacter();
 
     virtual void BeginPlay() override;
+    virtual void PawnClientRestart() override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     UFUNCTION(BlueprintCallable, Category="VICE|Camera")
@@ -45,6 +47,12 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="VICE|Movement")
     void StopSprint();
+
+    UFUNCTION(BlueprintCallable, Category="VICE|Vehicle")
+    void InteractWithVehicle();
+
+    void SetCurrentVehicle(AVICEVehiclePawn* Vehicle) { CurrentVehicle = Vehicle; }
+    AVICEVehiclePawn* GetCurrentVehicle() const { return CurrentVehicle; }
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="VICE|Camera")
@@ -72,5 +80,10 @@ protected:
     float WalkSpeed = 420.0f;
 
 private:
+    void EnsureTouchHUD();
+
+    UPROPERTY(Transient)
+    TObjectPtr<AVICEVehiclePawn> CurrentVehicle;
+
     bool bFirstPerson = false;
 };
