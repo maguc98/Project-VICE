@@ -39,6 +39,8 @@ jobs:
           test -f Source/ProjectVICE/VICEDayNightController.cpp
       - name: Validate editor bootstrap script
         run: python3 -m py_compile Content/Python/create_vice_blockout_map.py
+      - name: Validate city source invariants
+        run: python3 Scripts/validate_city_source.py
       - name: Verify project documentation
         run: |
           test -f Docs/ROADMAP.md
