@@ -16,8 +16,8 @@ jobs:
       - name: Verify core source files
         run: |
           test -f Source/ProjectVICE/ProjectVICE.Build.cs
-          test -f Source/ProjectVICTarget.cs
-          test -f Source/ProjectVICEEditorTarget.cs
+          test -f Source/ProjectVICE.Target.cs
+          test -f Source/ProjectVICEEditor.Target.cs
           test -f Source/ProjectVICE/ProjectVICE.cpp
           test -f Source/ProjectVICE/VICECharacter.h
           test -f Source/ProjectVICE/VICECharacter.cpp
@@ -27,6 +27,8 @@ jobs:
           test -f Source/ProjectVICE/VICECityGenerator.cpp
           test -f Source/ProjectVICE/VICETouchHUD.h
           test -f Source/ProjectVICE/VICETouchHUD.cpp
+          test -f Source/ProjectVICE/VICEVehiclePawn.h
+          test -f Source/ProjectVICE/VICEVehiclePawn.cpp
       - name: Validate editor bootstrap script
         run: python3 -m py_compile Content/Python/create_vice_blockout_map.py
       - name: Verify project documentation
