@@ -24,7 +24,7 @@ The script creates a map, sets the Project VICE game mode, places a PlayerStart,
 - The city grid covers approximately 4.32 km × 4.32 km (25 × 25 road intersections, 24 × 24 blocks).
 - The custom city streamer tracks the currently possessed pawn, so streaming follows the player on foot or while driving.
 - A 5 × 5 neighborhood of cell actors is desired around the player; new cells are spawned nearest-first, up to 3 per 0.25-second update. Cells outside the radius are destroyed.
-- Each cell creates road segments and three deterministic primitive building masses for its north-east block.
+- Each cell creates road segments and three deterministic primitive building masses for its north-east block, grouped into one Hierarchical Instanced Static Mesh component to reduce component and draw-call overhead.
 - The player can walk, jump, sprint, and switch first-/third-person view.
 - The first blockout sedan supports entering/exiting, throttle, reverse, steering, braking, camera switching, and a speed display.
 - Mobile virtual joysticks drive movement/steering and camera look; the touch HUD provides jump, sprint, brake, camera, and enter/exit actions.
