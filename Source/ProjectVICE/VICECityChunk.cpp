@@ -76,20 +76,30 @@ AVICECityChunk::AVICECityChunk()
 
     if (BasicMaterial.Succeeded())
     {
-        RoadMaterial = VICECityVisuals::MakeColorMaterial(BasicMaterial.Object, this, FLinearColor(0.035f, 0.045f, 0.055f, 1.0f));
-        SidewalkMaterial = VICECityVisuals::MakeColorMaterial(BasicMaterial.Object, this, FLinearColor(0.34f, 0.36f, 0.37f, 1.0f));
-        BuildingMaterial = VICECityVisuals::MakeColorMaterial(BasicMaterial.Object, this, FLinearColor(0.62f, 0.59f, 0.52f, 1.0f));
-        GlassMaterial = VICECityVisuals::MakeColorMaterial(BasicMaterial.Object, this, FLinearColor(0.055f, 0.12f, 0.17f, 1.0f));
-        MarkingMaterial = VICECityVisuals::MakeColorMaterial(BasicMaterial.Object, this, FLinearColor(0.92f, 0.84f, 0.56f, 1.0f));
-        TrimMaterial = VICECityVisuals::MakeColorMaterial(BasicMaterial.Object, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f));
-
-        RoadInstances->SetMaterial(0, RoadMaterial);
-        SidewalkInstances->SetMaterial(0, SidewalkMaterial);
-        BuildingInstances->SetMaterial(0, BuildingMaterial);
-        GlassInstances->SetMaterial(0, GlassMaterial);
-        MarkingInstances->SetMaterial(0, MarkingMaterial);
-        TrimInstances->SetMaterial(0, TrimMaterial);
+        BaseColorMaterial = BasicMaterial.Object;
     }
+}
+
+void AVICECityChunk::InitializeMaterials()
+{
+    if (!BaseColorMaterial)
+    {
+        return;
+    }
+
+    RoadMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.045f, 0.055f, 1.0f));
+    SidewalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.34f, 0.36f, 0.37f, 1.0f));
+    BuildingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.62f, 0.59f, 0.52f, 1.0f));
+    GlassMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.055f, 0.12f, 0.17f, 1.0f));
+    MarkingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.92f, 0.92f, 0.86f, 1.0f));
+    TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f));
+
+    RoadInstances->SetMaterial(0, RoadMaterial);
+    SidewalkInstances->SetMaterial(0, SidewalkMaterial);
+    BuildingInstances->SetMaterial(0, BuildingMaterial);
+    GlassInstances->SetMaterial(0, GlassMaterial);
+    MarkingInstances->SetMaterial(0, MarkingMaterial);
+    TrimInstances->SetMaterial(0, TrimMaterial);
 }
 
 void AVICECityChunk::AddCube(
@@ -117,6 +127,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         return;
     }
     bInitialized = true;
+    InitializeMaterials();
 
     const float RoadHalf = RoadWidth * 0.5f;
     const float HalfCell = CellSpacing * 0.5f;
@@ -194,7 +205,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         // Two columns by up to three rows per side keep the instance count low.
         const float WindowWidth = 220.0f;
         const float WindowHeight = 240.0f;
-        const float WindowInset = 22.0f;
+        const float WindowInset = 8.0f;
         const float ColumnOffsets[] = { -0.22f, 0.22f };
         const float FloorOffsets[] = { 0.24f, 0.48f, 0.72f };
 
