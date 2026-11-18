@@ -37,6 +37,12 @@ private:
     TObjectPtr<UStaticMesh> CubeMesh;
 
     UPROPERTY()
+    TObjectPtr<UStaticMesh> CylinderMesh;
+
+    UPROPERTY()
+    TObjectPtr<UStaticMesh> SphereMesh;
+
+    UPROPERTY()
     TObjectPtr<UMaterialInterface> BaseColorMaterial;
 
     void InitializeMaterials();
