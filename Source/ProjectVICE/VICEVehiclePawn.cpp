@@ -182,7 +182,7 @@ void AVICEVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 bool AVICEVehiclePawn::EnterVehicle(AVICECharacter* Character)
 {
-    if (!IsValid(Character) || OccupyingCharacter || !Character->GetController())
+    if (!IsValid(Character) || OccupyingCharacter || GetController() || !Character->GetController())
     {
         return false;
     }
@@ -202,7 +202,20 @@ bool AVICEVehiclePawn::EnterVehicle(AVICECharacter* Character)
     Character->GetCharacterMovement()->DisableMovement();
 
     PC->Possess(this);
-    return GetController() == PC;
+    if (GetController() != PC)
+    {
+        // Restore the character if possession is rejected so the player can
+        // never become stuck in a hidden, unpossessed state.
+        Character->SetActorHiddenInGame(false);
+        Character->SetActorEnableCollision(true);
+        Character->SetActorTickEnabled(true);
+        Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+        OccupyingCharacter = nullptr;
+        VehicleController = nullptr;
+        return false;
+    }
+
+    return true;
 }
 
 void AVICEVehiclePawn::ExitVehicle()
