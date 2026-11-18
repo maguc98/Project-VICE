@@ -23,7 +23,7 @@ The first drivable vehicle is a lightweight arcade sedan blockout. It is deliber
 | Brake button | No action | Brake |
 | Enter/exit button | Enter nearby vehicle | Exit vehicle |
 
-Keyboard fallbacks:
+Touch HUD action buttons are arranged in a compact top-right cluster, while the speed readout is placed top-left to avoid the default virtual-joystick areas.\n\nKeyboard fallbacks:
 - WASD: move / throttle and steer
 - Mouse: camera look
 - E: enter / exit
