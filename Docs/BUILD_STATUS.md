@@ -12,6 +12,7 @@ Last updated: 2026-11-18
 - Runtime mobile touch HUD with camera, jump, sprint, vehicle interaction, and brake buttons.
 - Default virtual joystick axes mapped for movement, driving, and camera look.
 - Arcade sedan prototype with throttle, reverse, steering, swept collision, camera toggle, enter/exit possession flow, and speed readout.
+- Mobile day/night controller that animates the map Directional Light and Sky Light using a 20-minute in-game day.
 - Unreal Editor Python script to create the initial map with player start and basic lighting actors.
 - GitHub Actions repository structure and Python syntax checks.
 
