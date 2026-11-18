@@ -18,7 +18,7 @@ public:
 
     virtual void Tick(float DeltaSeconds) override;
 
-    void InitializePatrol(const FVector& CellOrigin, float CellSpacing, int32 RouteSeed);
+    void InitializePatrol(const FVector& CellOrigin, float CellSpacing, uint32 RouteSeed);
 
 private:
     UPROPERTY(VisibleAnywhere, Category="VICE|Pedestrian")
