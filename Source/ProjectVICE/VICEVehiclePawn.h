@@ -39,6 +39,9 @@ public:
     UFUNCTION(BlueprintCallable, Category="VICE|Vehicle")
     void SetBrakeInput(bool bPressed);
 
+    UFUNCTION(BlueprintPure, Category="VICE|Vehicle")
+    float GetSpeedKmh() const { return FMath::Abs(CurrentSpeed) * 0.036f; }
+
 protected:
     virtual void BeginPlay() override;
 
