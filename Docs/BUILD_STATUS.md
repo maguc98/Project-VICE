@@ -18,7 +18,7 @@ Last updated: 2026-11-19
 - Default virtual joystick axes mapped for movement, driving, and camera look.
 - Arcade sedan prototype with throttle, reverse, steering, swept collision, camera toggle, enter/exit possession flow, and speed readout.
 - Mobile day/night controller that animates the map Directional Light and Sky Light using a 20-minute in-game day.
-- Unreal Editor Python script to create the initial map with player start, directional sun linked to SkyAtmosphere, SkyLight, SkyAtmosphere, and exponential height fog.
+- Unreal Editor Python script to create the initial map with player start, SkyAtmosphere, and exponential height fog; the runtime day/night controller owns movable sun and skylight components.
 - Direct-to-game guest preview flow with a visible `PROJECT VICE / 游客预览版` HUD label, touch-control hints, and an on-foot/vehicle status readout; no account flow is required.
 - iOS visitor-preview packaging scaffolding: command-line map generation, local signing checks, Unreal Automation Tool BuildCookRun script, and a manual self-hosted macOS GitHub Actions workflow with IPA artifact upload. Signing assets stay on the build machine.
 - GitHub Actions repository structure, project JSON, Python syntax, and city source-level invariant checks (not an Unreal C++ compile).
