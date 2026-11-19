@@ -356,8 +356,8 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         };
         for (const FVector& LightLocation : ParkLightLocations)
         {
-            AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 1500.0f), FVector(90.0f, 90.0f, 3000.0f));
-            AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 3070.0f), FVector(360.0f, 360.0f, 140.0f));
+            AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 300.0f), FVector(80.0f, 80.0f, 600.0f));
+            AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 650.0f), FVector(260.0f, 260.0f, 120.0f));
         }
     }
 
