@@ -23,7 +23,7 @@ The outdoor world should feel continuous. Streaming boundaries must be hidden th
 
 ## Repository status
 
-This repository is being bootstrapped with source and configuration scaffolding. It does not yet contain Unreal Engine binaries, licensed marketplace assets, final character/vehicle art, or a signed IPA. Those require the Unreal Engine toolchain, art production, an Apple signing setup, and device testing.
+The project now has a direct-to-game guest flow and an explicitly labelled **Project VICE — 游客预览版** HUD. It remains a graybox engineering preview: it does not yet contain final character/vehicle art or a signed IPA. A local macOS iOS packaging script and a manually triggered self-hosted GitHub Actions workflow are provided; both require Unreal Engine 5.4, Xcode, and valid Apple signing assets on the build machine.
 
 ## Getting started
 
@@ -34,7 +34,7 @@ This repository is being bootstrapped with source and configuration scaffolding.
 
 See [Docs/ROADMAP.md](Docs/ROADMAP.md), [Docs/TECHNICAL_DESIGN.md](Docs/TECHNICAL_DESIGN.md), [Docs/DEVICE_BUDGETS.md](Docs/DEVICE_BUDGETS.md), [Docs/MAP_SETUP.md](Docs/MAP_SETUP.md), [Docs/VEHICLE_PROTOTYPE.md](Docs/VEHICLE_PROTOTYPE.md), [Docs/ENVIRONMENT_PROTOTYPE.md](Docs/ENVIRONMENT_PROTOTYPE.md), [Docs/PEDESTRIAN_PROTOTYPE.md](Docs/PEDESTRIAN_PROTOTYPE.md), [Docs/TRAFFIC_PROTOTYPE.md](Docs/TRAFFIC_PROTOTYPE.md), [Docs/CITY_VISUAL_STYLE.md](Docs/CITY_VISUAL_STYLE.md), and [Docs/BUILD_STATUS.md](Docs/BUILD_STATUS.md).
 
-The repository now includes a streamed coastal-city graybox with material-separated streets, connected sidewalks, road markings, facade details and low-poly trees; capsule-placeholder pedestrians, sparse ambient road-loop traffic, a character capsule placeholder, arcade sedan with enter/exit driving, native touch action HUD, and map bootstrap script. The map must be generated in Unreal Editor; source has not yet been compiled with Unreal Build Tool.
+The repository includes a streamed coastal-city graybox with material-separated streets, connected sidewalks, road markings, facade details and low-poly trees; capsule-placeholder pedestrians, sparse ambient road-loop traffic, a character capsule placeholder, arcade sedan with enter/exit driving, native touch action HUD, visitor-preview guidance, and a map bootstrap script. The iOS build workflow generates the map before cooking; source has not yet been compiled with Unreal Build Tool. See [iOS Visitor Preview](Docs/IOS_VISITOR_PREVIEW.md) for the build requirements.
 
 ## License
 
