@@ -50,8 +50,8 @@ if 'MAP_PATH = "/Game/Maps/L_ViceCity_Blockout"' not in map_script:
     raise SystemExit("Map bootstrap path does not match GameDefaultMap.")
 if "build_vice_city_blockout()" not in map_script:
     raise SystemExit("Map bootstrap script no longer creates the preview map.")
-if "unreal.SkyAtmosphere" not in map_script or '"atmosphere_sun_light", True' not in map_script:
-    raise SystemExit("Generated visitor preview map is missing its atmospheric sky setup.")
+if "unreal.SkyAtmosphere" not in map_script:
+    raise SystemExit("Generated visitor preview map is missing its SkyAtmosphere actor.")
 day_night_cpp = read("Source/ProjectVICE/VICEDayNightController.cpp")
 day_night_header = read("Source/ProjectVICE/VICEDayNightController.h")
 for token in ("SetMobility(EComponentMobility::Movable)", "SetAtmosphereSunLight(true)", "SetIntensity("):
