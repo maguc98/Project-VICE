@@ -85,7 +85,7 @@ park_invariants = (
     "FVector(CellSpacing * 0.28f, CellSpacing * 0.535f, 65.0f)",
     "FVector(CellSpacing * 0.72f, CellSpacing * 0.535f, 65.0f)",
     "AddCube(TrimInstances, BenchLocation + FVector(0.0f, 0.0f, 125.0f)",
-    "AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 1500.0f)",
+    "AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 300.0f)",
 )
 for invariant in park_invariants:
     if invariant not in chunk:
