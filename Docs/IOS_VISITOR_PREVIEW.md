@@ -8,36 +8,31 @@ This is an engineering preview, not a public release candidate. The city, charac
 
 ## Required build machine
 
-A signed iOS package must be built on macOS with:
+An iOS package (unsigned for later signing, or signed on the build machine) must be built on macOS with:
 
 - Unreal Engine **5.4**, including its iOS platform support and Automation Tool.
 - An Xcode version supported by that UE 5.4 installation, plus Xcode command-line tools.
-- An Apple development signing identity installed in the macOS keychain.
-- A matching iOS Development or Ad Hoc provisioning profile for bundle ID `com.maguc98.projectvice`.
-- The target iPhone registered in the provisioning profile when using a device-limited Development/Ad Hoc profile.
+- For **unsigned** builds: no Apple signing identity or provisioning profile is required at build time.
+- For **signed** builds: an Apple development signing identity and matching iOS Development or Ad Hoc profile for `com.maguc98.projectvice` are required.
 
-The signing identity and profile must belong to the same Apple team and match the bundle identifier. The private `.p12` and provisioning profile should stay on the build machine; do not commit them to this repository or paste them into chat.
+An unsigned IPA is a packaging artifact, not directly installable until it is signed with a matching certificate and provisioning profile. Keep private `.p12` files and profiles off the repository.
 
 ## Local macOS build
 
-Install the signing certificate into the current user's keychain and place the provisioning profile in:
-
-`~/Library/MobileDevice/Provisioning Profiles/`
-
-Then run from the repository root:
+For an unsigned package (the default), only set the Unreal installation path:
 
 ```bash
 export UE_ROOT="/path/to/UnrealEngine_5.4"
-export IOS_TEAM_ID="YOUR10CHARTEAM"
-export IOS_SIGNING_CERTIFICATE="Apple Development: Your Name (YOUR10CHARTEAM)"
-export IOS_MOBILE_PROVISION="ProjectVICE-Visitor.mobileprovision"
+export IOS_SIGNING_MODE=unsigned
 bash Scripts/package_ios_preview.sh
 ```
 
+For a signed package, install the certificate and profile locally, then set `IOS_SIGNING_MODE=signed` plus `IOS_TEAM_ID`, `IOS_SIGNING_CERTIFICATE`, and `IOS_MOBILE_PROVISION`.
+
 The script:
 
-1. Confirms macOS, Xcode, Unreal Engine 5.4 tools, signing identity, and provisioning-profile team/App ID.
-2. Temporarily injects the local signing identity into `Config/DefaultEngine.ini` and restores the original file on exit.
+1. Confirms macOS, Xcode, and Unreal Engine 5.4 tools. Signed mode additionally validates the local identity and profile.
+2. Signed mode temporarily injects local signing settings and restores the original config on exit; unsigned mode leaves project signing settings untouched.
 3. Opens Unreal Editor in command-line mode and runs `Content/Python/create_vice_blockout_map.py` to generate the currently missing `Content/Maps/L_ViceCity_Blockout.umap`.
 4. Runs Unreal Automation Tool `BuildCookRun` for iOS Development, including build, cook, stage, package, and archive.
 5. Copies the resulting IPA to `Artifacts/IOS/ProjectVICE-VisitorPreview.ipa` and writes a SHA-256 checksum.
@@ -54,7 +49,7 @@ It requires a **self-hosted macOS runner** with these labels:
 
 `self-hosted`, `macOS`, `ue5.4`, `ios`
 
-The runner must have UE 5.4 and Xcode installed, and its local keychain and provisioning-profile directory must already contain the signing assets. Configure these repository Actions Variables:
+The runner must have UE 5.4 and Xcode installed. Select `unsigned` in the workflow input to build without Apple signing assets; select `signed` only when the runner has a matching identity and provisioning profile. `UE_ROOT` is the only required repository variable for unsigned builds. Configure these repository Actions Variables for signed builds:
 
 | Variable | Value |
 |---|---|
@@ -70,10 +65,10 @@ No private signing key is uploaded to GitHub by this workflow. Once the runner a
 - [x] Guest flow has no login requirement.
 - [x] Visitor-preview identity and touch hints are included in the runtime HUD.
 - [x] UE editor bootstrap script creates the map referenced by the game default map.
-- [x] Local signed iOS packaging script is in the repository.
-- [x] Manual GitHub Actions workflow and artifact upload are defined.
+- [x] Local packaging script supports unsigned and signed modes.
+- [x] Manual GitHub Actions workflow exposes unsigned and signed build modes.
 - [ ] Run UE 5.4 Header Tool and C++ compilation.
-- [ ] Cook and package on a configured macOS runner with the project's real signing assets.
+- [ ] Cook and package on a configured macOS runner (unsigned mode does not require signing assets).
 - [ ] Install and launch on the target iPhone.
 - [ ] Complete a representative play session and fix any crashes, touch-layout issues, or streaming hitches.
 
