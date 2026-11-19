@@ -24,14 +24,34 @@ void UVICETouchHUD::NativeConstruct()
     UCanvasPanel* RootCanvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("TouchRoot"));
     WidgetTree->RootWidget = RootCanvas;
 
+    // Visitor-preview identity is always visible; the game intentionally
+    // starts directly in a guest session and does not require an account.
+    PreviewHeader = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("PreviewHeader"));
+    PreviewHeader->SetText(FText::FromString(TEXT("PROJECT VICE  /  游客预览版")));
+    PreviewHeader->SetJustification(ETextJustify::Left);
+    UCanvasPanelSlot* HeaderSlot = RootCanvas->AddChildToCanvas(PreviewHeader);
+    HeaderSlot->SetAnchors(FAnchors(0.0f, 0.0f, 0.0f, 0.0f));
+    HeaderSlot->SetAlignment(FVector2D(0.0f, 0.0f));
+    HeaderSlot->SetPosition(FVector2D(28.0f, 22.0f));
+    HeaderSlot->SetSize(FVector2D(320.0f, 32.0f));
+
+    PreviewHint = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("PreviewHint"));
+    PreviewHint->SetText(FText::FromString(TEXT("左侧摇杆移动  ·  右侧滑动转向  ·  靠近车辆后点击上车")));
+    PreviewHint->SetJustification(ETextJustify::Left);
+    UCanvasPanelSlot* HintSlot = RootCanvas->AddChildToCanvas(PreviewHint);
+    HintSlot->SetAnchors(FAnchors(0.0f, 0.0f, 0.0f, 0.0f));
+    HintSlot->SetAlignment(FVector2D(0.0f, 0.0f));
+    HintSlot->SetPosition(FVector2D(28.0f, 54.0f));
+    HintSlot->SetSize(FVector2D(420.0f, 30.0f));
+
     SpeedReadout = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("SpeedReadout"));
-    SpeedReadout->SetText(FText::FromString(TEXT("VICE CITY")));
+    SpeedReadout->SetText(FText::FromString(TEXT("步行探索")));
     SpeedReadout->SetJustification(ETextJustify::Left);
     UCanvasPanelSlot* SpeedSlot = RootCanvas->AddChildToCanvas(SpeedReadout);
     SpeedSlot->SetAnchors(FAnchors(0.0f, 0.0f, 0.0f, 0.0f));
     SpeedSlot->SetAlignment(FVector2D(0.0f, 0.0f));
-    SpeedSlot->SetPosition(FVector2D(28.0f, 26.0f));
-    SpeedSlot->SetSize(FVector2D(210.0f, 48.0f));
+    SpeedSlot->SetPosition(FVector2D(28.0f, 86.0f));
+    SpeedSlot->SetSize(FVector2D(210.0f, 36.0f));
 
     UButton* CameraButton = AddActionButton(TEXT("视角"), FVector2D(-16.0f, 24.0f), FVector2D(92.0f, 56.0f));
     if (CameraButton)
@@ -184,6 +204,6 @@ void UVICETouchHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     }
     else
     {
-        SpeedReadout->SetText(FText::FromString(TEXT("VICE CITY")));
+        SpeedReadout->SetText(FText::FromString(TEXT("步行探索  ·  游客模式")));
     }
 }
