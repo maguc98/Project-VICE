@@ -52,6 +52,8 @@ if "build_vice_city_blockout()" not in map_script:
     raise SystemExit("Map bootstrap script no longer creates the preview map.")
 if "unreal.SkyAtmosphere" not in map_script or '"atmosphere_sun_light", True' not in map_script:
     raise SystemExit("Generated visitor preview map is missing its atmospheric sky setup.")
+if "unreal.ComponentMobility.MOVABLE" not in map_script:
+    raise SystemExit("Generated sun and skylight must be movable for the day/night cycle.")
 
 for widget_name in ("PreviewHeader", "PreviewHint", "SpeedReadout"):
     if widget_name not in hud_header or widget_name not in hud_cpp:
