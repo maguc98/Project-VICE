@@ -27,6 +27,12 @@ private:
     TObjectPtr<AVICECharacter> ControlledCharacter;
 
     UPROPERTY(Transient)
+    TObjectPtr<UTextBlock> PreviewHeader;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UTextBlock> PreviewHint;
+
+    UPROPERTY(Transient)
     TObjectPtr<UTextBlock> SpeedReadout;
 
     UFUNCTION()
