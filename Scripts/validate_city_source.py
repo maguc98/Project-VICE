@@ -28,6 +28,7 @@ batches = (
     "TrimInstances",
     "TreeTrunkInstances",
     "TreeCanopyInstances",
+    "WaterInstances",
 )
 
 for batch in batches:
@@ -63,6 +64,18 @@ if "const float WidthBase = bIndustrial ? 5000.0f" not in chunk:
 if "const float WidthRange = bIndustrial ? 1200.0f" not in chunk:
     raise SystemExit("Industrial building width range is missing.")
 
+# Waterfront-only geometry must use a dedicated, non-colliding HISM batch.
+if "WaterMaterial = bWaterfront ?" not in chunk:
+    raise SystemExit("Water material must only be allocated for waterfront cells.")
+if "WaterInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);" not in chunk:
+    raise SystemExit("Water placeholder must not block player movement.")
+if "AddCube(WaterInstances, FVector(HalfCell, CellSpacing * 0.805f" not in chunk:
+    raise SystemExit("Water surface placement is missing.")
+if "FVector(HalfCell, CellSpacing * 0.63f, 9.0f)" not in chunk:
+    raise SystemExit("Waterfront promenade placement is missing.")
+if "const float WaterfrontY[] = { 0.24f, 0.24f, 0.48f };" not in chunk:
+    raise SystemExit("Waterfront buildings are not moved away from the promenade.")
+
 # The pedestrian spawn and its patrol loop must remain on the sidewalk centerline.
 if "const float SidewalkInset = 1300.0f;" not in pedestrian:
     raise SystemExit("Pedestrian sidewalk inset changed unexpectedly.")
@@ -74,6 +87,6 @@ if "FVector(1300.0f, 1300.0f, 110.0f)" not in generator:
 print(
     "City source invariants passed: "
     f"{len(batches)} HISM batches, deterministic district rules, "
-    "static component mobility, and sidewalk patrol alignment. "
+    "static component mobility, waterfront water/promenade layout, and sidewalk patrol alignment. "
     "This is not an Unreal C++ compile."
 )
