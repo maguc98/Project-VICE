@@ -146,8 +146,10 @@ void AVICECityChunk::InitializeMaterials(const FIntPoint& Coordinates)
     const FLinearColor BuildingColor = bWaterfront
         ? FLinearColor(0.72f, 0.68f, 0.57f, 1.0f)
         : (bIndustrial ? FLinearColor(0.43f, 0.45f, 0.43f, 1.0f) : FLinearColor(0.62f, 0.59f, 0.52f, 1.0f));
+    // Coastal glazing shares a brighter sea-glass tint with the shallow-water
+    // shelf, making the shoreline transition readable without another HISM.
     const FLinearColor GlassColor = bWaterfront
-        ? FLinearColor(0.08f, 0.19f, 0.22f, 1.0f)
+        ? FLinearColor(0.10f, 0.31f, 0.33f, 1.0f)
         : (bIndustrial ? FLinearColor(0.10f, 0.13f, 0.14f, 1.0f) : FLinearColor(0.055f, 0.12f, 0.17f, 1.0f));
     const FLinearColor CanopyColor = bWaterfront
         ? FLinearColor(0.16f, 0.34f, 0.25f, 1.0f)
@@ -156,7 +158,7 @@ void AVICECityChunk::InitializeMaterials(const FIntPoint& Coordinates)
     RoadMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.045f, 0.055f, 1.0f), 0.92f);
     SidewalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, SidewalkColor, 0.86f);
     BuildingMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, BuildingColor, 0.82f);
-    GlassMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, GlassColor, 0.24f);
+    GlassMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, GlassColor, bWaterfront ? 0.42f : 0.24f);
     LaneLineMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.96f, 0.72f, 0.18f, 1.0f), 0.72f);
     CrosswalkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.92f, 0.93f, 0.88f, 1.0f), 0.78f);
     TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f), 0.82f);
@@ -332,6 +334,20 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
                 FVector(CoastSegmentWidth, SandDepth, 16.0f), BeachSlopeRotation);
             AddCube(WaterInstances, FVector(SegmentCenterX, WaterCenterY, -12.0f),
                 FVector(CoastSegmentWidth, WaterDepth, 24.0f));
+
+            // A narrow, opaque sea-glass band overlays the near-shore water.
+            // It uses the existing non-colliding glazing batch and its coastal
+            // tint, so shallow/deep separation adds no component or translucency.
+            const float ShallowBandStartY = ShorelineY + 0.018f;
+            const float ShallowBandEndY = FMath::Min(ShorelineY + 0.058f, OceanEdgeY - 0.025f);
+            const float ShallowBandDepth = (ShallowBandEndY - ShallowBandStartY) * CellSpacing;
+            const float ShallowBandCenterY = (ShallowBandEndY + ShallowBandStartY) * 0.5f * CellSpacing;
+            if (ShallowBandDepth > 100.0f)
+            {
+                AddCube(GlassInstances, FVector(SegmentCenterX, ShallowBandCenterY, 2.5f),
+                    FVector(CoastSegmentWidth, ShallowBandDepth, 5.0f));
+            }
+
             AddCube(CrosswalkInstances,
                 FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f),
                 FVector(CoastSegmentWidth - 40.0f, 70.0f, 6.0f));
