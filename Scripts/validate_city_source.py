@@ -91,7 +91,7 @@ coastline_invariants = (
     "AddCube(SidewalkInstances, FVector(SegmentCenterX, SandCenterY, 8.0f)",
     "FVector(CoastSegmentWidth, SandDepth, 16.0f), BeachSlopeRotation);",
     "AddCube(WaterInstances, FVector(SegmentCenterX, WaterCenterY, -12.0f)",
-    "AddCube(CrosswalkInstances, FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f)",
+    "AddCube(CrosswalkInstances,\n                FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f)",
     "FVector(CoastSegmentWidth - 40.0f, 70.0f, 6.0f)",
 )
 for invariant in coastline_invariants:
