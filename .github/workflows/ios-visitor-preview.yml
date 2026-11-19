@@ -3,6 +3,14 @@ name: iOS Visitor Preview
 on:
   workflow_dispatch:
     inputs:
+      build_mode:
+        description: Build unsigned IPA for later signing, or sign on the runner
+        required: true
+        default: unsigned
+        type: choice
+        options:
+          - unsigned
+          - signed
       notes:
         description: Build notes for this visitor preview
         required: false
@@ -19,6 +27,7 @@ jobs:
     timeout-minutes: 180
     env:
       UE_ROOT: ${{ vars.UE_ROOT }}
+      IOS_SIGNING_MODE: ${{ inputs.build_mode }}
       IOS_TEAM_ID: ${{ vars.IOS_TEAM_ID }}
       IOS_SIGNING_CERTIFICATE: ${{ vars.IOS_SIGNING_CERTIFICATE }}
       IOS_MOBILE_PROVISION: ${{ vars.IOS_MOBILE_PROVISION }}
@@ -33,7 +42,9 @@ jobs:
           test -x "$UE_ROOT/Engine/Binaries/Mac/UnrealEditor-Cmd"
           test -x "$UE_ROOT/Engine/Build/BatchFiles/RunUAT.sh"
           xcodebuild -version
-          security find-identity -v -p codesigning
+          if [[ "${IOS_SIGNING_MODE}" == "signed" ]]; then
+            security find-identity -v -p codesigning
+          fi
 
       - name: Validate packaging scripts
         run: |
@@ -41,7 +52,7 @@ jobs:
           python3 -m json.tool ProjectVICE.uproject > /dev/null
           python3 -m py_compile Content/Python/create_vice_blockout_map.py
 
-      - name: Build signed visitor preview IPA
+      - name: Build visitor preview IPA
         run: bash Scripts/package_ios_preview.sh
 
       - name: Upload visitor preview IPA
