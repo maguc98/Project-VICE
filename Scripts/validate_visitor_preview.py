@@ -52,8 +52,16 @@ if "build_vice_city_blockout()" not in map_script:
     raise SystemExit("Map bootstrap script no longer creates the preview map.")
 if "unreal.SkyAtmosphere" not in map_script or '"atmosphere_sun_light", True' not in map_script:
     raise SystemExit("Generated visitor preview map is missing its atmospheric sky setup.")
-if "unreal.ComponentMobility.MOVABLE" not in map_script:
-    raise SystemExit("Generated sun and skylight must be movable for the day/night cycle.")
+day_night_cpp = read("Source/ProjectVICE/VICEDayNightController.cpp")
+day_night_header = read("Source/ProjectVICE/VICEDayNightController.h")
+for token in ("SetMobility(EComponentMobility::Movable)", "SetAtmosphereSunLight(true)", "SetIntensity("):
+    if token not in day_night_cpp:
+        raise SystemExit(f"Runtime lighting component setup is missing: {token}")
+for token in ("UDirectionalLightComponent", "USkyLightComponent", "SceneRoot"):
+    if token not in day_night_header:
+        raise SystemExit(f"Runtime lighting component declaration is missing: {token}")
+if "unreal.DirectionalLight" in map_script or "unreal.SkyLight" in map_script:
+    raise SystemExit("Map bootstrap must not create duplicate lights; the runtime lighting rig owns them.")
 
 for widget_name in ("PreviewHeader", "PreviewHint", "SpeedReadout"):
     if widget_name not in hud_header or widget_name not in hud_cpp:
