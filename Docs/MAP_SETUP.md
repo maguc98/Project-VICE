@@ -17,7 +17,7 @@ py "Content/Python/create_vice_blockout_map.py"
 
 5. Save the project after the script reports that `/Game/Maps/L_ViceCity_Blockout` was created.
 
-The script creates a map, sets the Project VICE game mode, places a PlayerStart, directional sun, skylight, and exponential height fog. The game mode spawns the runtime city streamer and the first sedan.
+The script creates a map, sets the Project VICE game mode, places a PlayerStart, a directional sun linked to SkyAtmosphere, a SkyLight, SkyAtmosphere, and exponential height fog. The game mode spawns the runtime city streamer and the first sedan.
 The iOS visitor-preview packaging script runs this bootstrap through UnrealEditor-Cmd before cooking. The editor startup map is set to the engine entry map so a clean checkout can open the editor before the generated project map exists; the packaged game still starts from the generated VICE blockout map.
 
 ## Current prototype behavior
@@ -31,7 +31,7 @@ The iOS visitor-preview packaging script runs this bootstrap through UnrealEdito
 - Waterfront cells reserve the outer block edge for a promenade, low seawall, and opaque water. The sea edge is split into three overlapping spans whose shoreline positions follow a deterministic low-frequency profile along the global X axis; the overlap avoids visible gaps and the same cell recreates the same contour after streaming. A sand-colored beach shelf fills the gap between seawall and water; each shelf segment is rotated into a gentle one-degree seaward slope. A narrow opaque sea-glass band overlays the near-shore water to distinguish shallow from deep water, reusing the existing glazing HISM and coastal tint; the white waterline accent stays at the surface. A compact park fills the inland strip with two planting beds, three stylized low-poly palms, two benches, and three lamp-post placeholders. Coastal cells skip generic trees that would overlap the sea edge.
 - One simple sidewalk pedestrian patrol is spawned per active cell; this is capped by the 5 × 5 streaming window.
 - A sparse deterministic pattern also spawns ambient road-loop cars; these are removed with their owning streamed cells.
-- The player can walk, jump, sprint, and switch first-/third-person view.
+- The player can walk, jump, sprint, and switch first-/third-person view. On touch devices, the left virtual stick drives movement or vehicle throttle/steering, the right virtual stick controls the camera, and the HUD buttons handle jump, sprint, brake, camera, and vehicle enter/exit.
 - The first blockout sedan supports entering/exiting, throttle, reverse, steering, braking, camera switching, and a speed display.
 - Mobile virtual joysticks drive movement/steering and camera look; the touch HUD provides jump, sprint, brake, camera, and enter/exit actions.
 
