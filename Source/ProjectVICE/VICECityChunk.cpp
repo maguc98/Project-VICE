@@ -183,7 +183,8 @@ void AVICECityChunk::AddMeshInstance(
     UHierarchicalInstancedStaticMeshComponent* Target,
     UStaticMesh* Mesh,
     const FVector& LocalLocation,
-    const FVector& Dimensions)
+    const FVector& Dimensions,
+    const FRotator& LocalRotation)
 {
     if (!Target || !Mesh)
     {
@@ -191,7 +192,7 @@ void AVICECityChunk::AddMeshInstance(
     }
 
     const FTransform InstanceTransform(
-        FRotator::ZeroRotator,
+        LocalRotation,
         LocalLocation,
         Dimensions / 100.0f);
 
@@ -201,9 +202,10 @@ void AVICECityChunk::AddMeshInstance(
 void AVICECityChunk::AddCube(
     UHierarchicalInstancedStaticMeshComponent* Target,
     const FVector& LocalLocation,
-    const FVector& Dimensions)
+    const FVector& Dimensions,
+    const FRotator& LocalRotation)
 {
-    AddMeshInstance(Target, CubeMesh, LocalLocation, Dimensions);
+    AddMeshInstance(Target, CubeMesh, LocalLocation, Dimensions, LocalRotation);
 }
 
 void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth)
@@ -320,11 +322,20 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
             const float SandDepth = (ShorelineY - LandwardShoreBaseY) * CellSpacing;
             const float SandCenterY = (ShorelineY + LandwardShoreBaseY) * 0.5f * CellSpacing;
 
+            // A one-degree seaward fall gives the beach a visible but
+            // gentle cross-section without raising its landward edge above
+            // the adjacent blockout sidewalk. The ramp stays in the sidewalk
+            // HISM batch, so it adds no component or material batch.
+            constexpr float BeachSlopeDegrees = 1.0f;
+            const FRotator BeachSlopeRotation(0.0f, 0.0f, -BeachSlopeDegrees);
             AddCube(SidewalkInstances, FVector(SegmentCenterX, SandCenterY, 8.0f),
-                FVector(CoastSegmentWidth, SandDepth, 16.0f));
+                FVector(CoastSegmentWidth, SandDepth, 16.0f), BeachSlopeRotation);
             AddCube(WaterInstances, FVector(SegmentCenterX, WaterCenterY, -12.0f),
                 FVector(CoastSegmentWidth, WaterDepth, 24.0f));
-            AddCube(CrosswalkInstances, FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f),
+            const float ShorelineSlopeDrop = SandDepth * 0.5f
+                * FMath::Sin(FMath::DegreesToRadians(BeachSlopeDegrees));
+            AddCube(CrosswalkInstances,
+                FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f - ShorelineSlopeDrop),
                 FVector(CoastSegmentWidth - 40.0f, 70.0f, 6.0f));
         }
 
