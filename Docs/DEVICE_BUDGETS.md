@@ -8,10 +8,10 @@ Target device: iPhone 12 mini (A14). These are starting engineering budgets, not
 | Frame time | 33.3 ms total frame budget |
 | Memory | Keep a conservative resident asset budget; avoid loading multiple districts at full detail |
 | Rendering | Mobile forward, Metal, dynamic resolution |
-| Geometry | LOD/HLOD and instancing; nine material-batched HISM components per graybox cell; no Nanite dependency |
+| Geometry | LOD/HLOD and instancing; ten material-batched HISM components per graybox cell (water batch populated only in waterfront cells); no Nanite dependency |
 | Lighting | Mostly baked/static; current city graybox lets building masses cast shadows while disabling shadows on small decorative batches |
 | Textures | ASTC, mipmaps, streaming, platform-specific max sizes |
-| Effects | Low overdraw; cap particles and translucency |
+| Effects | Low overdraw; cap particles and translucency; keep the prototype water surface opaque to avoid large translucent overdraw |
 | Streaming | Target: 25 active city chunks, up to 25 placeholder pedestrians, and sparse traffic actors; at most 3 chunks spawned per 0.25-second update in the current prototype |
 | Thermal | Profile sustained sessions, not only short benchmark runs |
 
