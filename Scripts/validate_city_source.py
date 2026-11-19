@@ -73,8 +73,23 @@ if "AddCube(WaterInstances, FVector(HalfCell, CellSpacing * 0.805f" not in chunk
     raise SystemExit("Water surface placement is missing.")
 if "FVector(HalfCell, CellSpacing * 0.63f, 9.0f)" not in chunk:
     raise SystemExit("Waterfront promenade placement is missing.")
-if "const float WaterfrontY[] = { 0.24f, 0.24f, 0.48f };" not in chunk:
-    raise SystemExit("Waterfront buildings are not moved away from the promenade.")
+if "const float WaterfrontY[] = { 0.22f, 0.22f, 0.38f };" not in chunk:
+    raise SystemExit("Waterfront buildings are not shifted inland to make room for the park.")
+
+# Coastal park details reuse existing HISM batches; no new component batch is allowed.
+park_invariants = (
+    "if (bWaterfront && TreeLocation.Y > 6000.0f)",
+    "const FVector CoastalPalmLocations[]",
+    "const FVector BenchLocations[]",
+    "const FVector ParkLightLocations[]",
+    "FVector(CellSpacing * 0.28f, CellSpacing * 0.535f, 65.0f)",
+    "FVector(CellSpacing * 0.72f, CellSpacing * 0.535f, 65.0f)",
+    "AddCube(TrimInstances, BenchLocation + FVector(0.0f, 0.0f, 125.0f)",
+    "AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 1500.0f)",
+)
+for invariant in park_invariants:
+    if invariant not in chunk:
+        raise SystemExit(f"Missing waterfront park invariant: {invariant}")
 
 # The pedestrian spawn and its patrol loop must remain on the sidewalk centerline.
 if "const float SidewalkInset = 1300.0f;" not in pedestrian:
@@ -87,6 +102,6 @@ if "FVector(1300.0f, 1300.0f, 110.0f)" not in generator:
 print(
     "City source invariants passed: "
     f"{len(batches)} HISM batches, deterministic district rules, "
-    "static component mobility, waterfront water/promenade layout, and sidewalk patrol alignment. "
+    "static component mobility, waterfront water/promenade/park props, and sidewalk patrol alignment. "
     "This is not an Unreal C++ compile."
 )
