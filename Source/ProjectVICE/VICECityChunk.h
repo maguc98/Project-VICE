@@ -26,9 +26,14 @@ private:
         UHierarchicalInstancedStaticMeshComponent* Target,
         UStaticMesh* Mesh,
         const FVector& LocalLocation,
-        const FVector& Dimensions);
+        const FVector& Dimensions,
+        const FRotator& LocalRotation = FRotator::ZeroRotator);
 
-    void AddCube(UHierarchicalInstancedStaticMeshComponent* Target, const FVector& LocalLocation, const FVector& Dimensions);
+    void AddCube(
+        UHierarchicalInstancedStaticMeshComponent* Target,
+        const FVector& LocalLocation,
+        const FVector& Dimensions,
+        const FRotator& LocalRotation = FRotator::ZeroRotator);
 
     UPROPERTY()
     TObjectPtr<USceneComponent> SceneRoot;
