@@ -4,8 +4,9 @@
 #include "GameFramework/Actor.h"
 #include "VICEDayNightController.generated.h"
 
-class ADirectionalLight;
-class ASkyLight;
+class UDirectionalLightComponent;
+class USceneComponent;
+class USkyLightComponent;
 
 /** Lightweight mobile-friendly time-of-day driver for the map's sun and sky light. */
 UCLASS()
@@ -28,14 +29,16 @@ protected:
     virtual void BeginPlay() override;
 
 private:
-    void FindEnvironmentLights();
     void UpdateLighting();
 
-    UPROPERTY(Transient)
-    TObjectPtr<ADirectionalLight> SunActor;
+    UPROPERTY(VisibleAnywhere, Category="VICE|Environment")
+    TObjectPtr<USceneComponent> SceneRoot;
 
-    UPROPERTY(Transient)
-    TObjectPtr<ASkyLight> SkyActor;
+    UPROPERTY(VisibleAnywhere, Category="VICE|Environment")
+    TObjectPtr<UDirectionalLightComponent> SunLight;
+
+    UPROPERTY(VisibleAnywhere, Category="VICE|Environment")
+    TObjectPtr<USkyLightComponent> SkyLight;
 
     UPROPERTY(EditAnywhere, Category="VICE|Environment", meta=(ClampMin="0.0", ClampMax="24.0"))
     float TimeOfDayHours = 14.0f;
