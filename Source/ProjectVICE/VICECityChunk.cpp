@@ -87,6 +87,12 @@ AVICECityChunk::AVICECityChunk()
     TreeCanopyInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     TreeCanopyInstances->SetCastShadow(false);
 
+    WaterInstances = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("WaterInstances"));
+    WaterInstances->SetupAttachment(SceneRoot);
+    WaterInstances->SetMobility(EComponentMobility::Static);
+    WaterInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    WaterInstances->SetCastShadow(false);
+
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderAsset(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereAsset(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
@@ -102,6 +108,7 @@ AVICECityChunk::AVICECityChunk()
         LaneLineInstances->SetStaticMesh(CubeMesh);
         CrosswalkInstances->SetStaticMesh(CubeMesh);
         TrimInstances->SetStaticMesh(CubeMesh);
+        WaterInstances->SetStaticMesh(CubeMesh);
     }
 
     if (CylinderAsset.Succeeded())
@@ -155,6 +162,7 @@ void AVICECityChunk::InitializeMaterials(const FIntPoint& Coordinates)
     TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f), 0.82f);
     TreeTrunkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.22f, 0.14f, 0.09f, 1.0f), 0.94f);
     TreeCanopyMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, CanopyColor, 0.9f);
+    WaterMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.22f, 0.30f, 1.0f), 0.28f);
 
     RoadInstances->SetMaterial(0, RoadMaterial);
     SidewalkInstances->SetMaterial(0, SidewalkMaterial);
@@ -165,6 +173,7 @@ void AVICECityChunk::InitializeMaterials(const FIntPoint& Coordinates)
     TrimInstances->SetMaterial(0, TrimMaterial);
     TreeTrunkInstances->SetMaterial(0, TreeTrunkMaterial);
     TreeCanopyInstances->SetMaterial(0, TreeCanopyMaterial);
+    WaterInstances->SetMaterial(0, WaterMaterial);
 }
 
 void AVICECityChunk::AddMeshInstance(
@@ -196,7 +205,7 @@ void AVICECityChunk::AddCube(
 
 void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpacing, float RoadWidth)
 {
-    if (bInitialized || !RoadInstances || !SidewalkInstances || !BuildingInstances || !LaneLineInstances || !CrosswalkInstances || !CubeMesh)
+    if (bInitialized || !RoadInstances || !SidewalkInstances || !BuildingInstances || !LaneLineInstances || !CrosswalkInstances || !WaterInstances || !CubeMesh)
     {
         return;
     }
