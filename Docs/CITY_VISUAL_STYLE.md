@@ -36,7 +36,7 @@ The runtime blockout assigns a stable district from each cell coordinate:
 - **Industrial:** non-downtown cells outside the waterfront band with X ≥ 8 and Y ≥ 5; broader, lower warehouse-like masses and a muted concrete palette.
 - **Residential:** all remaining cells; the baseline mid-rise proportions and warm neutral palette.
 
-These rules are deterministic. Waterfront cells now populate the dedicated water HISM with an opaque blue plane, add a promenade strip and low seawall placeholder, and move their building masses inland. This is still a simple blockout: there is no beach, sculpted shoreline, translucent/reflection shader, or wave simulation.
+These rules are deterministic. Waterfront cells populate the dedicated water HISM with an opaque blue plane, add a promenade and low seawall, and reserve an inland park strip. The park uses flattened foliage-mesh planting beds, three radial-frond palm placeholders, two simple benches, and three lamp-post silhouettes. These instances reuse the existing foliage and trim HISM batches; the cell still has ten HISM components. Buildings shift farther inland to protect the promenade and park footprint. This remains a primitive blockout: there is no beach, sculpted shoreline, emissive/functional park lighting, reflective/translucent water shader, or wave simulation.
 
 ## Production asset pipeline
 
@@ -50,4 +50,4 @@ These rules are deterministic. Waterfront cells now populate the dedicated water
 
 ## Current limitations
 
-The current buildings, glazing, trees, road markings and sidewalks are procedural primitive-mesh assemblies. They do not yet contain authored UVs, texture atlases, physically based facade materials, real tree meshes, unique silhouettes, signs, street furniture, or baked lighting. Do not describe this stage as photorealistic until those assets exist and are validated in the running game.
+The current buildings, glazing, trees, park furniture, road markings and sidewalks are procedural primitive-mesh assemblies. They do not yet contain authored UVs, texture atlases, physically based facade materials, real tree meshes, unique silhouettes, signs, finished street furniture, functional park lights, or baked lighting. Do not describe this stage as photorealistic until those assets exist and are validated in the running game.
