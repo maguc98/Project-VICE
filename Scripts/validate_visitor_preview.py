@@ -50,11 +50,13 @@ if 'MAP_PATH = "/Game/Maps/L_ViceCity_Blockout"' not in map_script:
     raise SystemExit("Map bootstrap path does not match GameDefaultMap.")
 if "build_vice_city_blockout()" not in map_script:
     raise SystemExit("Map bootstrap script no longer creates the preview map.")
+if "unreal.SkyAtmosphere" not in map_script or '"atmosphere_sun_light", True' not in map_script:
+    raise SystemExit("Generated visitor preview map is missing its atmospheric sky setup.")
 
 for widget_name in ("PreviewHeader", "PreviewHint", "SpeedReadout"):
     if widget_name not in hud_header or widget_name not in hud_cpp:
         raise SystemExit(f"Visitor preview HUD widget is incomplete: {widget_name}")
-for label in ("游客预览版", "左侧摇杆移动", "步行探索  ·  游客模式"):
+for label in ("游客预览版", "左摇杆：移动 / 驾驶", "右摇杆：镜头", "步行探索  ·  游客模式"):
     if label not in hud_cpp:
         raise SystemExit(f"Missing visitor-preview HUD copy: {label}")
 
