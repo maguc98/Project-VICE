@@ -2,7 +2,7 @@
 
 ## Scope
 
-The visitor preview is a direct-to-game guest experience: it does not require an account or sign-in. On launch, the player enters the coastal-city graybox and can walk, jump, sprint, switch camera perspective, and enter/drive/exit the prototype sedan. The HUD identifies the build as **Project VICE — 游客预览版** and shows the basic touch-control hints.
+The visitor preview is a direct-to-game guest experience: it does not require an account or sign-in. On launch, the player enters the coastal-city graybox and can walk, jump, sprint, switch camera perspective, and enter/drive/exit the prototype sedan. The HUD identifies the build as **Project VICE — 游客预览版**. The left virtual stick controls walking or vehicle throttle/steering, the right stick controls camera look, and on-screen actions handle jump, sprint, brake, camera, and vehicle enter/exit. The generated map includes a SkyAtmosphere linked to the directional sun.
 
 This is an engineering preview, not a public release candidate. The city, character, vehicle, pedestrians, traffic, and waterfront are still graybox prototypes.
 
