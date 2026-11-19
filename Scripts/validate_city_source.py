@@ -50,6 +50,11 @@ if signature not in header or "void AVICECityChunk::InitializeMaterials(const FI
 if "InitializeMaterials(Coordinates);" not in chunk:
     raise SystemExit("Cell coordinates are not passed into material initialization.")
 
+if "const FRotator& LocalRotation = FRotator::ZeroRotator" not in header:
+    raise SystemExit("Instance helpers must support optional local rotation.")
+if "const FTransform InstanceTransform(\n        LocalRotation," not in chunk:
+    raise SystemExit("Instance transforms do not apply the supplied local rotation.")
+
 district_rules = (
     "const bool bDowntown = FMath::Abs(Coordinates.X) <= 2 && FMath::Abs(Coordinates.Y) <= 2;",
     "const bool bWaterfront = !bDowntown && Coordinates.Y <= -8;",
@@ -81,7 +86,10 @@ coastline_invariants = (
     "FMath::Sin(CoastPhase * 0.21f + 1.3f)",
     "const float OceanEdgeY = 0.902f;",
     "const float LandwardShoreBaseY = 0.674f;",
+    "constexpr float BeachSlopeDegrees = 1.0f;",
+    "const FRotator BeachSlopeRotation(0.0f, 0.0f, -BeachSlopeDegrees);",
     "AddCube(SidewalkInstances, FVector(SegmentCenterX, SandCenterY, 8.0f)",
+    "FVector(CoastSegmentWidth, SandDepth, 16.0f), BeachSlopeRotation);",
     "AddCube(WaterInstances, FVector(SegmentCenterX, WaterCenterY, -12.0f)",
     "AddCube(CrosswalkInstances, FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f)",
     "FVector(CoastSegmentWidth - 40.0f, 70.0f, 6.0f)",
