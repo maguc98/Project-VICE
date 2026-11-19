@@ -29,6 +29,17 @@ def build_vice_city_blockout():
     )
     if sun:
         sun.set_actor_label("VICE_Sun_Directional")
+        sun_component = sun.get_component_by_class(unreal.DirectionalLightComponent)
+        if sun_component:
+            sun_component.set_editor_property("atmosphere_sun_light", True)
+
+    atmosphere = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        unreal.SkyAtmosphere,
+        unreal.Vector(0.0, 0.0, 0.0),
+        unreal.Rotator(0.0, 0.0, 0.0),
+    )
+    if atmosphere:
+        atmosphere.set_actor_label("VICE_SkyAtmosphere")
 
     sky = unreal.EditorLevelLibrary.spawn_actor_from_class(
         unreal.SkyLight,
