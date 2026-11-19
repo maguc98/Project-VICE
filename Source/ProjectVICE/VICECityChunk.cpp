@@ -325,7 +325,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
             AddCube(WaterInstances, FVector(SegmentCenterX, WaterCenterY, -12.0f),
                 FVector(CoastSegmentWidth, WaterDepth, 24.0f));
             AddCube(CrosswalkInstances, FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f),
-                FVector(CoastSegmentStep - 40.0f, 70.0f, 6.0f));
+                FVector(CoastSegmentWidth - 40.0f, 70.0f, 6.0f));
         }
 
         // A compact coastal park occupies the strip between the low-rise
