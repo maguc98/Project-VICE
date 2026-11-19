@@ -36,7 +36,7 @@ void UVICETouchHUD::NativeConstruct()
     HeaderSlot->SetSize(FVector2D(320.0f, 32.0f));
 
     PreviewHint = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("PreviewHint"));
-    PreviewHint->SetText(FText::FromString(TEXT("左侧摇杆移动  ·  右侧滑动转向  ·  靠近车辆后点击上车")));
+    PreviewHint->SetText(FText::FromString(TEXT("左摇杆：移动 / 驾驶  ·  右摇杆：镜头  ·  点击上车 / 下车")));
     PreviewHint->SetJustification(ETextJustify::Left);
     UCanvasPanelSlot* HintSlot = RootCanvas->AddChildToCanvas(PreviewHint);
     HintSlot->SetAnchors(FAnchors(0.0f, 0.0f, 0.0f, 0.0f));
