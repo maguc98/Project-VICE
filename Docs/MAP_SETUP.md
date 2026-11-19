@@ -24,9 +24,10 @@ The script creates a map, sets the Project VICE game mode, places a PlayerStart,
 - The city grid covers approximately 4.32 km × 4.32 km (25 × 25 road intersections, 24 × 24 blocks).
 - The custom city streamer tracks the currently possessed pawn, so streaming follows the player on foot or while driving.
 - A 5 × 5 neighborhood of cell actors is desired around the player; new cells are spawned nearest-first, up to 3 per 0.25-second update. Cells outside the radius are destroyed.
-- Each cell creates separate instanced batches for dark asphalt, concrete sidewalks/curbs, building masses, dark glazing, road markings, and facade trim.
+- Each cell creates ten instanced batches for dark asphalt, concrete sidewalks/curbs, building masses, dark glazing, road markings, facade trim, tree trunks/canopies, and a waterfront-only water surface. The water batch is empty outside the waterfront district.
 - Roads receive dashed center markings and zebra crossings; each block receives a connected sidewalk loop, three deterministic building masses, repeated facade glazing, roof/belt trim, and eight low-poly sidewalk trees grouped into trunk/canopy batches.
 - District identity is derived from cell coordinates: the central 5 × 5 cells are downtown, cells at Y ≤ -8 use a low-rise waterfront palette, the north-east edge at X ≥ 8 and Y ≥ 5 uses broader industrial masses, and remaining cells use the residential style. Re-streaming a cell reproduces its district and building variation.
+- Waterfront cells reserve the outer block edge for a continuous promenade strip, a low seawall placeholder, and a blue opaque water plane. Waterfront buildings shift inland so they do not occupy the promenade/water footprint.
 - One simple sidewalk pedestrian patrol is spawned per active cell; this is capped by the 5 × 5 streaming window.
 - A sparse deterministic pattern also spawns ambient road-loop cars; these are removed with their owning streamed cells.
 - The player can walk, jump, sprint, and switch first-/third-person view.
@@ -35,7 +36,7 @@ The script creates a map, sets the Project VICE game mode, places a PlayerStart,
 
 The cell actors are created and destroyed on the game thread. This is a bounded prototype streaming system, not yet Unreal World Partition or true asynchronous asset streaming. Fast movement may reveal cell pop-in or a frame-time spike and must be profiled on the iPhone 12 mini.
 
-This is a color-separated low-poly graybox prototype, not final city art. The waterfront designation currently changes building scale and palette only; it does not create a real shoreline, water surface, or finished promenade. It currently uses engine primitive cubes and has no final character mesh, vehicle mesh, animation set, full NPC behavior, traffic-light/lane AI, missions, authored World Partition landscape, or final art/audio.
+This is a color-separated low-poly graybox prototype, not final city art. The waterfront now has a procedural promenade, seawall placeholder, and opaque blue water plane, but these are still primitive graybox geometry: there is no shoreline sculpting, translucent/reflection water shader, beach, wave simulation, or finished coastal asset. It currently uses engine primitive cubes and has no final character mesh, vehicle mesh, animation set, full NPC behavior, traffic-light/lane AI, missions, authored World Partition landscape, or final art/audio.
 
 ## Build validation
 
