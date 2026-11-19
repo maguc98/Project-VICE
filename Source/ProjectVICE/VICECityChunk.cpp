@@ -279,6 +279,13 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
 
     for (const FVector& TreeLocation : TreeLocations)
     {
+        // Waterfront-side entries would sit on the seawall or water plane;
+        // keep only the inland street trees in coastal cells.
+        if (bWaterfront && TreeLocation.Y > 6000.0f)
+        {
+            continue;
+        }
+
         AddMeshInstance(TreeTrunkInstances, CylinderMesh, TreeLocation + FVector(0.0f, 0.0f, 228.0f), FVector(80.0f, 80.0f, 420.0f));
         AddMeshInstance(TreeCanopyInstances, SphereMesh, TreeLocation + FVector(0.0f, 0.0f, 460.0f), FVector(560.0f, 560.0f, 440.0f));
     }
@@ -291,6 +298,67 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         AddCube(SidewalkInstances, FVector(HalfCell, CellSpacing * 0.63f, 9.0f), FVector(CellSpacing - 4000.0f, 760.0f, 18.0f));
         AddCube(TrimInstances, FVector(HalfCell, CellSpacing * 0.668f, 45.0f), FVector(CellSpacing - 4000.0f, 80.0f, 70.0f));
         AddCube(WaterInstances, FVector(HalfCell, CellSpacing * 0.805f, -12.0f), FVector(CellSpacing - 4000.0f, 3600.0f, 24.0f));
+
+        // A compact coastal park occupies the strip between the low-rise
+        // buildings and promenade. Flattened foliage spheres act as low
+        // planting beds without adding another component or material batch.
+        AddMeshInstance(TreeCanopyInstances, SphereMesh,
+            FVector(CellSpacing * 0.28f, CellSpacing * 0.535f, 65.0f), FVector(2600.0f, 820.0f, 130.0f));
+        AddMeshInstance(TreeCanopyInstances, SphereMesh,
+            FVector(CellSpacing * 0.72f, CellSpacing * 0.535f, 65.0f), FVector(2600.0f, 820.0f, 130.0f));
+
+        // Stylized low-poly palms reuse the existing trunk/canopy batches.
+        // Four flattened crown lobes read as a simple radial frond silhouette.
+        const FVector CoastalPalmLocations[] =
+        {
+            FVector(CellSpacing * 0.18f, CellSpacing * 0.545f, 0.0f),
+            FVector(CellSpacing * 0.50f, CellSpacing * 0.545f, 0.0f),
+            FVector(CellSpacing * 0.82f, CellSpacing * 0.545f, 0.0f)
+        };
+        for (const FVector& PalmLocation : CoastalPalmLocations)
+        {
+            AddMeshInstance(TreeTrunkInstances, CylinderMesh,
+                PalmLocation + FVector(0.0f, 0.0f, 875.0f), FVector(130.0f, 130.0f, 1750.0f));
+            AddMeshInstance(TreeCanopyInstances, SphereMesh,
+                PalmLocation + FVector(-340.0f, 0.0f, 1710.0f), FVector(950.0f, 260.0f, 180.0f));
+            AddMeshInstance(TreeCanopyInstances, SphereMesh,
+                PalmLocation + FVector(340.0f, 0.0f, 1710.0f), FVector(950.0f, 260.0f, 180.0f));
+            AddMeshInstance(TreeCanopyInstances, SphereMesh,
+                PalmLocation + FVector(0.0f, -340.0f, 1710.0f), FVector(260.0f, 950.0f, 180.0f));
+            AddMeshInstance(TreeCanopyInstances, SphereMesh,
+                PalmLocation + FVector(0.0f, 340.0f, 1710.0f), FVector(260.0f, 950.0f, 180.0f));
+            AddMeshInstance(TreeCanopyInstances, SphereMesh,
+                PalmLocation + FVector(0.0f, 0.0f, 1800.0f), FVector(360.0f, 360.0f, 300.0f));
+        }
+
+        // Simple bench props use the existing trim batch and stay clear of
+        // the promenade's pedestrian path.
+        const FVector BenchLocations[] =
+        {
+            FVector(CellSpacing * 0.34f, CellSpacing * 0.585f, 0.0f),
+            FVector(CellSpacing * 0.66f, CellSpacing * 0.585f, 0.0f)
+        };
+        for (const FVector& BenchLocation : BenchLocations)
+        {
+            AddCube(TrimInstances, BenchLocation + FVector(0.0f, 0.0f, 125.0f), FVector(1200.0f, 300.0f, 70.0f));
+            AddCube(TrimInstances, BenchLocation + FVector(0.0f, 145.0f, 360.0f), FVector(1200.0f, 70.0f, 430.0f));
+            AddCube(TrimInstances, BenchLocation + FVector(-480.0f, 0.0f, 55.0f), FVector(90.0f, 220.0f, 110.0f));
+            AddCube(TrimInstances, BenchLocation + FVector(480.0f, 0.0f, 55.0f), FVector(90.0f, 220.0f, 110.0f));
+        }
+
+        // Unlit-looking placeholder lamp posts establish a readable rhythm
+        // along the park edge; actual emissive lights can replace them later.
+        const FVector ParkLightLocations[] =
+        {
+            FVector(CellSpacing * 0.18f, CellSpacing * 0.598f, 0.0f),
+            FVector(CellSpacing * 0.50f, CellSpacing * 0.598f, 0.0f),
+            FVector(CellSpacing * 0.82f, CellSpacing * 0.598f, 0.0f)
+        };
+        for (const FVector& LightLocation : ParkLightLocations)
+        {
+            AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 1500.0f), FVector(90.0f, 90.0f, 3000.0f));
+            AddCube(TrimInstances, LightLocation + FVector(0.0f, 0.0f, 3070.0f), FVector(360.0f, 360.0f, 140.0f));
+        }
     }
 
     // One deterministic north-east block per intersection.
@@ -322,7 +390,7 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         if (bWaterfront)
         {
             const float WaterfrontX[] = { 0.25f, 0.72f, 0.48f };
-            const float WaterfrontY[] = { 0.24f, 0.24f, 0.48f };
+            const float WaterfrontY[] = { 0.22f, 0.22f, 0.38f };
             BuildingLocation.X = CellSpacing * WaterfrontX[Index];
             BuildingLocation.Y = CellSpacing * WaterfrontY[Index];
         }
