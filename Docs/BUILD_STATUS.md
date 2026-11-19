@@ -19,6 +19,8 @@ Last updated: 2026-11-19
 - Arcade sedan prototype with throttle, reverse, steering, swept collision, camera toggle, enter/exit possession flow, and speed readout.
 - Mobile day/night controller that animates the map Directional Light and Sky Light using a 20-minute in-game day.
 - Unreal Editor Python script to create the initial map with player start and basic lighting actors.
+- Direct-to-game guest preview flow with a visible `PROJECT VICE / 游客预览版` HUD label, touch-control hints, and an on-foot/vehicle status readout; no account flow is required.
+- iOS visitor-preview packaging scaffolding: command-line map generation, local signing checks, Unreal Automation Tool BuildCookRun script, and a manual self-hosted macOS GitHub Actions workflow with IPA artifact upload. Signing assets stay on the build machine.
 - GitHub Actions repository structure, project JSON, Python syntax, and city source-level invariant checks (not an Unreal C++ compile).
 
 ## Current prototype limitations
@@ -27,7 +29,7 @@ The city is now a color-separated low-poly graybox made from engine primitive me
 
 ## Build and test status
 
-The repository has **not** been compiled with Unreal Build Tool in this session and has **not** been launched on an iPhone. GitHub Actions checks repository structure and Python syntax only; they do not compile Unreal C++.
+The repository has **not** been compiled with Unreal Build Tool in this session and has **not** been launched on an iPhone. The standard GitHub Actions workflow validates source/configuration and packaging-script wiring only; it does not compile Unreal C++. The signed iOS workflow requires a configured self-hosted macOS runner with Unreal Engine 5.4, Xcode, and a matching local Apple signing identity/provisioning profile. No IPA has been produced in this session.
 
 The first map asset is generated locally by running the editor script described in [MAP_SETUP.md](MAP_SETUP.md). The iOS build still requires Unreal Engine with iOS support, Xcode, an Apple development team, and physical-device profiling.
 
