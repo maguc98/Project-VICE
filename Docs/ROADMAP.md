@@ -31,6 +31,13 @@
 - [ ] Weather presets and scalable effects.
 - [ ] Audio, UI, accessibility, localization, and performance tiers.
 
+## Visitor preview milestone
+- [x] Add direct-to-game guest preview flow with on-screen visitor identity and touch hints.
+- [x] Add reproducible map generation before iOS cooking.
+- [x] Add a local signed iOS packaging script and a manual self-hosted macOS workflow.
+- [ ] Compile with Unreal Engine 5.4 and package a signed Development/Ad Hoc IPA.
+- [ ] Install and validate on iPhone 12 mini.
+
 ## Release gates
 - [ ] No critical crashes in a 30-minute device session.
 - [ ] Stable 30 FPS target under representative gameplay.
