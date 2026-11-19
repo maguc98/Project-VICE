@@ -162,7 +162,7 @@ void AVICECityChunk::InitializeMaterials(const FIntPoint& Coordinates)
     TrimMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.78f, 0.76f, 0.69f, 1.0f), 0.82f);
     TreeTrunkMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.22f, 0.14f, 0.09f, 1.0f), 0.94f);
     TreeCanopyMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, CanopyColor, 0.9f);
-    WaterMaterial = VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.22f, 0.30f, 1.0f), 0.28f);
+    WaterMaterial = bWaterfront ? VICECityVisuals::MakeColorMaterial(BaseColorMaterial, this, FLinearColor(0.035f, 0.22f, 0.30f, 1.0f), 0.28f) : nullptr;
 
     RoadInstances->SetMaterial(0, RoadMaterial);
     SidewalkInstances->SetMaterial(0, SidewalkMaterial);
@@ -173,7 +173,10 @@ void AVICECityChunk::InitializeMaterials(const FIntPoint& Coordinates)
     TrimInstances->SetMaterial(0, TrimMaterial);
     TreeTrunkInstances->SetMaterial(0, TreeTrunkMaterial);
     TreeCanopyInstances->SetMaterial(0, TreeCanopyMaterial);
-    WaterInstances->SetMaterial(0, WaterMaterial);
+    if (WaterMaterial)
+    {
+        WaterInstances->SetMaterial(0, WaterMaterial);
+    }
 }
 
 void AVICECityChunk::AddMeshInstance(
