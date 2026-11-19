@@ -37,6 +37,16 @@ else
 fi
 [[ -f "$PROFILE_FILE" ]] || fail "Provisioning profile not found: $PROFILE_FILE"
 
+# UE discovers profiles from this directory. Copy an explicitly supplied
+# external profile into it while retaining its original filename.
+mkdir -p "$PROFILE_DIR"
+PROFILE_NAME="$(basename "$PROFILE_FILE")"
+INSTALLED_PROFILE="$PROFILE_DIR/$PROFILE_NAME"
+if [[ "$PROFILE_FILE" != "$INSTALLED_PROFILE" ]]; then
+  cp "$PROFILE_FILE" "$INSTALLED_PROFILE"
+  PROFILE_FILE="$INSTALLED_PROFILE"
+fi
+
 IDENTITIES="$(security find-identity -v -p codesigning 2>/dev/null || true)"
 grep -F -- "$IOS_SIGNING_CERTIFICATE" <<< "$IDENTITIES" >/dev/null \
   || fail "The requested signing identity is not installed in the current macOS keychain."
