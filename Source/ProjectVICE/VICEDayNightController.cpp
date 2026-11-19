@@ -1,20 +1,34 @@
 #include "VICEDayNightController.h"
-#include "Engine/DirectionalLight.h"
-#include "Engine/SkyLight.h"
 #include "Components/DirectionalLightComponent.h"
+#include "Components/SceneComponent.h"
 #include "Components/SkyLightComponent.h"
-#include "EngineUtils.h"
 
 AVICEDayNightController::AVICEDayNightController()
 {
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.TickInterval = 1.0f;
+
+    SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+    RootComponent = SceneRoot;
+
+    // Mobility is established in the component constructors. Setting it here
+    // avoids changing a registered light's mobility from an editor script.
+    SunLight = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("PreviewSun"));
+    SunLight->SetupAttachment(SceneRoot);
+    SunLight->SetMobility(EComponentMobility::Movable);
+    SunLight->SetAtmosphereSunLight(true);
+    SunLight->SetAtmosphereSunLightIndex(0);
+    SunLight->SetIntensity(8.0f);
+
+    SkyLight = CreateDefaultSubobject<USkyLightComponent>(TEXT("PreviewSkyLight"));
+    SkyLight->SetupAttachment(SceneRoot);
+    SkyLight->SetMobility(EComponentMobility::Movable);
+    SkyLight->SetIntensity(1.0f);
 }
 
 void AVICEDayNightController::BeginPlay()
 {
     Super::BeginPlay();
-    FindEnvironmentLights();
     UpdateLighting();
 }
 
@@ -33,35 +47,6 @@ void AVICEDayNightController::SetTimeOfDay(float Hours)
     UpdateLighting();
 }
 
-void AVICEDayNightController::FindEnvironmentLights()
-{
-    if (!GetWorld())
-    {
-        return;
-    }
-
-    for (TActorIterator<ADirectionalLight> It(GetWorld()); It; ++It)
-    {
-        SunActor = *It;
-        break;
-    }
-
-    for (TActorIterator<ASkyLight> It(GetWorld()); It; ++It)
-    {
-        SkyActor = *It;
-        break;
-    }
-
-    if (!SunActor)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("VICE day/night: no DirectionalLight found in the current map."));
-    }
-    if (!SkyActor)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("VICE day/night: no SkyLight found in the current map."));
-    }
-}
-
 void AVICEDayNightController::UpdateLighting()
 {
     const float SolarAngle = ((TimeOfDayHours - 6.0f) / 12.0f) * PI;
@@ -77,25 +62,19 @@ void AVICEDayNightController::UpdateLighting()
     const FLinearColor HorizonColor = FMath::Lerp(NightSunColor, WarmSunColor, FMath::Max(Daylight, 0.12f));
     const FLinearColor SunColor = FMath::Lerp(HorizonColor, DaySunColor, 1.0f - Warmth);
 
-    if (SunActor)
+    SetActorRotation(FRotator(SunPitch, -35.0f, 0.0f));
+    if (SunLight)
     {
-        SunActor->SetActorRotation(FRotator(SunPitch, -35.0f, 0.0f));
-        if (UDirectionalLightComponent* SunComponent = SunActor->GetLightComponent())
-        {
-            SunComponent->SetIntensity(0.04f + MaximumSunIntensity * Daylight);
-            SunComponent->SetLightColor(SunColor);
-        }
+        SunLight->SetIntensity(0.04f + MaximumSunIntensity * Daylight);
+        SunLight->SetLightColor(SunColor);
     }
 
-    if (SkyActor)
+    if (SkyLight)
     {
-        if (USkyLightComponent* SkyComponent = SkyActor->GetLightComponent())
-        {
-            SkyComponent->SetIntensity(0.18f + 0.82f * Daylight);
-            SkyComponent->SetLightColor(FMath::Lerp(
-                FLinearColor(0.12f, 0.18f, 0.30f, 1.0f),
-                FLinearColor(0.78f, 0.86f, 1.0f, 1.0f),
-                Daylight));
-        }
+        SkyLight->SetIntensity(0.18f + 0.82f * Daylight);
+        SkyLight->SetLightColor(FMath::Lerp(
+            FLinearColor(0.12f, 0.18f, 0.30f, 1.0f),
+            FLinearColor(0.78f, 0.86f, 1.0f, 1.0f),
+            Daylight));
     }
 }
