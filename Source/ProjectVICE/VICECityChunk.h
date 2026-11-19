@@ -74,6 +74,9 @@ private:
     UPROPERTY()
     TObjectPtr<UHierarchicalInstancedStaticMeshComponent> TreeCanopyInstances;
 
+    UPROPERTY()
+    TObjectPtr<UHierarchicalInstancedStaticMeshComponent> WaterInstances;
+
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> RoadMaterial;
 
@@ -100,6 +103,9 @@ private:
 
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> TreeCanopyMaterial;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> WaterMaterial;
 
     bool bInitialized = false;
 };
