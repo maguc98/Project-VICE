@@ -18,7 +18,7 @@ Project VICE is an original contemporary coastal metropolis. The visual directio
 | Tree trunks | Dark warm brown | Bark placeholder |
 | Tree canopies | Muted coastal green | Foliage placeholder |
 
-The current implementation uses nine HISM material batches per streamed cell. The palette is a blockout guide, not a final PBR material library.
+The current implementation uses ten HISM material batches per streamed cell; the water batch is populated only in waterfront cells. The palette is a blockout guide, not a final PBR material library.
 
 ## District identity targets
 
@@ -36,7 +36,7 @@ The runtime blockout assigns a stable district from each cell coordinate:
 - **Industrial:** non-downtown cells outside the waterfront band with X ≥ 8 and Y ≥ 5; broader, lower warehouse-like masses and a muted concrete palette.
 - **Residential:** all remaining cells; the baseline mid-rise proportions and warm neutral palette.
 
-These rules are deterministic and do not add HISM component batches. “Waterfront” is currently a visual district treatment only: a shoreline, water plane, beach, and promenade are not yet implemented.
+These rules are deterministic. Waterfront cells now populate the dedicated water HISM with an opaque blue plane, add a promenade strip and low seawall placeholder, and move their building masses inland. This is still a simple blockout: there is no beach, sculpted shoreline, translucent/reflection shader, or wave simulation.
 
 ## Production asset pipeline
 
