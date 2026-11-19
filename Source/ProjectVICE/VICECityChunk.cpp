@@ -297,7 +297,36 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     {
         AddCube(SidewalkInstances, FVector(HalfCell, CellSpacing * 0.63f, 9.0f), FVector(CellSpacing - 4000.0f, 760.0f, 18.0f));
         AddCube(TrimInstances, FVector(HalfCell, CellSpacing * 0.668f, 45.0f), FVector(CellSpacing - 4000.0f, 80.0f, 70.0f));
-        AddCube(WaterInstances, FVector(HalfCell, CellSpacing * 0.805f, -12.0f), FVector(CellSpacing - 4000.0f, 3600.0f, 24.0f));
+
+        // Break the water edge into three overlapping deterministic spans.
+        // The small overlap prevents visible gaps between adjacent segments;
+        // global segment indices keep the shoreline profile stable when cells
+        // stream out and back in.
+        const float CoastSpan = CellSpacing - 4000.0f;
+        const float CoastSegmentStep = CoastSpan / 3.0f;
+        const float CoastSegmentWidth = CoastSegmentStep + 120.0f;
+        const float OceanEdgeY = 0.902f;
+        const float LandwardShoreBaseY = 0.674f;
+        for (int32 SegmentIndex = 0; SegmentIndex < 3; ++SegmentIndex)
+        {
+            const int32 GlobalCoastSegment = Coordinates.X * 3 + SegmentIndex;
+            const float CoastPhase = static_cast<float>(GlobalCoastSegment);
+            const float ShorelineY = 0.735f
+                + 0.018f * FMath::Sin(CoastPhase * 0.62f)
+                + 0.012f * FMath::Sin(CoastPhase * 0.21f + 1.3f);
+            const float SegmentCenterX = 2000.0f + (static_cast<float>(SegmentIndex) + 0.5f) * CoastSegmentStep;
+            const float WaterDepth = (OceanEdgeY - ShorelineY) * CellSpacing;
+            const float WaterCenterY = (OceanEdgeY + ShorelineY) * 0.5f * CellSpacing;
+            const float SandDepth = (ShorelineY - LandwardShoreBaseY) * CellSpacing;
+            const float SandCenterY = (ShorelineY + LandwardShoreBaseY) * 0.5f * CellSpacing;
+
+            AddCube(SidewalkInstances, FVector(SegmentCenterX, SandCenterY, 8.0f),
+                FVector(CoastSegmentWidth, SandDepth, 16.0f));
+            AddCube(WaterInstances, FVector(SegmentCenterX, WaterCenterY, -12.0f),
+                FVector(CoastSegmentWidth, WaterDepth, 24.0f));
+            AddCube(CrosswalkInstances, FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f),
+                FVector(CoastSegmentStep - 40.0f, 70.0f, 6.0f));
+        }
 
         // A compact coastal park occupies the strip between the low-rise
         // buildings and promenade. Flattened foliage spheres act as low
