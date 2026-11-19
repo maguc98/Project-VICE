@@ -76,7 +76,7 @@ if "self-hosted, macOS, ue5.4, ios" not in workflow:
     raise SystemExit("iOS preview workflow must target a macOS UE 5.4 self-hosted runner.")
 if "actions/upload-artifact@v4" not in workflow:
     raise SystemExit("iOS preview workflow must publish the IPA artifact.")
-if "游客预览版" not in readme or "iOS Visitor Preview" not in preview_docs:
+if "游客预览版" not in readme or "iOS visitor preview" not in preview_docs:
     raise SystemExit("Visitor-preview documentation is incomplete.")
 
 print(
