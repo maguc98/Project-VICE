@@ -17,7 +17,7 @@ py "Content/Python/create_vice_blockout_map.py"
 
 5. Save the project after the script reports that `/Game/Maps/L_ViceCity_Blockout` was created.
 
-The script creates a map, sets the Project VICE game mode, places a PlayerStart, a movable directional sun linked to SkyAtmosphere, a movable SkyLight, SkyAtmosphere, and exponential height fog. The two light components are movable because the runtime day/night controller updates them. The game mode spawns the runtime city streamer and the first sedan.
+The script creates a map, sets the Project VICE game mode, places a PlayerStart, a SkyAtmosphere actor and exponential height fog. The runtime day/night controller owns its own movable directional sun and SkyLight components, so the map bootstrap does not create duplicate light actors. The game mode spawns the runtime city streamer and the first sedan.
 The iOS visitor-preview packaging script runs this bootstrap through UnrealEditor-Cmd before cooking. The editor startup map is set to the engine entry map so a clean checkout can open the editor before the generated project map exists; the packaged game still starts from the generated VICE blockout map.
 
 ## Current prototype behavior
