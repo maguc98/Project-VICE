@@ -212,6 +212,10 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
     bInitialized = true;
     InitializeMaterials(Coordinates);
 
+    const bool bDowntown = FMath::Abs(Coordinates.X) <= 2 && FMath::Abs(Coordinates.Y) <= 2;
+    const bool bWaterfront = !bDowntown && Coordinates.Y <= -8;
+    const bool bIndustrial = !bDowntown && !bWaterfront && Coordinates.X >= 8 && Coordinates.Y >= 5;
+
     const float RoadHalf = RoadWidth * 0.5f;
     const float HalfCell = CellSpacing * 0.5f;
     const float SegmentLength = HalfCell - RoadHalf;
@@ -276,12 +280,18 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         AddMeshInstance(TreeCanopyInstances, SphereMesh, TreeLocation + FVector(0.0f, 0.0f, 460.0f), FVector(560.0f, 560.0f, 440.0f));
     }
 
+    // Waterfront cells reserve the outer half of the block for a simple
+    // promenade, seawall and opaque water placeholder. Keeping water opaque
+    // avoids the fill-rate cost of large translucent surfaces on mobile.
+    if (bWaterfront)
+    {
+        AddCube(SidewalkInstances, FVector(HalfCell, CellSpacing * 0.63f, 9.0f), FVector(CellSpacing - 4000.0f, 760.0f, 18.0f));
+        AddCube(TrimInstances, FVector(HalfCell, CellSpacing * 0.668f, 45.0f), FVector(CellSpacing - 4000.0f, 80.0f, 70.0f));
+        AddCube(WaterInstances, FVector(HalfCell, CellSpacing * 0.805f, -12.0f), FVector(CellSpacing - 4000.0f, 3600.0f, 24.0f));
+    }
+
     // One deterministic north-east block per intersection.
     const uint32 Seed = GetTypeHash(Coordinates) ^ 0x9E3779B9u;
-    const bool bDowntown = FMath::Abs(Coordinates.X) <= 2 && FMath::Abs(Coordinates.Y) <= 2;
-    const bool bWaterfront = !bDowntown && Coordinates.Y <= -8;
-    const bool bIndustrial = !bDowntown && !bWaterfront && Coordinates.X >= 8 && Coordinates.Y >= 5;
-
     // District identity is coordinate-derived, so the same world location
     // always recreates the same skyline after a cell is streamed back in.
     const float HeightBase = bDowntown ? 9000.0f : (bWaterfront ? 3200.0f : (bIndustrial ? 2600.0f : 4200.0f));
@@ -306,6 +316,13 @@ void AVICECityChunk::InitializeCell(const FIntPoint& Coordinates, float CellSpac
         const float Height = HeightBase + static_cast<float>((BuildingSeed >> 19) % static_cast<uint32>(HeightRange));
 
         FVector BuildingLocation = BuildingLocations[Index];
+        if (bWaterfront)
+        {
+            const float WaterfrontX[] = { 0.25f, 0.72f, 0.48f };
+            const float WaterfrontY[] = { 0.24f, 0.24f, 0.48f };
+            BuildingLocation.X = CellSpacing * WaterfrontX[Index];
+            BuildingLocation.Y = CellSpacing * WaterfrontY[Index];
+        }
         BuildingLocation.Z = Height * 0.5f;
         AddCube(BuildingInstances, BuildingLocation, FVector(Width, Depth, Height));
 
