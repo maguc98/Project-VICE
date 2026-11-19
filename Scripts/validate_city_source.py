@@ -69,8 +69,27 @@ if "WaterMaterial = bWaterfront ?" not in chunk:
     raise SystemExit("Water material must only be allocated for waterfront cells.")
 if "WaterInstances->SetCollisionEnabled(ECollisionEnabled::NoCollision);" not in chunk:
     raise SystemExit("Water placeholder must not block player movement.")
-if "AddCube(WaterInstances, FVector(HalfCell, CellSpacing * 0.805f" not in chunk:
-    raise SystemExit("Water surface placement is missing.")
+# Three overlapping spans form a deterministic stepped shoreline while
+# reusing the existing water, sidewalk, and marking batches.
+coastline_invariants = (
+    "const float CoastSpan = CellSpacing - 4000.0f;",
+    "const float CoastSegmentStep = CoastSpan / 3.0f;",
+    "const float CoastSegmentWidth = CoastSegmentStep + 120.0f;",
+    "const int32 GlobalCoastSegment = Coordinates.X * 3 + SegmentIndex;",
+    "const float ShorelineY = 0.735f",
+    "FMath::Sin(CoastPhase * 0.62f)",
+    "FMath::Sin(CoastPhase * 0.21f + 1.3f)",
+    "const float OceanEdgeY = 0.902f;",
+    "const float LandwardShoreBaseY = 0.674f;",
+    "AddCube(SidewalkInstances, FVector(SegmentCenterX, SandCenterY, 8.0f)",
+    "AddCube(WaterInstances, FVector(SegmentCenterX, WaterCenterY, -12.0f)",
+    "AddCube(CrosswalkInstances, FVector(SegmentCenterX, ShorelineY * CellSpacing + 25.0f, 3.0f)",
+)
+for invariant in coastline_invariants:
+    if invariant not in chunk:
+        raise SystemExit(f"Missing deterministic coastline invariant: {invariant}")
+if "const float CoastSegmentWidth = CoastSegmentStep + 120.0f;" not in chunk:
+    raise SystemExit("Water shoreline spans must overlap to avoid segment gaps.")
 if "FVector(HalfCell, CellSpacing * 0.63f, 9.0f)" not in chunk:
     raise SystemExit("Waterfront promenade placement is missing.")
 if "const float WaterfrontY[] = { 0.22f, 0.22f, 0.38f };" not in chunk:
@@ -102,6 +121,6 @@ if "FVector(1300.0f, 1300.0f, 110.0f)" not in generator:
 print(
     "City source invariants passed: "
     f"{len(batches)} HISM batches, deterministic district rules, "
-    "static component mobility, waterfront water/promenade/park props, and sidewalk patrol alignment. "
+    "static component mobility, deterministic segmented coastline, waterfront park props, and sidewalk patrol alignment. "
     "This is not an Unreal C++ compile."
 )
