@@ -41,6 +41,11 @@ jobs:
         run: python3 -m py_compile Content/Python/create_vice_blockout_map.py
       - name: Validate city source invariants
         run: python3 Scripts/validate_city_source.py
+      - name: Validate visitor preview release wiring
+        run: |
+          bash -n Scripts/package_ios_preview.sh
+          python3 -m py_compile Scripts/validate_visitor_preview.py
+          python3 Scripts/validate_visitor_preview.py
       - name: Verify project documentation
         run: |
           test -f Docs/ROADMAP.md
@@ -53,3 +58,4 @@ jobs:
           test -f Docs/PEDESTRIAN_PROTOTYPE.md
           test -f Docs/TRAFFIC_PROTOTYPE.md
           test -f Docs/CITY_VISUAL_STYLE.md
+          test -f Docs/IOS_VISITOR_PREVIEW.md
