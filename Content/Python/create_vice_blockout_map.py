@@ -22,19 +22,6 @@ def build_vice_city_blockout():
         unreal.Rotator(0.0, 0.0, 0.0),
     )
 
-    sun = unreal.EditorLevelLibrary.spawn_actor_from_class(
-        unreal.DirectionalLight,
-        unreal.Vector(0.0, 0.0, 12000.0),
-        unreal.Rotator(-42.0, -32.0, 0.0),
-    )
-    if sun:
-        sun.set_actor_label("VICE_Sun_Directional")
-        sun_component = sun.get_component_by_class(unreal.DirectionalLightComponent)
-        if sun_component:
-            # The day/night controller rotates and retints this light at runtime.
-            sun_component.set_editor_property("mobility", unreal.ComponentMobility.MOVABLE)
-            sun_component.set_editor_property("atmosphere_sun_light", True)
-
     atmosphere = unreal.EditorLevelLibrary.spawn_actor_from_class(
         unreal.SkyAtmosphere,
         unreal.Vector(0.0, 0.0, 0.0),
@@ -42,19 +29,6 @@ def build_vice_city_blockout():
     )
     if atmosphere:
         atmosphere.set_actor_label("VICE_SkyAtmosphere")
-
-    sky = unreal.EditorLevelLibrary.spawn_actor_from_class(
-        unreal.SkyLight,
-        unreal.Vector(0.0, 0.0, 8000.0),
-        unreal.Rotator(0.0, 0.0, 0.0),
-    )
-    if sky:
-        sky.set_actor_label("VICE_SkyLight")
-        sky_component = sky.get_component_by_class(unreal.SkyLightComponent)
-        if sky_component:
-            # The runtime day/night controller updates the skylight intensity
-            # and color, so this component must not be static.
-            sky_component.set_editor_property("mobility", unreal.ComponentMobility.MOVABLE)
 
     fog = unreal.EditorLevelLibrary.spawn_actor_from_class(
         unreal.ExponentialHeightFog,
