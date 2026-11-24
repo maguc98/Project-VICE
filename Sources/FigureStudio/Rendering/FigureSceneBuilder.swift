@@ -344,6 +344,24 @@ enum FigureSceneBuilder {
     }
 
     /// Replaces the procedural blockout with the bundled, skinned female base mesh.
+    static func updateRealisticBaseMesh(_ modelRoot: SCNNode, profile: BodyProfile) {
+        let bounds = modelRoot.boundingBox
+        let minimum = bounds.min
+        let maximum = bounds.max
+        let sourceHeight = max(maximum.y - minimum.y, 0.01)
+        let statureScale = Float(profile.stature / 100.0) / sourceHeight
+        let shoulderFactor = Float(profile.shoulderWidth / 38.0)
+        let pelvisFactor = Float(profile.pelvis / 94.0)
+        let chestFactor = Float(profile.chest / 86.0)
+        let waistFactor = Float(profile.waist / 68.0)
+        let widthScale = 1 + ((shoulderFactor + pelvisFactor) * 0.5 - 1) * 0.55
+        let depthScale = 1 + ((chestFactor + waistFactor) * 0.5 - 1) * 0.35
+        modelRoot.scale = SCNVector3(statureScale * widthScale, statureScale, statureScale * depthScale)
+        modelRoot.position = SCNVector3(-minimum.x * statureScale * widthScale,
+                                        -minimum.y * statureScale,
+                                        -minimum.z * statureScale * depthScale)
+    }
+
     static func attachRealisticBaseMesh(
         _ modelRoot: SCNNode,
         to scene: SCNScene,
@@ -354,24 +372,7 @@ enum FigureSceneBuilder {
         scene.rootNode.childNode(withName: "proceduralFigureRoot", recursively: false)?.isHidden = true
 
         modelRoot.name = "realisticFemaleMeshRoot"
-        let bounds = modelRoot.boundingBox
-        let minimum = bounds.min
-        let maximum = bounds.max
-        let sourceHeight = max(maximum.y - minimum.y, 0.01)
-        let statureScale = Float(profile.stature / 100.0) / sourceHeight
-        let shoulderFactor = Float(profile.shoulderWidth / 38.0)
-        let pelvisFactor = Float(profile.pelvis / 94.0)
-        let chestFactor = Float(profile.chest / 86.0)
-        let waistFactor = Float(profile.waist / 68.0)
-
-        // Global proportions provide a restrained first-pass adjustment. Local anatomical
-        // morphs will be applied to the bind-pose vertices in the next modelling pass.
-        let widthScale = 1 + ((shoulderFactor + pelvisFactor) * 0.5 - 1) * 0.55
-        let depthScale = 1 + ((chestFactor + waistFactor) * 0.5 - 1) * 0.35
-        modelRoot.scale = SCNVector3(statureScale * widthScale, statureScale, statureScale * depthScale)
-        modelRoot.position = SCNVector3(-minimum.x * statureScale * widthScale,
-                                        -minimum.y * statureScale,
-                                        -minimum.z * statureScale * depthScale)
+        updateRealisticBaseMesh(modelRoot, profile: profile)
 
         modelRoot.enumerateChildNodes { node, _ in
             guard let source = node.geometry else { return }

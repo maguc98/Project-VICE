@@ -442,10 +442,11 @@ private struct FigureViewport: UIViewRepresentable {
         coordinator.lightingStyle = lightingStyle
         let cameraChanged = coordinator.cameraView != cameraView
         coordinator.cameraView = cameraView
-        let needsRebuild = coordinator.lastBuiltProfile != profile
-            || coordinator.lastBuiltDisplayStyle != displayStyle
+        let profileChanged = coordinator.lastBuiltProfile != profile
+        let needsRebuild = coordinator.lastBuiltDisplayStyle != displayStyle
             || coordinator.lastBuiltLightingStyle != lightingStyle
             || view.scene == nil
+            || (coordinator.modelRoot == nil && profileChanged)
 
         if needsRebuild {
             let oldPosition = view.pointOfView?.position
@@ -471,8 +472,14 @@ private struct FigureViewport: UIViewRepresentable {
             coordinator.lastBuiltDisplayStyle = displayStyle
             coordinator.lastBuiltLightingStyle = lightingStyle
         } else if let scene = view.scene {
-            FigureSceneBuilder.apply(pose: pose, to: scene, profile: profile)
-            coordinator.rig?.applyProfile(profile)
+            if profileChanged, let modelRoot = coordinator.modelRoot {
+                FigureSceneBuilder.updateRealisticBaseMesh(modelRoot, profile: profile)
+                coordinator.rig?.applyProfile(profile)
+                coordinator.lastBuiltProfile = profile
+            }
+            if coordinator.modelRoot == nil {
+                FigureSceneBuilder.apply(pose: pose, to: scene, profile: profile)
+            }
             coordinator.rig?.apply(pose)
         }
         if cameraChanged { coordinator.applyCamera(to: view) }
