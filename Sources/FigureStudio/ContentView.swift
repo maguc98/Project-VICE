@@ -1,43 +1,93 @@
 import SwiftUI
 import SceneKit
+import UIKit
 
 struct ContentView: View {
     @Binding var profile: BodyProfile
     @State private var selectedSection: MeasurementSection = .body
     @State private var pose = FigurePose()
-    @AppStorage("figureStudio.savedPose") private var savedPoseData: Data = Data()
+    @State private var displayStyle: FigureDisplayStyle = .realistic
+    @State private var lightingStyle: FigureLightingStyle = .studio
+    @State private var savedPoses: [SavedFigurePose] = []
+    @State private var poseName = ""
+    @State private var showSavePrompt = false
+    @State private var showShareSheet = false
+    @State private var shareImage: UIImage?
+    @State private var showExportError = false
+    @AppStorage("figureStudio.poseLibrary.v2") private var poseLibraryData: Data = Data()
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                FigureViewport(profile: profile, pose: pose)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 390)
-                    .background(Color(red: 0.94, green: 0.96, blue: 0.97))
+                ZStack(alignment: .topLeading) {
+                    FigureViewport(profile: profile, pose: pose,
+                                   displayStyle: displayStyle, lightingStyle: lightingStyle)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 370)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("FIGURE STUDIO")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .tracking(1.8)
+                        Text("女性人体 · 3D 参考")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(12)
+                }
+                .background(Color(red: 0.94, green: 0.95, blue: 0.96))
 
-                Picker("身体部位", selection: $selectedSection) {
+                HStack(spacing: 10) {
+                    Menu {
+                        Picker("显示模式", selection: $displayStyle) {
+                            ForEach(FigureDisplayStyle.allCases) { style in
+                                Text(style.title).tag(style)
+                            }
+                        }
+                    } label: {
+                        Label(displayStyle.title, systemImage: "view.3d")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+
+                    Menu {
+                        Picker("灯光", selection: $lightingStyle) {
+                            ForEach(FigureLightingStyle.allCases) { style in
+                                Text(style.title).tag(style)
+                            }
+                        }
+                    } label: {
+                        Label(lightingStyle.title, systemImage: "lightbulb")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        exportHighResolutionImage()
+                    } label: {
+                        Label("导出", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 9)
+
+                Picker("工作区", selection: $selectedSection) {
                     ForEach(MeasurementSection.allCases) { section in
                         Text(section.title).tag(section)
                     }
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
-                .padding(.top, 16)
+                .padding(.bottom, 8)
 
                 if selectedSection == .pose {
                     PoseControlPanel(
                         pose: $pose,
-                        hasSavedPose: !savedPoseData.isEmpty,
-                        onSave: {
-                            if let data = try? JSONEncoder().encode(pose) {
-                                savedPoseData = data
-                            }
-                        },
-                        onLoad: {
-                            if let saved = try? JSONDecoder().decode(FigurePose.self, from: savedPoseData) {
-                                pose = saved
-                            }
-                        }
+                        savedPoses: savedPoses,
+                        onSave: { showSavePrompt = true },
+                        onLoad: { pose = $0.pose },
+                        onDelete: deletePose,
+                        onPreset: { pose = $0 }
                     )
                 } else {
                     List {
@@ -55,12 +105,82 @@ struct ContentView: View {
             }
             .background(Color.white)
             .navigationTitle("人体工坊")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("重置") { profile = .defaultProfile; pose = FigurePose() }
+                    Button("重置") {
+                        profile = .defaultProfile
+                        pose = FigurePose()
+                    }
                 }
             }
+            .alert("保存姿势", isPresented: $showSavePrompt) {
+                TextField("例如：侧身站姿", text: $poseName)
+                Button("取消", role: .cancel) { }
+                Button("保存") { savePose() }
+            } message: {
+                Text("姿势会保存在本机，不需要联网。")
+            }
+            .alert("导出失败", isPresented: $showExportError) {
+                Button("好", role: .cancel) { }
+            } message: {
+                Text("当前设备无法创建高清图像。请稍后重试。")
+            }
+            .sheet(isPresented: $showShareSheet) {
+                if let shareImage {
+                    ActivityShareSheet(items: [shareImage])
+                }
+            }
+            .onAppear(perform: restorePoseLibrary)
         }
+    }
+
+    private func restorePoseLibrary() {
+        if let decoded = try? JSONDecoder().decode([SavedFigurePose].self, from: poseLibraryData) {
+            savedPoses = decoded
+            return
+        }
+        // Migrate the original single saved pose into the new named library.
+        if let legacyData = UserDefaults.standard.data(forKey: "figureStudio.savedPose"),
+           let legacyPose = try? JSONDecoder().decode(FigurePose.self, from: legacyData) {
+            savedPoses = [SavedFigurePose(name: "旧版已保存姿势", pose: legacyPose)]
+            persistPoseLibrary()
+        }
+    }
+
+    private func persistPoseLibrary() {
+        if let data = try? JSONEncoder().encode(savedPoses) {
+            poseLibraryData = data
+        }
+    }
+
+    private func savePose() {
+        let name = poseName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        savedPoses.insert(SavedFigurePose(name: name, pose: pose), at: 0)
+        poseName = ""
+        persistPoseLibrary()
+    }
+
+    private func deletePose(_ id: UUID) {
+        savedPoses.removeAll { $0.id == id }
+        persistPoseLibrary()
+    }
+
+    private func exportHighResolutionImage() {
+        guard let image = FigureSceneBuilder.makeSnapshot(
+            profile: profile,
+            pose: pose,
+            displayStyle: displayStyle,
+            lightingStyle: lightingStyle,
+            width: 1800,
+            height: 2400
+        ) else {
+            showExportError = true
+            return
+        }
+        shareImage = image
+        showShareSheet = true
     }
 }
 
@@ -90,36 +210,118 @@ private struct MeasurementRow: View {
 
 private struct PoseControlPanel: View {
     @Binding var pose: FigurePose
-    let hasSavedPose: Bool
+    let savedPoses: [SavedFigurePose]
     let onSave: () -> Void
-    let onLoad: () -> Void
+    let onLoad: (SavedFigurePose) -> Void
+    let onDelete: (UUID) -> Void
+    let onPreset: (FigurePose) -> Void
+
+    private let fingerNames = ["拇指", "食指", "中指", "无名指", "小指"]
 
     var body: some View {
         Form {
-            Section("手臂姿势") {
-                AngleControl(title: "双侧肩部抬起", value: $pose.armRaiseDegrees, range: -35...150)
-                AngleControl(title: "双侧肘部弯曲", value: $pose.elbowBendDegrees, range: 0...145)
+            Section("姿势库") {
+                Picker("腿部控制", selection: $pose.rigMode) {
+                    ForEach(FigureRigMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+                Menu("载入动作预设") {
+                    Button("自然站姿") { onPreset(.natural) }
+                    Button("A 字站姿") { onPreset(.aPose) }
+                    Button("行走动态") { onPreset(.walking) }
+                    Button("坐姿") { onPreset(.sitting) }
+                    Button("深蹲") { onPreset(.squat) }
+                }
+                Button("左右镜像当前姿势", systemImage: "arrow.left.arrow.right") {
+                    pose = pose.mirrored()
+                }
+                Button("保存当前姿势", systemImage: "square.and.arrow.down", action: onSave)
             }
-            Section("左腿") {
-                AngleControl(title: "髋部前后摆动", value: $pose.leftHipFlexionDegrees, range: -90...90)
-                AngleControl(title: "髋部外展", value: $pose.leftHipAbductionDegrees, range: -45...45)
-                AngleControl(title: "膝部弯曲", value: $pose.leftKneeBendDegrees, range: 0...135)
-                AngleControl(title: "脚踝活动", value: $pose.leftAnkleFlexionDegrees, range: -45...45)
+
+            Section("躯干与头部") {
+                AngleControl(title: "躯干前后弯曲", value: $pose.spineFlexionDegrees, range: -45...75)
+                AngleControl(title: "躯干侧弯", value: $pose.spineSideBendDegrees, range: -40...40)
+                AngleControl(title: "躯干旋转", value: $pose.spineRotationDegrees, range: -75...75)
+                AngleControl(title: "头部俯仰", value: $pose.headTiltDegrees, range: -45...45)
+                AngleControl(title: "头部转向", value: $pose.headRotationDegrees, range: -85...85)
             }
-            Section("右腿") {
-                AngleControl(title: "髋部前后摆动", value: $pose.rightHipFlexionDegrees, range: -90...90)
-                AngleControl(title: "髋部外展", value: $pose.rightHipAbductionDegrees, range: -45...45)
-                AngleControl(title: "膝部弯曲", value: $pose.rightKneeBendDegrees, range: 0...135)
-                AngleControl(title: "脚踝活动", value: $pose.rightAnkleFlexionDegrees, range: -45...45)
+
+            armSection(title: "左臂", arm: $pose.leftArm)
+            armSection(title: "右臂", arm: $pose.rightArm)
+
+            legSection(title: "左腿", leg: $pose.leftLeg)
+            legSection(title: "右腿", leg: $pose.rightLeg)
+
+            if !savedPoses.isEmpty {
+                Section("已保存姿势") {
+                    ForEach(savedPoses) { entry in
+                        HStack {
+                            Button {
+                                onLoad(entry)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(entry.name).foregroundStyle(.primary)
+                                    Text(entry.savedAt, style: .date)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            Spacer()
+                            Button(role: .destructive) {
+                                onDelete(entry.id)
+                            } label: {
+                                Image(systemName: "trash")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                }
             }
-            Section("姿势管理") {
-                Button("保存当前姿势", action: onSave)
-                Button("读取已保存姿势", action: onLoad)
-                    .disabled(!hasSavedPose)
-                Button("恢复自然站姿", role: .destructive) { pose = FigurePose() }
+
+            Section {
+                Button("恢复自然站姿", role: .destructive) {
+                    pose = FigurePose()
+                }
             }
         }
         .scrollContentBackground(.hidden)
+    }
+
+    @ViewBuilder
+    private func armSection(title: String, arm: Binding<ArmPose>) -> some View {
+        Section(title) {
+            AngleControl(title: "肩部前屈", value: arm.shoulderFlexionDegrees, range: -100...150)
+            AngleControl(title: "肩部外展", value: arm.shoulderAbductionDegrees, range: -100...100)
+            AngleControl(title: "肘部弯曲", value: arm.elbowFlexionDegrees, range: 0...145)
+            AngleControl(title: "前臂旋转", value: arm.forearmRotationDegrees, range: -90...90)
+            AngleControl(title: "手腕屈伸", value: arm.wristFlexionDegrees, range: -75...75)
+            AngleControl(title: "手腕侧偏", value: arm.wristDeviationDegrees, range: -35...35)
+            ForEach(0..<5, id: \.self) { index in
+                AngleControl(title: "\(fingerNames[index])屈曲",
+                             value: arm.fingerCurlDegrees[index], range: 0...95)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func legSection(title: String, leg: Binding<LegPose>) -> some View {
+        Section(title + (pose.rigMode == .ik ? " · IK 目标" : " · FK 关节")) {
+            if pose.rigMode == .fk {
+                AngleControl(title: "髋部前后摆动", value: leg.hipFlexionDegrees, range: -100...120)
+                AngleControl(title: "髋部外展", value: leg.hipAbductionDegrees, range: -55...55)
+                AngleControl(title: "髋部旋转", value: leg.hipRotationDegrees, range: -55...55)
+                AngleControl(title: "膝部弯曲", value: leg.kneeFlexionDegrees, range: 0...140)
+            } else {
+                AngleControl(title: "脚掌前后目标", value: leg.footForwardTargetCM, range: -55...55, suffix: "cm")
+                AngleControl(title: "脚掌抬升目标", value: leg.footLiftTargetCM, range: -30...45, suffix: "cm")
+                Text("IK 会根据脚掌目标自动计算髋部和膝部角度。目标会受腿长与关节活动范围限制。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            AngleControl(title: "脚踝屈伸", value: leg.ankleFlexionDegrees, range: -45...45)
+            AngleControl(title: "脚趾弯曲", value: leg.toeCurlDegrees, range: 0...60)
+        }
     }
 }
 
@@ -127,13 +329,14 @@ private struct AngleControl: View {
     let title: String
     @Binding var value: Double
     let range: ClosedRange<Double>
+    var suffix: String = "°"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
             HStack {
                 Text(title)
                 Spacer()
-                Text("\(value, specifier: "%.0f")°")
+                Text("\(value, specifier: "%.0f")\(suffix)")
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
             }
@@ -146,27 +349,68 @@ private struct AngleControl: View {
 private struct FigureViewport: UIViewRepresentable {
     let profile: BodyProfile
     let pose: FigurePose
+    let displayStyle: FigureDisplayStyle
+    let lightingStyle: FigureLightingStyle
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
 
     func makeUIView(context: Context) -> SCNView {
         let view = SCNView()
-        view.scene = FigureSceneBuilder.makeScene(profile: profile, pose: pose)
-        view.backgroundColor = UIColor(red: 0.94, green: 0.96, blue: 0.97, alpha: 1)
+        let scene = FigureSceneBuilder.makeScene(profile: profile, pose: pose,
+                                                 displayStyle: displayStyle, lightingStyle: lightingStyle)
+        view.scene = scene
+        view.pointOfView = scene.rootNode.childNode(withName: "figureCamera", recursively: false)
+        view.backgroundColor = UIColor(red: 0.94, green: 0.95, blue: 0.96, alpha: 1)
         view.allowsCameraControl = true
-        view.autoenablesDefaultLighting = true
+        view.autoenablesDefaultLighting = false
         view.antialiasingMode = .multisampling4X
+        view.rendersContinuously = false
+        context.coordinator.profile = profile
+        context.coordinator.displayStyle = displayStyle
+        context.coordinator.lightingStyle = lightingStyle
         return view
     }
 
     func updateUIView(_ view: SCNView, context: Context) {
-        // Preserve the user's orbit-camera position while the body proportions update.
-        let oldCameraPosition = view.pointOfView?.position
-        let oldCameraOrientation = view.pointOfView?.orientation
-        let scene = FigureSceneBuilder.makeScene(profile: profile, pose: pose)
-        view.scene = scene
-        if let camera = scene.rootNode.childNodes.first(where: { $0.camera != nil }) {
-            if let oldCameraPosition { camera.position = oldCameraPosition }
-            if let oldCameraOrientation { camera.orientation = oldCameraOrientation }
-            view.pointOfView = camera
+        let coordinator = context.coordinator
+        let needsRebuild = coordinator.profile != profile
+            || coordinator.displayStyle != displayStyle
+            || coordinator.lightingStyle != lightingStyle
+            || view.scene == nil
+
+        if needsRebuild {
+            let oldPosition = view.pointOfView?.position
+            let oldOrientation = view.pointOfView?.orientation
+            let scene = FigureSceneBuilder.makeScene(profile: profile, pose: pose,
+                                                     displayStyle: displayStyle, lightingStyle: lightingStyle)
+            view.scene = scene
+            let camera = scene.rootNode.childNode(withName: "figureCamera", recursively: false)
+            if let camera {
+                if let oldPosition { camera.position = oldPosition }
+                if let oldOrientation { camera.orientation = oldOrientation }
+                view.pointOfView = camera
+            }
+            coordinator.profile = profile
+            coordinator.displayStyle = displayStyle
+            coordinator.lightingStyle = lightingStyle
+        } else if let scene = view.scene {
+            FigureSceneBuilder.apply(pose: pose, to: scene, profile: profile)
         }
     }
+
+    final class Coordinator {
+        var profile: BodyProfile?
+        var displayStyle: FigureDisplayStyle?
+        var lightingStyle: FigureLightingStyle?
+    }
+}
+
+private struct ActivityShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) { }
 }

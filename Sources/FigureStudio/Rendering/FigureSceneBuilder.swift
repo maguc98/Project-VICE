@@ -1,6 +1,7 @@
 import SceneKit
 import UIKit
 import simd
+import Metal
 
 enum FigureDisplayStyle: String, CaseIterable, Identifiable {
     case realistic, silhouette, wireframe, skeleton
@@ -269,7 +270,7 @@ enum FigureSceneBuilder {
         cameraNode.position = SCNVector3(0, 1.50 * h, 4.45 * h)
         cameraNode.look(at: SCNVector3(0, 1.43 * h, 0))
         root.addChildNode(cameraNode)
-        scene.rootNode.camera = camera
+        scene.background.contents = UIColor(red: 0.94, green: 0.95, blue: 0.96, alpha: 1)
 
         let keyLight = SCNLight()
         keyLight.type = .directional
@@ -295,6 +296,28 @@ enum FigureSceneBuilder {
         floorNode.position.y = 0.035 * h
         root.addChildNode(floorNode)
         return scene
+    }
+
+
+    static func makeSnapshot(
+        profile: BodyProfile,
+        pose: FigurePose,
+        displayStyle: FigureDisplayStyle,
+        lightingStyle: FigureLightingStyle,
+        width: Int,
+        height: Int
+    ) -> UIImage? {
+        guard let device = MTLCreateSystemDefaultDevice() else { return nil }
+        let scene = makeScene(profile: profile, pose: pose,
+                              displayStyle: displayStyle, lightingStyle: lightingStyle)
+        let renderer = SCNRenderer(device: device, options: nil)
+        renderer.scene = scene
+        renderer.pointOfView = scene.rootNode.childNode(withName: "figureCamera", recursively: false)
+        return renderer.snapshot(
+            atTime: 0,
+            with: CGSize(width: width, height: height),
+            antialiasingMode: .multisampling4X
+        )
     }
 
     /// Applies pose deltas to the existing rig. Geometry is rebuilt only when proportions or display change.
