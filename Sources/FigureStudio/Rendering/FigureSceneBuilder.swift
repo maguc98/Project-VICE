@@ -275,13 +275,13 @@ enum FigureSceneBuilder {
             let end = SCNVector3(wrist.x + side * (offset + (offset * 0.10)) * h,
                                  handBaseY - length * h, wrist.z + 0.030 * h)
             addTaperedSegment(name, from: start, to: end,
-                              startRadius: 0.014 * CGFloat(h), endRadius: 0.010 * CGFloat(h),
+                              startRadius: 0.014 * h, endRadius: 0.010 * h,
                               material: material, root: root)
         }
         let thumbStart = SCNVector3(wrist.x + side * 0.052 * h, wrist.y - 0.075 * h, wrist.z + 0.015 * h)
         let thumbEnd = SCNVector3(wrist.x + side * 0.105 * h, wrist.y - 0.155 * h, wrist.z + 0.040 * h)
         addTaperedSegment("thumb", from: thumbStart, to: thumbEnd,
-                          startRadius: 0.018 * CGFloat(h), endRadius: 0.012 * CGFloat(h),
+                          startRadius: 0.018 * h, endRadius: 0.012 * h,
                           material: material, root: root)
     }
 
@@ -302,7 +302,6 @@ enum FigureSceneBuilder {
                                      material: SCNMaterial, to root: SCNNode) {
         let geometry = SCNSphere(radius: 1)
         geometry.segmentCount = 32
-        geometry.ringCount = 24
         geometry.firstMaterial = material
         let node = SCNNode(geometry: geometry)
         node.name = name
@@ -312,14 +311,14 @@ enum FigureSceneBuilder {
     }
 
     private static func addTaperedSegment(_ name: String, from start: SCNVector3, to end: SCNVector3,
-                                          startRadius: CGFloat, endRadius: CGFloat,
+                                          startRadius: Float, endRadius: Float,
                                           material: SCNMaterial, root: SCNNode) {
         let a = SIMD3<Float>(start.x, start.y, start.z)
         let b = SIMD3<Float>(end.x, end.y, end.z)
         let delta = b - a
         let length = simd_length(delta)
         guard length > 0.001 else { return }
-        let geometry = SCNCone(topRadius: endRadius, bottomRadius: startRadius, height: CGFloat(length))
+        let geometry = SCNCone(topRadius: CGFloat(endRadius), bottomRadius: CGFloat(startRadius), height: CGFloat(length))
         geometry.radialSegmentCount = 24
         geometry.firstMaterial = material
         let node = SCNNode(geometry: geometry)
@@ -330,10 +329,10 @@ enum FigureSceneBuilder {
         node.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: simd_normalize(delta))
         root.addChildNode(node)
         addEllipsoid("\(name)JointStart", at: start,
-                     scale: SCNVector3(Float(startRadius), Float(startRadius), Float(startRadius)),
+                     scale: SCNVector3(startRadius, startRadius, startRadius),
                      material: material, to: root)
         addEllipsoid("\(name)JointEnd", at: end,
-                     scale: SCNVector3(Float(endRadius), Float(endRadius), Float(endRadius)),
+                     scale: SCNVector3(endRadius, endRadius, endRadius),
                      material: material, to: root)
     }
 }
