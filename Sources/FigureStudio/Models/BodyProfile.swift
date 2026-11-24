@@ -20,14 +20,16 @@ struct MeasurementItem: Identifiable {
     let range: ClosedRange<Double>
 }
 
-/// One female reference figure. Values are editable measurements in centimetres.
+/// One female reference figure. Measurements are expressed in centimetres.
 struct BodyProfile: Codable {
     var stature = 165.0
     var headHeight = 22.0
     var shoulderWidth = 38.0
     var chest = 86.0
+    var bustProjection = 9.0
     var waist = 68.0
     var pelvis = 94.0
+    var glutealProjection = 10.0
     var upperArm = 29.0
     var forearm = 24.0
     var handLength = 17.5
@@ -46,8 +48,10 @@ struct BodyProfile: Codable {
                 .init(id: "headHeight", title: "头部高度", value: headHeight, range: 18...30),
                 .init(id: "shoulderWidth", title: "肩宽", value: shoulderWidth, range: 30...60),
                 .init(id: "chest", title: "胸围", value: chest, range: 65...130),
+                .init(id: "bustProjection", title: "胸部突出度", value: bustProjection, range: 3...18),
                 .init(id: "waist", title: "腰围", value: waist, range: 50...120),
-                .init(id: "pelvis", title: "骨盆围", value: pelvis, range: 65...130)
+                .init(id: "pelvis", title: "骨盆围", value: pelvis, range: 65...130),
+                .init(id: "glutealProjection", title: "臀部突出度", value: glutealProjection, range: 4...18)
             ]
         case .arms:
             return [
@@ -74,8 +78,10 @@ struct BodyProfile: Codable {
         case "headHeight": headHeight = value
         case "shoulderWidth": shoulderWidth = value
         case "chest": chest = value
+        case "bustProjection": bustProjection = value
         case "waist": waist = value
         case "pelvis": pelvis = value
+        case "glutealProjection": glutealProjection = value
         case "upperArm": upperArm = value
         case "forearm": forearm = value
         case "handLength": handLength = value

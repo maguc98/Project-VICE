@@ -7,23 +7,26 @@
 - [ ] First CI build and simulator validation
 
 ## M1 — Female anatomical base mesh
-- [x] Establish one female reference figure; no male model or model selector.
-- [x] Replace the torso's separate primitive volumes with a continuous ring-built surface.
-- [x] Drive torso silhouette and limb segment lengths from editable measurements.
-- [ ] Refine torso landmarks, breast/chest transition, shoulder, pelvis, knees, and ankles.
-- [ ] Replace simplified head, hands, feet, and limb joints with anatomical forms.
-- [ ] Validate proportions from front, side, and three-quarter views.
+- [x] One female reference figure; no male model or model selector
+- [x] Continuous ring-built torso surface
+- [x] Smooth interpolation between torso profile rings
+- [x] Editable chest projection and posterior hip/gluteal projection
+- [x] Named shoulder, elbow, knee, and ankle landmarks
+- [x] Individually named finger and toe geometry blockout
+- [ ] Refine anatomical landmarks, torso topology, and limb attachment transitions
+- [ ] Validate front, side, and three-quarter silhouettes on device
 
 ## M2 — Rig and posing
-- Hierarchical skeleton, IK/FK controls, hand and finger controls.
-- Pose library, mirror pose, reset, and local JSON save/load.
+- [ ] Hierarchical skeleton and joint constraints
+- [ ] IK/FK controls, hand and finger articulation
+- [ ] Pose library, mirror pose, reset, and local JSON save/load
 
 ## M3 — Artist tools
-- Orbit/pan/zoom camera, focal length, orthographic view.
-- Anatomy overlays, lighting presets, silhouette and contour modes.
-- High-resolution transparent PNG export.
+- [ ] Orbit/pan/zoom camera, focal length, orthographic view
+- [ ] Anatomy overlays, lighting presets, silhouette and contour modes
+- [ ] High-resolution transparent PNG export
 
 ## Performance targets
 - iPhone 12 mini (A14) is the baseline device.
-- Keep model updates incremental; avoid rebuilding the full scene for every slider tick.
+- Keep mesh rebuilds lightweight and avoid unnecessary scene recreation during slider movement.
 - Offline operation; no account or network requirement for core modeling.
