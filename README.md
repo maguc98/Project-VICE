@@ -19,7 +19,16 @@ The viewport uses a continuous ring-built torso with interpolated profile rings.
 - XcodeGen generates the Xcode project from `project.yml`.
 
 ## Build
-Install Xcode and XcodeGen, then run:
+The GitHub Actions workflow builds the iOS Simulator target and, on pushes to `main` or manual runs, creates an **unsigned device IPA** as a workflow artifact.
+
+1. Open the repository's Actions page.
+2. Open the latest successful **iOS Build** run.
+3. Download the `figure-studio-unsigned-ipa` artifact and extract the ZIP to get `FigureStudio-unsigned.ipa`.
+4. Sign the IPA with your own certificate and provisioning profile before installing it on a device.
+
+The IPA is deliberately unsigned; it is not directly installable until signed. Pull-request runs only perform the simulator build.
+
+For a local simulator build:
 
 ```sh
 xcodegen generate
