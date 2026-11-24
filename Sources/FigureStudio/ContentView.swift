@@ -2,12 +2,27 @@ import SwiftUI
 import SceneKit
 import UIKit
 
+enum FigureCameraView: String, CaseIterable, Identifiable {
+    case front, threeQuarter, left, right, back
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .front: "正面"
+        case .threeQuarter: "四分之三"
+        case .left: "左侧"
+        case .right: "右侧"
+        case .back: "背面"
+        }
+    }
+}
+
 struct ContentView: View {
     @Binding var profile: BodyProfile
     @State private var selectedSection: MeasurementSection = .body
     @State private var pose = FigurePose()
     @State private var displayStyle: FigureDisplayStyle = .realistic
     @State private var lightingStyle: FigureLightingStyle = .studio
+    @State private var cameraView: FigureCameraView = .threeQuarter
     @State private var savedPoses: [SavedFigurePose] = []
     @State private var poseName = ""
     @State private var showSavePrompt = false
@@ -21,7 +36,8 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 ZStack(alignment: .topLeading) {
                     FigureViewport(profile: profile, pose: pose,
-                                   displayStyle: displayStyle, lightingStyle: lightingStyle)
+                                   displayStyle: displayStyle, lightingStyle: lightingStyle,
+                                   cameraView: cameraView)
                         .frame(maxWidth: .infinity)
                         .frame(height: 370)
                     VStack(alignment: .leading, spacing: 3) {
@@ -188,7 +204,10 @@ struct ContentView: View {
                 FigureSceneBuilder.attachRealisticBaseMesh(
                     root, to: scene, profile: exportProfile, displayStyle: exportDisplayStyle
                 )
-                FemaleFigureRig(root: root).apply(exportPose)
+                let rig = FemaleFigureRig(root: root)
+                rig.applyProfile(exportProfile)
+                rig.apply(exportPose)
+                rig.setSkeletonVisible(exportDisplayStyle == .skeleton)
             }
             guard let image = FigureSceneBuilder.makeSnapshot(scene: scene, width: 1800, height: 2400) else {
                 showExportError = true
@@ -376,6 +395,7 @@ private struct FigureViewport: UIViewRepresentable {
     let pose: FigurePose
     let displayStyle: FigureDisplayStyle
     let lightingStyle: FigureLightingStyle
+    let cameraView: FigureCameraView
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -396,6 +416,8 @@ private struct FigureViewport: UIViewRepresentable {
         coordinator.displayStyle = displayStyle
         coordinator.lightingStyle = lightingStyle
         coordinator.pose = pose
+        coordinator.cameraView = cameraView
+        coordinator.applyCamera(to: view)
         coordinator.loadRealisticMesh(for: view)
         return view
     }
@@ -406,6 +428,8 @@ private struct FigureViewport: UIViewRepresentable {
         coordinator.profile = profile
         coordinator.displayStyle = displayStyle
         coordinator.lightingStyle = lightingStyle
+        let cameraChanged = coordinator.cameraView != cameraView
+        coordinator.cameraView = cameraView
         let needsRebuild = coordinator.lastBuiltProfile != profile
             || coordinator.lastBuiltDisplayStyle != displayStyle
             || coordinator.lastBuiltLightingStyle != lightingStyle
@@ -420,7 +444,9 @@ private struct FigureViewport: UIViewRepresentable {
             if let modelRoot = coordinator.modelRoot {
                 FigureSceneBuilder.attachRealisticBaseMesh(modelRoot, to: scene,
                                                            profile: profile, displayStyle: displayStyle)
+                coordinator.rig?.applyProfile(profile)
                 coordinator.rig?.apply(pose)
+                coordinator.rig?.setSkeletonVisible(displayStyle == .skeleton)
             }
             let camera = scene.rootNode.childNode(withName: "figureCamera", recursively: false)
             if let camera {
@@ -433,8 +459,10 @@ private struct FigureViewport: UIViewRepresentable {
             coordinator.lastBuiltLightingStyle = lightingStyle
         } else if let scene = view.scene {
             FigureSceneBuilder.apply(pose: pose, to: scene, profile: profile)
+            coordinator.rig?.applyProfile(profile)
             coordinator.rig?.apply(pose)
         }
+        if cameraChanged { coordinator.applyCamera(to: view) }
 
         if coordinator.modelRoot == nil {
             coordinator.loadRealisticMesh(for: view)
@@ -449,10 +477,30 @@ private struct FigureViewport: UIViewRepresentable {
         var lastBuiltDisplayStyle: FigureDisplayStyle?
         var lastBuiltLightingStyle: FigureLightingStyle?
         var pose = FigurePose()
+        var cameraView: FigureCameraView = .threeQuarter
         var modelRoot: SCNNode?
         var rig: FemaleFigureRig?
         private var isLoadingModel = false
         private var attemptedModelLoad = false
+
+
+        func applyCamera(to view: SCNView) {
+            guard let camera = view.scene?.rootNode.childNode(withName: "figureCamera", recursively: false) else { return }
+            let height = Float(profile?.stature ?? BodyProfile.defaultProfile.stature) / 100
+            let distance = max(height * 2.65, 2.6)
+            let target = SCNVector3(0, height * 0.49, 0)
+            let offset: SCNVector3
+            switch cameraView {
+            case .front: offset = SCNVector3(0, height * 0.03, distance)
+            case .threeQuarter: offset = SCNVector3(distance * 0.58, height * 0.04, distance * 0.82)
+            case .left: offset = SCNVector3(-distance, height * 0.03, 0)
+            case .right: offset = SCNVector3(distance, height * 0.03, 0)
+            case .back: offset = SCNVector3(0, height * 0.03, -distance)
+            }
+            camera.position = SCNVector3(target.x + offset.x, target.y + offset.y, target.z + offset.z)
+            camera.look(at: target)
+            view.pointOfView = camera
+        }
 
         func loadRealisticMesh(for view: SCNView) {
             guard !isLoadingModel && !attemptedModelLoad && modelRoot == nil else { return }
@@ -479,7 +527,9 @@ private struct FigureViewport: UIViewRepresentable {
                     profile: self.profile ?? .defaultProfile,
                     displayStyle: self.displayStyle ?? .realistic
                 )
+                self.rig?.applyProfile(self.profile ?? .defaultProfile)
                 self.rig?.apply(self.pose)
+                self.rig?.setSkeletonVisible(self.displayStyle == .skeleton)
                 self.lastBuiltProfile = self.profile
                 self.lastBuiltDisplayStyle = self.displayStyle
                 self.lastBuiltLightingStyle = self.lightingStyle

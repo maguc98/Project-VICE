@@ -20,6 +20,8 @@ The model is an anatomical 3D base mesh, not a photographic scan or a medically 
 - SceneKit viewport with orbit/zoom, PBR skin material, studio/soft/dramatic lighting, silhouette, wireframe and skeleton-oriented views.
 - FK controls for torso, left/right shoulders, elbows, wrists, five fingers per hand, hips, knees, ankles and toes.
 - IK target controls for left/right hands and feet.
+- Bone-length-aware hand and foot IK solvers; proportion sliders also scale relevant skinned bone groups as a first-pass fit.
+- Front, three-quarter, left, right and rear camera presets; live joint/bone guide overlay in skeleton mode.
 - Presets: natural, A-pose, walking, sitting and squat; mirror, save, load and delete named poses locally.
 - High-resolution 1800×2400 PNG share/export.
 - Procedural model remains as a fallback if the offline GLB cannot load.

@@ -39,6 +39,8 @@ final class FemaleFigureRig {
     private var nodes: [String: SCNNode] = [:]
     private var restOrientations: [String: simd_quatf] = [:]
     private var restPositions: [String: SIMD3<Float>] = [:]
+    private var restLocalPositions: [String: SCNVector3] = [:]
+    private var restScales: [String: SCNVector3] = [:]
 
     init(root: SCNNode) {
         self.root = root
@@ -46,8 +48,113 @@ final class FemaleFigureRig {
             guard let name = node.name else { return }
             self.nodes[name] = node
             self.restOrientations[name] = node.simdOrientation
+            self.restLocalPositions[name] = node.position
+            self.restScales[name] = node.scale
             let point = node.convertPosition(SCNVector3Zero, to: root)
             self.restPositions[name] = SIMD3<Float>(point.x, point.y, point.z)
+        }
+    }
+
+    /// Applies restrained segment and contour proportion adjustments on the skinned rig.
+    /// This is a bone-scale approximation; it does not replace a sculpted morph-target set.
+    func applyProfile(_ profile: BodyProfile) {
+        let shoulder = clamped(profile.shoulderWidth / 38.0, 0.78, 1.24)
+        let chest = clamped(profile.chest / 86.0, 0.78, 1.25)
+        let waist = clamped(profile.waist / 68.0, 0.78, 1.24)
+        let pelvis = clamped(profile.pelvis / 94.0, 0.78, 1.25)
+        let bust = clamped(profile.bustProjection / 9.0, 0.55, 1.70)
+        let glute = clamped(profile.glutealProjection / 10.0, 0.55, 1.65)
+        let upperArm = clamped(profile.upperArm / 29.0, 0.75, 1.30)
+        let forearm = clamped(profile.forearm / 24.0, 0.75, 1.30)
+        let thigh = clamped(profile.thigh / 43.0, 0.75, 1.30)
+        let lowerLeg = clamped(profile.lowerLeg / 39.0, 0.75, 1.30)
+        let hand = clamped(profile.handLength / 17.5, 0.75, 1.30)
+        let footWidth = clamped(profile.footWidth / 9.0, 0.75, 1.30)
+        let footLength = clamped(profile.footLength / 24.0, 0.75, 1.30)
+        let head = clamped(profile.headHeight / 22.0, 0.78, 1.25)
+
+        for side in ["L", "R"] {
+            scaleNode("clavicle.\(side)", x: shoulder, z: shoulder)
+            scaleNode("shoulder01.\(side)", x: shoulder, z: shoulder)
+            scaleNode("breast.\(side)", z: bust)
+            scaleNode("pelvis.\(side)", x: pelvis, z: glute)
+            scaleNode("upperarm02.\(side)", y: upperArm)
+            scaleNode("lowerarm02.\(side)", y: forearm)
+            scaleNode("upperleg02.\(side)", y: thigh)
+            scaleNode("lowerleg02.\(side)", y: lowerLeg)
+            scaleNode("wrist.\(side)", x: hand, y: hand, z: hand)
+            scaleNode("foot.\(side)", x: footWidth, z: footLength)
+            for finger in 1...5 {
+                scaleNode("finger\(finger)-1.\(side)", y: hand)
+                scaleNode("finger\(finger)-2.\(side)", y: hand)
+                scaleNode("finger\(finger)-3.\(side)", y: hand)
+            }
+
+            if let clavicle = nodes["clavicle.\(side)"],
+               let original = restLocalPositions["clavicle.\(side)"] {
+                clavicle.position = SCNVector3(original.x * shoulder, original.y, original.z)
+            }
+            if let pelvisNode = nodes["pelvis.\(side)"],
+               let original = restLocalPositions["pelvis.\(side)"] {
+                pelvisNode.position = SCNVector3(original.x * pelvis, original.y, original.z)
+            }
+        }
+
+        scaleNode("spine02", x: waist, z: waist)
+        scaleNode("spine03", x: chest, z: chest)
+        scaleNode("spine04", x: chest, z: chest)
+        scaleNode("head", y: head)
+    }
+
+    private func clamped(_ value: Double, _ lower: Double, _ upper: Double) -> Double {
+        min(max(value, lower), upper)
+    }
+
+    private func scaleNode(_ name: String, x: Double = 1, y: Double = 1, z: Double = 1) {
+        guard let node = nodes[name], let base = restScales[name] else { return }
+        node.scale = SCNVector3(base.x * Float(x), base.y * Float(y), base.z * Float(z))
+    }
+
+    /// Adds a live joint-and-bone guide to the imported skeleton for figure study.
+    func setSkeletonVisible(_ visible: Bool) {
+        for node in nodes.values {
+            node.childNodes.filter { $0.name == "__figureBoneGuide" }.forEach { $0.removeFromParentNode() }
+        }
+        guard visible else { return }
+        let guideMaterial = SCNMaterial()
+        guideMaterial.diffuse.contents = UIColor(red: 0.16, green: 0.47, blue: 0.69, alpha: 1)
+        guideMaterial.emission.contents = UIColor(red: 0.06, green: 0.18, blue: 0.28, alpha: 1)
+        guideMaterial.lightingModel = .constant
+
+        for (name, parent) in nodes {
+            let joints = parent.childNodes.filter { child in
+                guard let childName = child.name else { return false }
+                return nodes[childName] === child
+            }
+            for joint in joints {
+                let delta = SIMD3<Float>(joint.position.x, joint.position.y, joint.position.z)
+                let length = simd_length(delta)
+                guard length > 0.012 else { continue }
+                let cylinder = SCNCylinder(radius: 0.0045, height: CGFloat(length))
+                cylinder.radialSegmentCount = 8
+                cylinder.firstMaterial = guideMaterial
+                let guide = SCNNode(geometry: cylinder)
+                guide.name = "__figureBoneGuide"
+                guide.position = SCNVector3(delta.x * 0.5, delta.y * 0.5, delta.z * 0.5)
+                guide.simdOrientation = simd_quatf(
+                    from: SIMD3<Float>(0, 1, 0),
+                    to: simd_normalize(delta)
+                )
+                parent.addChildNode(guide)
+
+                let jointSphere = SCNSphere(radius: 0.008)
+                jointSphere.segmentCount = 8
+                jointSphere.firstMaterial = guideMaterial
+                let marker = SCNNode(geometry: jointSphere)
+                marker.name = "__figureBoneGuide"
+                marker.position = joint.position
+                parent.addChildNode(marker)
+            }
         }
     }
 
