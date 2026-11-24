@@ -365,17 +365,25 @@ private struct FigureViewport: UIViewRepresentable {
         view.autoenablesDefaultLighting = false
         view.antialiasingMode = .multisampling4X
         view.rendersContinuously = false
-        context.coordinator.profile = profile
-        context.coordinator.displayStyle = displayStyle
-        context.coordinator.lightingStyle = lightingStyle
+
+        let coordinator = context.coordinator
+        coordinator.profile = profile
+        coordinator.displayStyle = displayStyle
+        coordinator.lightingStyle = lightingStyle
+        coordinator.pose = pose
+        coordinator.loadRealisticMesh(for: view)
         return view
     }
 
     func updateUIView(_ view: SCNView, context: Context) {
         let coordinator = context.coordinator
-        let needsRebuild = coordinator.profile != profile
-            || coordinator.displayStyle != displayStyle
-            || coordinator.lightingStyle != lightingStyle
+        coordinator.pose = pose
+        coordinator.profile = profile
+        coordinator.displayStyle = displayStyle
+        coordinator.lightingStyle = lightingStyle
+        let needsRebuild = coordinator.lastBuiltProfile != profile
+            || coordinator.lastBuiltDisplayStyle != displayStyle
+            || coordinator.lastBuiltLightingStyle != lightingStyle
             || view.scene == nil
 
         if needsRebuild {
@@ -384,17 +392,27 @@ private struct FigureViewport: UIViewRepresentable {
             let scene = FigureSceneBuilder.makeScene(profile: profile, pose: pose,
                                                      displayStyle: displayStyle, lightingStyle: lightingStyle)
             view.scene = scene
+            if let modelRoot = coordinator.modelRoot {
+                FigureSceneBuilder.attachRealisticBaseMesh(modelRoot, to: scene,
+                                                           profile: profile, displayStyle: displayStyle)
+                coordinator.rig?.apply(pose)
+            }
             let camera = scene.rootNode.childNode(withName: "figureCamera", recursively: false)
             if let camera {
-                if let oldPosition { camera.position = oldPosition }
-                if let oldOrientation { camera.orientation = oldOrientation }
+                if let oldPosition, coordinator.modelRoot == nil { camera.position = oldPosition }
+                if let oldOrientation, coordinator.modelRoot == nil { camera.orientation = oldOrientation }
                 view.pointOfView = camera
             }
-            coordinator.profile = profile
-            coordinator.displayStyle = displayStyle
-            coordinator.lightingStyle = lightingStyle
+            coordinator.lastBuiltProfile = profile
+            coordinator.lastBuiltDisplayStyle = displayStyle
+            coordinator.lastBuiltLightingStyle = lightingStyle
         } else if let scene = view.scene {
             FigureSceneBuilder.apply(pose: pose, to: scene, profile: profile)
+            coordinator.rig?.apply(pose)
+        }
+
+        if coordinator.modelRoot == nil {
+            coordinator.loadRealisticMesh(for: view)
         }
     }
 
@@ -402,6 +420,46 @@ private struct FigureViewport: UIViewRepresentable {
         var profile: BodyProfile?
         var displayStyle: FigureDisplayStyle?
         var lightingStyle: FigureLightingStyle?
+        var lastBuiltProfile: BodyProfile?
+        var lastBuiltDisplayStyle: FigureDisplayStyle?
+        var lastBuiltLightingStyle: FigureLightingStyle?
+        var pose = FigurePose()
+        var modelRoot: SCNNode?
+        var rig: FemaleFigureRig?
+        private var isLoadingModel = false
+        private var attemptedModelLoad = false
+
+        func loadRealisticMesh(for view: SCNView) {
+            guard !isLoadingModel && !attemptedModelLoad && modelRoot == nil else { return }
+            isLoadingModel = true
+            attemptedModelLoad = true
+            FemaleBaseMeshLoader.load { [weak self, weak view] loadedScene in
+                guard let self else { return }
+                self.isLoadingModel = false
+                guard let loadedScene, let view, let activeScene = view.scene else {
+                    NSLog("Using procedural Figure Studio fallback; realistic base mesh is unavailable.")
+                    return
+                }
+
+                let root = SCNNode()
+                root.name = "realisticFemaleMeshRoot"
+                for child in Array(loadedScene.rootNode.childNodes) {
+                    child.removeFromParentNode()
+                    root.addChildNode(child)
+                }
+                self.modelRoot = root
+                self.rig = FemaleFigureRig(root: root)
+                FigureSceneBuilder.attachRealisticBaseMesh(
+                    root, to: activeScene,
+                    profile: self.profile ?? .defaultProfile,
+                    displayStyle: self.displayStyle ?? .realistic
+                )
+                self.rig?.apply(self.pose)
+                self.lastBuiltProfile = self.profile
+                self.lastBuiltDisplayStyle = self.displayStyle
+                self.lastBuiltLightingStyle = self.lightingStyle
+            }
+        }
     }
 }
 

@@ -260,6 +260,15 @@ enum FigureSceneBuilder {
             addSkeletonOverlay(root: root, scale: h, skinMaterial: skin)
         }
 
+        // Keep all procedural anatomy in one container so the imported skinned model can replace it.
+        let proceduralRoot = SCNNode()
+        proceduralRoot.name = "proceduralFigureRoot"
+        for child in Array(root.childNodes) {
+            child.removeFromParentNode()
+            proceduralRoot.addChildNode(child)
+        }
+        root.addChildNode(proceduralRoot)
+
         let camera = SCNCamera()
         camera.fieldOfView = 38
         camera.wantsHDR = true
@@ -318,6 +327,78 @@ enum FigureSceneBuilder {
             with: CGSize(width: width, height: height),
             antialiasingMode: .multisampling4X
         )
+    }
+
+
+    /// Replaces the procedural blockout with the bundled, skinned female base mesh.
+    static func attachRealisticBaseMesh(
+        _ modelRoot: SCNNode,
+        to scene: SCNScene,
+        profile: BodyProfile,
+        displayStyle: FigureDisplayStyle
+    ) {
+        scene.rootNode.childNode(withName: "realisticFemaleMeshRoot", recursively: false)?.removeFromParentNode()
+        scene.rootNode.childNode(withName: "proceduralFigureRoot", recursively: false)?.isHidden = true
+
+        modelRoot.name = "realisticFemaleMeshRoot"
+        var minimum = SCNVector3Zero
+        var maximum = SCNVector3Zero
+        let hasBounds = modelRoot.getBoundingBoxMin(&minimum, max: &maximum)
+        let sourceHeight = hasBounds ? max(maximum.y - minimum.y, 0.01) : 1.59
+        let statureScale = Float(profile.stature / 100.0) / sourceHeight
+        let shoulderFactor = Float(profile.shoulderWidth / 38.0)
+        let pelvisFactor = Float(profile.pelvis / 94.0)
+        let chestFactor = Float(profile.chest / 86.0)
+        let waistFactor = Float(profile.waist / 68.0)
+
+        // Global proportions provide a restrained first-pass adjustment. Local anatomical
+        // morphs will be applied to the bind-pose vertices in the next modelling pass.
+        let widthScale = 1 + ((shoulderFactor + pelvisFactor) * 0.5 - 1) * 0.55
+        let depthScale = 1 + ((chestFactor + waistFactor) * 0.5 - 1) * 0.35
+        modelRoot.scale = SCNVector3(statureScale * widthScale, statureScale, statureScale * depthScale)
+        modelRoot.position = SCNVector3(-minimum.x * statureScale * widthScale,
+                                        -minimum.y * statureScale,
+                                        -minimum.z * statureScale * depthScale)
+
+        modelRoot.enumerateChildNodes { node, _ in
+            guard let source = node.geometry else { return }
+            let geometry = source.copy() as! SCNGeometry
+            geometry.materials = source.materials.map { sourceMaterial in
+                let material = sourceMaterial.copy() as! SCNMaterial
+                switch displayStyle {
+                case .realistic:
+                    material.lightingModel = .physicallyBased
+                    material.diffuse.contents = UIColor(red: 0.76, green: 0.59, blue: 0.49, alpha: 1)
+                    material.roughness.contents = 0.62
+                    material.metalness.contents = 0
+                    material.specular.contents = UIColor(white: 0.22, alpha: 1)
+                case .silhouette:
+                    material.lightingModel = .constant
+                    material.diffuse.contents = UIColor(white: 0.025, alpha: 1)
+                    material.roughness.contents = 1
+                    material.fillMode = .fill
+                case .wireframe:
+                    material.lightingModel = .constant
+                    material.diffuse.contents = UIColor(red: 0.20, green: 0.38, blue: 0.50, alpha: 1)
+                    material.fillMode = .lines
+                case .skeleton:
+                    material.lightingModel = .physicallyBased
+                    material.diffuse.contents = UIColor(red: 0.64, green: 0.70, blue: 0.73, alpha: 1)
+                    material.transparency = 0.23
+                    material.fillMode = .fill
+                }
+                return material
+            }
+            node.geometry = geometry
+        }
+        scene.rootNode.addChildNode(modelRoot)
+
+        // Reframe the camera for a real 1.65 m figure rather than the taller procedural blockout.
+        if let camera = scene.rootNode.childNode(withName: "figureCamera", recursively: false) {
+            camera.position = SCNVector3(0, Float(profile.stature / 100.0) * 0.53,
+                                         Float(profile.stature / 100.0) * 2.75)
+            camera.look(at: SCNVector3(0, Float(profile.stature / 100.0) * 0.49, 0))
+        }
     }
 
     /// Applies pose deltas to the existing rig. Geometry is rebuilt only when proportions or display change.
