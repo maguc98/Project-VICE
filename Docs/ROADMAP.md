@@ -2,13 +2,13 @@
 
 ## M0 — Foundation
 - [x] Repository reset and native app skeleton
-- [x] Measurement data model in centimetres
+- [x] Female reference measurement data model in centimetres
 - [x] Interactive SceneKit viewport scaffold
 - [ ] First CI build and simulator validation
 
-## M1 — Anatomical base mesh
-- Replace primitive proportion volumes with connected, smooth human topology.
-- Separate male/female base profiles while keeping shared measurement semantics.
+## M1 — Female anatomical base mesh
+- Build one anatomically plausible female base figure; no male model or model selector.
+- Replace primitive volumes with connected, smooth human topology.
 - Implement measurement-driven deformation with silhouette and landmark constraints.
 - Validate proportions from front, side, and three-quarter views.
 
