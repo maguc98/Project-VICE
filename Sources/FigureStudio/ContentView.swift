@@ -216,6 +216,9 @@ struct ContentView: View {
                 FigureSceneBuilder.attachRealisticBaseMesh(
                     root, to: scene, profile: exportProfile, displayStyle: exportDisplayStyle
                 )
+                let exportView = SCNView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+                exportView.scene = scene
+                FigureSceneBuilder.applyCamera(cameraView, profile: exportProfile, to: exportView)
                 let rig = FemaleFigureRig(root: root)
                 rig.applyProfile(exportProfile)
                 rig.apply(exportPose)
@@ -505,21 +508,9 @@ private struct FigureViewport: UIViewRepresentable {
 
 
         func applyCamera(to view: SCNView) {
-            guard let camera = view.scene?.rootNode.childNode(withName: "figureCamera", recursively: false) else { return }
-            let height = Float(profile?.stature ?? BodyProfile.defaultProfile.stature) / 100
-            let distance = max(height * 2.65, 2.6)
-            let target = SCNVector3(0, height * 0.49, 0)
-            let offset: SCNVector3
-            switch cameraView {
-            case .front: offset = SCNVector3(0, height * 0.03, distance)
-            case .threeQuarter: offset = SCNVector3(distance * 0.58, height * 0.04, distance * 0.82)
-            case .left: offset = SCNVector3(-distance, height * 0.03, 0)
-            case .right: offset = SCNVector3(distance, height * 0.03, 0)
-            case .back: offset = SCNVector3(0, height * 0.03, -distance)
-            }
-            camera.position = SCNVector3(target.x + offset.x, target.y + offset.y, target.z + offset.z)
-            camera.look(at: target)
-            view.pointOfView = camera
+            FigureSceneBuilder.applyCamera(
+                cameraView, profile: profile ?? .defaultProfile, to: view
+            )
         }
 
         func loadRealisticMesh(for view: SCNView) {
