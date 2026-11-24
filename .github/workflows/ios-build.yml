@@ -40,12 +40,29 @@ jobs:
           json_size = struct.unpack_from("<I", data, 12)[0]
           model = json.loads(data[20:20 + json_size].decode("utf-8").rstrip("\\x00 "))
           nodes = model.get("nodes", [])
+          joints = {
+              nodes[index].get("name", "")
+              for skin in model.get("skins", [])
+              for index in skin.get("joints", [])
+              if isinstance(index, int) and index < len(nodes)
+          }
+          required = {
+              "pelvis.L", "pelvis.R", "upperleg01.L", "upperleg01.R",
+              "upperleg02.L", "upperleg02.R", "lowerleg01.L", "lowerleg01.R",
+              "lowerleg02.L", "lowerleg02.R", "foot.L", "foot.R",
+              "spine01", "spine02", "spine03", "spine04", "spine05", "head",
+              "breast.L", "breast.R", "clavicle.L", "clavicle.R",
+              "shoulder01.L", "shoulder01.R", "upperarm01.L", "upperarm01.R",
+              "upperarm02.L", "upperarm02.R", "lowerarm01.L", "lowerarm01.R",
+              "lowerarm02.L", "lowerarm02.R", "wrist.L", "wrist.R",
+              "finger1-1.L", "finger1-1.R", "finger5-3.L", "finger5-3.R"
+          }
+          missing = sorted(required - joints)
           print("CC0 FEMALE BASE MESH: nodes =", len(nodes), "skins =", len(model.get("skins", [])))
-          for skin in model.get("skins", []):
-              print("SKIN JOINTS:")
-              for index in skin.get("joints", []):
-                  if isinstance(index, int) and index < len(nodes):
-                      print(f"  {index}: {nodes[index].get('name', '<unnamed>')}")
+          print("SKIN JOINT COUNT:", len(joints))
+          if missing:
+              raise SystemExit("Female rig is missing required joints: " + ", ".join(missing))
+          print("FEMALE RIG VALIDATION: all required body, hand and foot joints found")
           PY
 
       - name: Generate project

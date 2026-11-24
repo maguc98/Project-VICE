@@ -344,6 +344,40 @@ enum FigureSceneBuilder {
     }
 
     /// Replaces the procedural blockout with the bundled, skinned female base mesh.
+    /// Applies a repeatable artist camera preset. Orthographic views keep proportions measurable.
+    static func applyCamera(_ preset: FigureCameraView, profile: BodyProfile, to view: SCNView) {
+        guard let cameraNode = view.scene?.rootNode.childNode(
+            withName: "figureCamera", recursively: true
+        ), let camera = cameraNode.camera else { return }
+
+        let height = Float(profile.stature / 100.0)
+        let distance = max(height * 2.9, 2.6)
+        let target = SCNVector3(0, height * 0.50, 0)
+        let offset: SCNVector3
+        switch preset {
+        case .front:
+            offset = SCNVector3(0, height * 0.025, distance)
+        case .threeQuarter:
+            offset = SCNVector3(distance * 0.58, height * 0.035, distance * 0.82)
+        case .left:
+            offset = SCNVector3(-distance, height * 0.025, 0)
+        case .right:
+            offset = SCNVector3(distance, height * 0.025, 0)
+        case .back:
+            offset = SCNVector3(0, height * 0.025, -distance)
+        }
+
+        cameraNode.position = SCNVector3(
+            target.x + offset.x, target.y + offset.y, target.z + offset.z
+        )
+        cameraNode.look(at: target)
+        camera.usesOrthographicProjection = preset != .threeQuarter
+        camera.orthographicScale = CGFloat(height * 1.13)
+        camera.zNear = 0.01
+        camera.zFar = 100
+        view.pointOfView = cameraNode
+    }
+
     static func updateRealisticBaseMesh(_ modelRoot: SCNNode, profile: BodyProfile) {
         let bounds = modelRoot.boundingBox
         let minimum = bounds.min

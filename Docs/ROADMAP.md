@@ -22,14 +22,14 @@
 - [x] Spine and head posing
 - [x] Pose presets, mirror, named local save/load/delete
 - [ ] Validate joint axes, ranges and skinning deformation on physical device
-- [ ] Improve reach limits and joint constraints using measured bind-pose lengths
+- [x] Improve reach limits and joint constraints using measured bind-pose lengths
 
 ## M3 — Artist tools
 - [x] PBR presentation and studio/soft/dramatic lighting choices
 - [x] Silhouette and wireframe display modes
 - [x] High-resolution 1800×2400 PNG export
-- [ ] Dynamic skeleton/bone overlay and anatomical landmark guides
-- [ ] Dedicated orthographic front/side/back camera presets
+- [x] Dynamic skeleton/bone overlay and anatomical landmark guides
+- [x] Dedicated orthographic front/side/back camera presets
 - [ ] Optional transparent background and clean image crop presets
 
 ## M4 — Performance and quality
