@@ -412,7 +412,7 @@ enum FigureSceneBuilder {
         }
 
         scene.rootNode.childNode(withName: "realisticFemaleMeshRoot", recursively: false)?.removeFromParentNode()
-        scene.rootNode.childNode(withName: "proceduralFigureRoot", recursively: false)?.isHidden = true
+        scene.rootNode.childNode(withName: "proceduralFigureRoot", recursively: false)?.removeFromParentNode()
 
         modelRoot.name = "realisticFemaleMeshRoot"
         updateRealisticBaseMesh(modelRoot, profile: profile)
