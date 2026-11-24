@@ -341,10 +341,10 @@ enum FigureSceneBuilder {
         scene.rootNode.childNode(withName: "proceduralFigureRoot", recursively: false)?.isHidden = true
 
         modelRoot.name = "realisticFemaleMeshRoot"
-        var minimum = SCNVector3Zero
-        var maximum = SCNVector3Zero
-        let hasBounds = modelRoot.getBoundingBoxMin(&minimum, max: &maximum)
-        let sourceHeight = hasBounds ? max(maximum.y - minimum.y, 0.01) : 1.59
+        let bounds = modelRoot.boundingBox
+        let minimum = bounds.min
+        let maximum = bounds.max
+        let sourceHeight = max(maximum.y - minimum.y, 0.01)
         let statureScale = Float(profile.stature / 100.0) / sourceHeight
         let shoulderFactor = Float(profile.shoulderWidth / 38.0)
         let pelvisFactor = Float(profile.pelvis / 94.0)
