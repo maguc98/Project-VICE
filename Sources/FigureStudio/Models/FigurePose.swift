@@ -128,6 +128,20 @@ struct FigurePose: Codable, Equatable {
         rightLeg.ankleFlexionDegrees = try c.decodeIfPresent(Double.self, forKey: .rightAnkleFlexionDegrees) ?? rightLeg.ankleFlexionDegrees
     }
 
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(leftArm, forKey: .leftArm)
+        try c.encode(rightArm, forKey: .rightArm)
+        try c.encode(leftLeg, forKey: .leftLeg)
+        try c.encode(rightLeg, forKey: .rightLeg)
+        try c.encode(spineFlexionDegrees, forKey: .spineFlexionDegrees)
+        try c.encode(spineSideBendDegrees, forKey: .spineSideBendDegrees)
+        try c.encode(spineRotationDegrees, forKey: .spineRotationDegrees)
+        try c.encode(headTiltDegrees, forKey: .headTiltDegrees)
+        try c.encode(headRotationDegrees, forKey: .headRotationDegrees)
+        try c.encode(rigMode, forKey: .rigMode)
+    }
+
     func mirrored() -> FigurePose {
         var copy = self
         copy.leftArm = rightArm
