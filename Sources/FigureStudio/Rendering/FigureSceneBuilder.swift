@@ -289,7 +289,7 @@ enum FigureSceneBuilder {
                                 scale h: Float, material: SCNMaterial, root: SCNNode) {
         let offsets: [Float] = [-0.060, -0.030, 0, 0.030, 0.058]
         for (index, offset) in offsets.enumerated() {
-            let size = index == 4 ? 0.014 : 0.018
+            let size: Float = index == 4 ? 0.014 : 0.018
             addEllipsoid("toe\(index + 1)",
                          at: SCNVector3(ankle.x + side * offset * widthFactor * h,
                                         ankle.y - 0.045 * h, 0.255 * lengthFactor * h),
