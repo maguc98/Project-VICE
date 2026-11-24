@@ -60,9 +60,8 @@ enum FemaleBaseMeshLoader {
     static func makeModelRoot(from scene: SCNScene) -> SCNNode {
         let root = SCNNode()
         root.name = "realisticFemaleMeshRoot"
-        if let sourceUserData = scene.rootNode.figureStudioMetadata {
-            root.figureStudioMetadata = sourceUserData.mutableCopy() as? NSMutableDictionary
-        }
+        let sourceUserData = scene.rootNode.figureStudioMetadata
+        root.figureStudioMetadata = sourceUserData.mutableCopy() as? NSMutableDictionary ?? NSMutableDictionary()
         for child in Array(scene.rootNode.childNodes) {
             child.removeFromParentNode()
             root.addChildNode(child)
