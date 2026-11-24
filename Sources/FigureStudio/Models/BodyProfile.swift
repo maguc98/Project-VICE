@@ -1,7 +1,7 @@
 import Foundation
 
 enum MeasurementSection: String, CaseIterable, Identifiable {
-    case body, arms, legs, feet
+    case body, arms, legs, feet, pose
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -9,6 +9,7 @@ enum MeasurementSection: String, CaseIterable, Identifiable {
         case .arms: "手臂与手"
         case .legs: "腿部"
         case .feet: "足部"
+        case .pose: "姿势"
         }
     }
 }
@@ -69,6 +70,8 @@ struct BodyProfile: Codable {
                 .init(id: "footLength", title: "脚长", value: footLength, range: 20...33),
                 .init(id: "footWidth", title: "脚宽", value: footWidth, range: 7...14)
             ]
+        case .pose:
+            return []
         }
     }
 

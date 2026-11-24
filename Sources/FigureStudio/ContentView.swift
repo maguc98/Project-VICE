@@ -4,11 +4,12 @@ import SceneKit
 struct ContentView: View {
     @Binding var profile: BodyProfile
     @State private var selectedSection: MeasurementSection = .body
+    @State private var pose = FigurePose()
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                FigureViewport(profile: profile)
+                FigureViewport(profile: profile, pose: pose)
                     .frame(maxWidth: .infinity)
                     .frame(height: 390)
                     .background(Color(red: 0.94, green: 0.96, blue: 0.97))
@@ -22,17 +23,21 @@ struct ContentView: View {
                 .padding(.horizontal)
                 .padding(.top, 16)
 
-                List {
-                    ForEach(profile.measurements(for: selectedSection)) { item in
-                        MeasurementRow(item: item) { newValue in
-                            profile.setMeasurement(item.id, value: newValue)
+                if selectedSection == .pose {
+                    PoseControlPanel(pose: $pose)
+                } else {
+                    List {
+                        ForEach(profile.measurements(for: selectedSection)) { item in
+                            MeasurementRow(item: item) { newValue in
+                                profile.setMeasurement(item.id, value: newValue)
+                            }
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.white)
                         }
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.white)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
             }
             .background(Color.white)
             .navigationTitle("人体工坊")
@@ -69,12 +74,44 @@ private struct MeasurementRow: View {
     }
 }
 
+private struct PoseControlPanel: View {
+    @Binding var pose: FigurePose
+
+    var body: some View {
+        Form {
+            Section("手臂姿势") {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("肩部抬起")
+                        Spacer()
+                        Text("\(pose.armRaiseDegrees, specifier: "%.0f")°")
+                            .monospacedDigit().foregroundStyle(.secondary)
+                    }
+                    Slider(value: $pose.armRaiseDegrees, in: -35...150, step: 1)
+                    HStack {
+                        Text("肘部弯曲")
+                        Spacer()
+                        Text("\(pose.elbowBendDegrees, specifier: "%.0f")°")
+                            .monospacedDigit().foregroundStyle(.secondary)
+                    }
+                    Slider(value: $pose.elbowBendDegrees, in: 0...145, step: 1)
+                }
+            }
+            Section {
+                Button("恢复自然站姿") { pose = FigurePose() }
+            }
+        }
+        .scrollContentBackground(.hidden)
+    }
+}
+
 private struct FigureViewport: UIViewRepresentable {
     let profile: BodyProfile
+    let pose: FigurePose
 
     func makeUIView(context: Context) -> SCNView {
         let view = SCNView()
-        view.scene = FigureSceneBuilder.makeScene(profile: profile)
+        view.scene = FigureSceneBuilder.makeScene(profile: profile, pose: pose)
         view.backgroundColor = UIColor(red: 0.94, green: 0.96, blue: 0.97, alpha: 1)
         view.allowsCameraControl = true
         view.autoenablesDefaultLighting = true

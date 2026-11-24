@@ -17,8 +17,10 @@
 - [ ] Validate front, side, and three-quarter silhouettes on device
 
 ## M2 — Rig and posing
-- [ ] Hierarchical skeleton and joint constraints
-- [ ] IK/FK controls, hand and finger articulation
+- [x] Hierarchical shoulder and elbow pivot groups for both arms
+- [ ] Full-body skeleton and joint constraints
+- [x] Live shoulder raise and elbow bend controls
+- [ ] IK/FK controls and individual finger articulation
 - [ ] Pose library, mirror pose, reset, and local JSON save/load
 
 ## M3 — Artist tools

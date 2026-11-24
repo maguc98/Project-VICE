@@ -12,7 +12,7 @@ enum FigureSceneBuilder {
         let centerZ: Float
     }
 
-    static func makeScene(profile: BodyProfile) -> SCNScene {
+    static func makeScene(profile: BodyProfile, pose: FigurePose = FigurePose()) -> SCNScene {
         let scene = SCNScene()
         let root = scene.rootNode
         let h = Float(profile.stature / 165.0)
@@ -69,21 +69,35 @@ enum FigureSceneBuilder {
         let armX = 0.285 * shoulderFactor * h
         for side: Float in [-1, 1] {
             let shoulder = SCNVector3(side * armX, 2.27 * h, 0)
-            let elbow = SCNVector3(side * (armX + 0.035 * h), 2.27 * h - upperArmLength, 0.015 * h)
-            let wrist = SCNVector3(side * (armX + 0.055 * h), elbow.y - forearmLength, 0.035 * h)
-            addEllipsoid("shoulderCap", at: shoulder,
-                         scale: SCNVector3(0.115 * h, 0.14 * h, 0.115 * h), material: skin, to: root)
-            addTaperedSegment("upperArm", from: shoulder, to: elbow,
-                              startRadius: 0.092 * h, endRadius: 0.070 * h, material: skin, root: root)
-            addEllipsoid("elbowLandmark", at: elbow,
-                         scale: SCNVector3(0.072 * h, 0.075 * h, 0.070 * h), material: skin, to: root)
-            addTaperedSegment("forearm", from: elbow, to: wrist,
-                              startRadius: 0.070 * h, endRadius: 0.045 * h, material: skin, root: root)
-            let palm = SCNVector3(wrist.x, wrist.y - 0.105 * h, wrist.z + 0.015 * h)
+            let shoulderPivot = SCNNode()
+            shoulderPivot.name = side < 0 ? "leftShoulderPivot" : "rightShoulderPivot"
+            shoulderPivot.position = shoulder
+            shoulderPivot.eulerAngles.z = side * Float(pose.armRaiseDegrees * .pi / 180)
+            root.addChildNode(shoulderPivot)
+
+            let shoulderOrigin = SCNVector3Zero
+            let elbowLocal = SCNVector3(side * 0.035 * h, -upperArmLength, 0.015 * h)
+            addEllipsoid("shoulderCap", at: shoulderOrigin,
+                         scale: SCNVector3(0.115 * h, 0.14 * h, 0.115 * h), material: skin, to: shoulderPivot)
+            addTaperedSegment("upperArm", from: shoulderOrigin, to: elbowLocal,
+                              startRadius: 0.092 * h, endRadius: 0.070 * h, material: skin, root: shoulderPivot)
+
+            let elbowPivot = SCNNode()
+            elbowPivot.name = side < 0 ? "leftElbowPivot" : "rightElbowPivot"
+            elbowPivot.position = elbowLocal
+            elbowPivot.eulerAngles.z = -side * Float(pose.elbowBendDegrees * .pi / 180)
+            shoulderPivot.addChildNode(elbowPivot)
+            addEllipsoid("elbowLandmark", at: SCNVector3Zero,
+                         scale: SCNVector3(0.072 * h, 0.075 * h, 0.070 * h), material: skin, to: elbowPivot)
+
+            let wristLocal = SCNVector3(side * 0.020 * h, -forearmLength, 0.020 * h)
+            addTaperedSegment("forearm", from: SCNVector3Zero, to: wristLocal,
+                              startRadius: 0.070 * h, endRadius: 0.045 * h, material: skin, root: elbowPivot)
+            let palm = SCNVector3(wristLocal.x, wristLocal.y - 0.105 * h, wristLocal.z + 0.015 * h)
             addEllipsoid("palm", at: palm,
                          scale: SCNVector3(0.060 * h, Float(profile.handLength / 17.5) * 0.105 * h, 0.035 * h),
-                         material: skin, to: root)
-            addFingers(side: side, wrist: wrist, scale: h, material: skin, root: root)
+                         material: skin, to: elbowPivot)
+            addFingers(side: side, wrist: wristLocal, scale: h, material: skin, root: elbowPivot)
         }
 
         // Legs include visible knee and ankle landmarks, with tapered thigh/shin segments.

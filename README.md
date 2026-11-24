@@ -6,7 +6,7 @@ Native iOS 3D female-figure reference studio for artists.
 - A single female base figure; no male model or sex-selection flow.
 - Realistic female proportions with an art-reference presentation (A3).
 - Editable measurements in centimetres: stature, head, shoulders, chest/bust projection, waist, pelvis/gluteal projection, limbs, hands, and feet.
-- Orbit camera, pose editing, anatomy layers, lighting, and PNG export.
+- Orbit camera, initial live shoulder/elbow posing controls, anatomy layers, lighting, and PNG export.
 - Offline-first; optimized for iPhone 12 mini (A14) and newer devices.
 
 ## Current model
