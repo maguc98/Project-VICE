@@ -92,11 +92,11 @@ final class FemaleFigureRig {
 
             if let clavicle = nodes["clavicle.\(side)"],
                let original = restLocalPositions["clavicle.\(side)"] {
-                clavicle.position = SCNVector3(original.x * shoulder, original.y, original.z)
+                clavicle.position = SCNVector3(original.x * Float(shoulder), original.y, original.z)
             }
             if let pelvisNode = nodes["pelvis.\(side)"],
                let original = restLocalPositions["pelvis.\(side)"] {
-                pelvisNode.position = SCNVector3(original.x * pelvis, original.y, original.z)
+                pelvisNode.position = SCNVector3(original.x * Float(pelvis), original.y, original.z)
             }
         }
 
@@ -126,7 +126,7 @@ final class FemaleFigureRig {
         guideMaterial.emission.contents = UIColor(red: 0.06, green: 0.18, blue: 0.28, alpha: 1)
         guideMaterial.lightingModel = .constant
 
-        for (name, parent) in nodes {
+        for (_, parent) in nodes {
             let joints = parent.childNodes.filter { child in
                 guard let childName = child.name else { return false }
                 return nodes[childName] === child
