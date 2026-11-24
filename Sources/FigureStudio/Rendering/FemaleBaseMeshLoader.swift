@@ -2,6 +2,7 @@ import Foundation
 import SceneKit
 import GLTFKit2
 import simd
+import ObjectiveC
 
 /// Loads a fresh copy of the bundled GLB for each viewport or export.
 /// The source asset remains bundled locally; no network access is needed at runtime.
@@ -45,9 +46,9 @@ enum FemaleBaseMeshLoader {
 
             // Retain the GLTF buffers on the imported root itself. A single global
             // asset reference is unsafe when the viewport and image export load in parallel.
-            let userData = scene.rootNode.userData ?? NSMutableDictionary()
+            let userData = scene.rootNode.figureStudioMetadata ?? NSMutableDictionary()
             userData.setObject(asset, forKey: "figureStudio.retainedGLTFAsset" as NSString)
-            scene.rootNode.userData = userData
+            scene.rootNode.figureStudioMetadata = userData
 
             DispatchQueue.main.async {
                 completion(scene)
@@ -59,8 +60,8 @@ enum FemaleBaseMeshLoader {
     static func makeModelRoot(from scene: SCNScene) -> SCNNode {
         let root = SCNNode()
         root.name = "realisticFemaleMeshRoot"
-        if let sourceUserData = scene.rootNode.userData {
-            root.userData = sourceUserData.mutableCopy() as? NSMutableDictionary
+        if let sourceUserData = scene.rootNode.figureStudioMetadata {
+            root.figureStudioMetadata = sourceUserData.mutableCopy() as? NSMutableDictionary
         }
         for child in Array(scene.rootNode.childNodes) {
             child.removeFromParentNode()
@@ -343,5 +344,24 @@ final class FemaleFigureRig {
         let qy = simd_quatf(angle: Float(y * .pi / 180), axis: SIMD3<Float>(0, 1, 0))
         let qz = simd_quatf(angle: Float(z * .pi / 180), axis: SIMD3<Float>(0, 0, 1))
         node.simdOrientation = simd_mul(simd_mul(simd_mul(rest, qx), qy), qz)
+    }
+}
+
+
+private var figureStudioMetadataAssociationKey: UInt8 = 0
+
+extension SCNNode {
+    var figureStudioMetadata: NSMutableDictionary {
+        get {
+            if let value = objc_getAssociatedObject(self, &figureStudioMetadataAssociationKey) as? NSMutableDictionary {
+                return value
+            }
+            let value = NSMutableDictionary()
+            objc_setAssociatedObject(self, &figureStudioMetadataAssociationKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            return value
+        }
+        set {
+            objc_setAssociatedObject(self, &figureStudioMetadataAssociationKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
     }
 }

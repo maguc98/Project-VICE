@@ -382,7 +382,7 @@ enum FigureSceneBuilder {
         // Cache the bind-pose bounds once. Bone scaling during profile edits can
         // otherwise change boundingBox and feed the previous edit back into the next.
         let boundsKey = "figureStudio.bindPoseBounds"
-        let cachedBounds = modelRoot.userData?[boundsKey] as? [NSNumber]
+        let cachedBounds = modelRoot.figureStudioMetadata?[boundsKey] as? [NSNumber]
         let minimum: SCNVector3
         let maximum: SCNVector3
         if let cachedBounds, cachedBounds.count == 6 {
@@ -407,12 +407,12 @@ enum FigureSceneBuilder {
         }
 
         if cachedBounds == nil || cachedBounds?.count != 6 {
-            let userData = modelRoot.userData ?? NSMutableDictionary()
+            let userData = modelRoot.figureStudioMetadata ?? NSMutableDictionary()
             userData.setObject([
                 NSNumber(value: minimum.x), NSNumber(value: minimum.y), NSNumber(value: minimum.z),
                 NSNumber(value: maximum.x), NSNumber(value: maximum.y), NSNumber(value: maximum.z)
             ], forKey: boundsKey as NSString)
-            modelRoot.userData = userData
+            modelRoot.figureStudioMetadata = userData
         }
 
         let statureScale = Float(profile.stature / 100.0) / sourceHeight
@@ -457,13 +457,13 @@ enum FigureSceneBuilder {
             // from this cache so silhouette/wireframe tinting cannot leak into realism.
             let originalMaterialsKey = "figureStudio.originalMaterials"
             let originalMaterials: [SCNMaterial]
-            if let cached = node.userData?[originalMaterialsKey] as? [SCNMaterial] {
+            if let cached = node.figureStudioMetadata?[originalMaterialsKey] as? [SCNMaterial] {
                 originalMaterials = cached
             } else {
                 originalMaterials = source.materials.map { $0.copy() as! SCNMaterial }
-                let userData = node.userData ?? NSMutableDictionary()
+                let userData = node.figureStudioMetadata ?? NSMutableDictionary()
                 userData.setObject(originalMaterials, forKey: originalMaterialsKey as NSString)
-                node.userData = userData
+                node.figureStudioMetadata = userData
             }
 
             geometry.materials = originalMaterials.map { sourceMaterial in
