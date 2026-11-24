@@ -65,6 +65,7 @@ private struct MeasurementRow: View {
         }
         .padding(.vertical, 5)
         .onAppear { value = item.value }
+        .onChange(of: item.value) { _, newValue in value = newValue }
     }
 }
 
@@ -82,6 +83,15 @@ private struct FigureViewport: UIViewRepresentable {
     }
 
     func updateUIView(_ view: SCNView, context: Context) {
-        view.scene = FigureSceneBuilder.makeScene(profile: profile)
+        // Preserve the user's orbit-camera position while the body proportions update.
+        let oldCameraPosition = view.pointOfView?.position
+        let oldCameraOrientation = view.pointOfView?.orientation
+        let scene = FigureSceneBuilder.makeScene(profile: profile)
+        view.scene = scene
+        if let camera = scene.rootNode.childNodes.first(where: { $0.camera != nil }) {
+            if let oldCameraPosition { camera.position = oldCameraPosition }
+            if let oldCameraOrientation { camera.orientation = oldCameraOrientation }
+            view.pointOfView = camera
+        }
     }
 }
