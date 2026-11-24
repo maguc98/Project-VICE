@@ -402,7 +402,7 @@ enum FigureSceneBuilder {
         profile: BodyProfile,
         displayStyle: FigureDisplayStyle
     ) {
-        var geometryCount = modelRoot.geometry == nil ? 1 : 0
+        var geometryCount = modelRoot.geometry == nil ? 0 : 1
         modelRoot.enumerateChildNodes { node, _ in
             if node.geometry != nil { geometryCount += 1 }
         }
