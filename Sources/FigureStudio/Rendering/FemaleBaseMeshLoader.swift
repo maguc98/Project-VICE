@@ -42,6 +42,15 @@ final class FemaleFigureRig {
     private var restLocalPositions: [String: SCNVector3] = [:]
     private var restScales: [String: SCNVector3] = [:]
 
+    private struct DeformableMesh {
+        let node: SCNNode
+        let baseGeometry: SCNGeometry
+        let vertexSourceIndex: Int
+        let basePositions: [SIMD3<Float>]
+        let source: SCNGeometrySource
+    }
+    private var deformableMeshes: [DeformableMesh] = []
+
     init(root: SCNNode) {
         self.root = root
         root.enumerateChildNodes { node, _ in
@@ -53,11 +62,118 @@ final class FemaleFigureRig {
             let point = node.convertPosition(SCNVector3Zero, to: root)
             self.restPositions[name] = SIMD3<Float>(point.x, point.y, point.z)
         }
+        collectDeformableMeshes()
+    }
+
+    /// Captures original skinned vertex positions once so every slider update is non-cumulative.
+    private func collectDeformableMeshes() {
+        root.enumerateChildNodes { node, _ in
+            guard node.skinner != nil, let geometry = node.geometry,
+                  let index = geometry.sources.firstIndex(where: {
+                      $0.semantic == .vertex && $0.usesFloatComponents
+                          && $0.componentsPerVector >= 3 && $0.bytesPerComponent == MemoryLayout<Float>.size
+                  }) else { return }
+            let source = geometry.sources[index]
+            let stride = source.dataStride
+            let offset = source.dataOffset
+            let bytes = source.data
+            guard stride >= source.componentsPerVector * source.bytesPerComponent,
+                  bytes.count >= offset + max(source.vectorCount - 1, 0) * stride + 3 * MemoryLayout<Float>.size else { return }
+            var positions: [SIMD3<Float>] = []
+            positions.reserveCapacity(source.vectorCount)
+            bytes.withUnsafeBytes { raw in
+                for vertex in 0..<source.vectorCount {
+                    let base = offset + vertex * stride
+                    let x = raw.loadUnaligned(fromByteOffset: base, as: Float.self)
+                    let y = raw.loadUnaligned(fromByteOffset: base + MemoryLayout<Float>.size, as: Float.self)
+                    let z = raw.loadUnaligned(fromByteOffset: base + 2 * MemoryLayout<Float>.size, as: Float.self)
+                    positions.append(SIMD3<Float>(x, y, z))
+                }
+            }
+            deformableMeshes.append(DeformableMesh(
+                node: node, baseGeometry: geometry, vertexSourceIndex: index,
+                basePositions: positions, source: source
+            ))
+        }
+        NSLog("Figure Studio: captured %d skinned mesh sections for localized contour shaping.", deformableMeshes.count)
+    }
+
+    /// Applies local torso contour changes to the original skin-weighted mesh vertices.
+    /// The deformation is rebuilt from the immutable bind geometry, so repeated slider
+    /// updates never accumulate rounding error or progressively distort the model.
+    private func applyLocalizedBodyShape(_ profile: BodyProfile) {
+        guard !deformableMeshes.isEmpty else { return }
+        let chest = Float(min(max(profile.chest / 86.0, 0.72), 1.32))
+        let waist = Float(min(max(profile.waist / 68.0, 0.72), 1.32))
+        let pelvis = Float(min(max(profile.pelvis / 94.0, 0.72), 1.32))
+        let bustDelta = Float(min(max((profile.bustProjection - 9.0) / 100.0, -0.07), 0.09))
+        let gluteDelta = Float(min(max((profile.glutealProjection - 10.0) / 100.0, -0.07), 0.09))
+
+        for mesh in deformableMeshes {
+            var values: [Float] = []
+            values.reserveCapacity(mesh.basePositions.count * 3)
+            for local in mesh.basePositions {
+                let world = mesh.node.convertPosition(
+                    SCNVector3(local.x, local.y, local.z), to: root
+                )
+                let x = world.x
+                let y = world.y
+                let z = world.z
+                let torsoGate = 1 - smoothstep(0.30, 0.49, abs(x))
+                let chestMask = exp(-pow((y - 1.91) / 0.245, 2)) * torsoGate
+                let waistMask = exp(-pow((y - 1.49) / 0.185, 2)) * torsoGate
+                let pelvisMask = exp(-pow((y - 1.105) / 0.205, 2)) * torsoGate
+
+                var shapedX = x
+                var shapedZ = z
+                shapedX *= 1 + (chest - 1) * chestMask
+                shapedZ *= 1 + (chest - 1) * chestMask * 0.72
+                shapedX *= 1 + (waist - 1) * waistMask
+                shapedZ *= 1 + (waist - 1) * waistMask * 0.72
+                shapedX *= 1 + (pelvis - 1) * pelvisMask
+                shapedZ *= 1 + (pelvis - 1) * pelvisMask * 0.72
+
+                let bustFront = smoothstep(0.025, 0.20, z)
+                    * exp(-pow((y - 1.84) / 0.19, 2))
+                    * exp(-pow(x / 0.205, 4))
+                let gluteBack = smoothstep(0.015, 0.20, -z)
+                    * exp(-pow((y - 1.075) / 0.22, 2))
+                    * exp(-pow(x / 0.245, 4))
+                shapedZ += bustDelta * bustFront
+                shapedZ -= gluteDelta * gluteBack
+
+                let localShaped = mesh.node.convertPosition(
+                    SCNVector3(shapedX, y, shapedZ), from: root
+                )
+                values.append(localShaped.x)
+                values.append(localShaped.y)
+                values.append(localShaped.z)
+            }
+
+            let data = values.withUnsafeBufferPointer { Data(buffer: $0) }
+            let replacement = SCNGeometrySource(
+                data: data, semantic: .vertex, vectorCount: mesh.basePositions.count,
+                usesFloatComponents: true, componentsPerVector: 3,
+                bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0,
+                dataStride: 3 * MemoryLayout<Float>.size
+            )
+            var sources = mesh.baseGeometry.sources
+            sources[mesh.vertexSourceIndex] = replacement
+            let geometry = SCNGeometry(sources: sources, elements: mesh.baseGeometry.elements)
+            geometry.materials = mesh.baseGeometry.materials
+            mesh.node.geometry = geometry
+        }
+    }
+
+    private func smoothstep(_ edge0: Float, _ edge1: Float, _ value: Float) -> Float {
+        let t = min(max((value - edge0) / (edge1 - edge0), 0), 1)
+        return t * t * (3 - 2 * t)
     }
 
     /// Applies restrained segment and contour proportion adjustments on the skinned rig.
     /// This is a bone-scale approximation; it does not replace a sculpted morph-target set.
     func applyProfile(_ profile: BodyProfile) {
+        applyLocalizedBodyShape(profile)
         let shoulder = clamped(profile.shoulderWidth / 38.0, 0.78, 1.24)
         let chest = clamped(profile.chest / 86.0, 0.78, 1.25)
         let waist = clamped(profile.waist / 68.0, 0.78, 1.24)
@@ -100,9 +216,6 @@ final class FemaleFigureRig {
             }
         }
 
-        scaleNode("spine02", x: waist, z: waist)
-        scaleNode("spine03", x: chest, z: chest)
-        scaleNode("spine04", x: chest, z: chest)
         scaleNode("head", y: head)
     }
 
