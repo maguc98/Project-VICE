@@ -10,7 +10,7 @@ Native iOS 3D female-figure reference studio for artists.
 - Offline-first; optimized for iPhone 12 mini (A14) and newer devices.
 
 ## Current model
-The viewport uses a continuous ring-built torso with interpolated profile rings. Chest and posterior gluteal contours are shaped by localized deformation of that same surface. Limb segments, named joint landmarks, fingers, and toes form the current blockout. These are procedural study meshes, not a final production anatomical topology.
+The viewport uses a continuous ring-built torso with interpolated profile rings. Chest and posterior gluteal contours are shaped by localized deformation of that same surface. Limb segments, named shoulder/elbow/knee/ankle landmarks, individually named fingers, and toe forms complete the current blockout. Chest projection and gluteal projection are separately adjustable. These are procedural study meshes, not a final production anatomical topology.
 
 ## Engineering
 - SwiftUI for the native interface.
