@@ -22,7 +22,7 @@ struct MeasurementItem: Identifiable {
 }
 
 /// One female reference figure. Measurements are expressed in centimetres.
-struct BodyProfile: Codable {
+struct BodyProfile: Codable, Equatable {
     var stature = 165.0
     var headHeight = 22.0
     var shoulderWidth = 38.0
