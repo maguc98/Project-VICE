@@ -407,7 +407,7 @@ enum FigureSceneBuilder {
         }
 
         if cachedBounds == nil || cachedBounds?.count != 6 {
-            let userData = modelRoot.figureStudioMetadata ?? NSMutableDictionary()
+            let userData = modelRoot.figureStudioMetadata
             userData.setObject([
                 NSNumber(value: minimum.x), NSNumber(value: minimum.y), NSNumber(value: minimum.z),
                 NSNumber(value: maximum.x), NSNumber(value: maximum.y), NSNumber(value: maximum.z)
@@ -461,7 +461,7 @@ enum FigureSceneBuilder {
                 originalMaterials = cached
             } else {
                 originalMaterials = source.materials.map { $0.copy() as! SCNMaterial }
-                let userData = node.figureStudioMetadata ?? NSMutableDictionary()
+                let userData = node.figureStudioMetadata
                 userData.setObject(originalMaterials, forKey: originalMaterialsKey as NSString)
                 node.figureStudioMetadata = userData
             }

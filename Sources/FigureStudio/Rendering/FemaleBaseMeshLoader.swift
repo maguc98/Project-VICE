@@ -46,7 +46,7 @@ enum FemaleBaseMeshLoader {
 
             // Retain the GLTF buffers on the imported root itself. A single global
             // asset reference is unsafe when the viewport and image export load in parallel.
-            let userData = scene.rootNode.figureStudioMetadata ?? NSMutableDictionary()
+            let userData = scene.rootNode.figureStudioMetadata
             userData.setObject(asset, forKey: "figureStudio.retainedGLTFAsset" as NSString)
             scene.rootNode.figureStudioMetadata = userData
 
