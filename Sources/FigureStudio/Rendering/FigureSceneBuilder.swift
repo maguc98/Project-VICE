@@ -388,15 +388,19 @@ enum FigureSceneBuilder {
                     material.roughness.contents = 0.62
                     material.metalness.contents = 0
                     material.specular.contents = UIColor(white: 0.24, alpha: 1)
+                    material.fillMode = .fill
+                    material.transparency = 1
                 case .silhouette:
                     material.lightingModel = .constant
                     material.diffuse.contents = UIColor(white: 0.025, alpha: 1)
                     material.roughness.contents = 1
                     material.fillMode = .fill
+                    material.transparency = 1
                 case .wireframe:
                     material.lightingModel = .constant
                     material.diffuse.contents = UIColor(red: 0.20, green: 0.38, blue: 0.50, alpha: 1)
                     material.fillMode = .lines
+                    material.transparency = 1
                 case .skeleton:
                     material.lightingModel = .physicallyBased
                     material.diffuse.contents = UIColor(red: 0.64, green: 0.70, blue: 0.73, alpha: 1)

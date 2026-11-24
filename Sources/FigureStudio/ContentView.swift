@@ -374,7 +374,9 @@ private struct PoseControlPanel: View {
             } else {
                 AngleControl(title: "脚掌前后目标", value: leg.footForwardTargetCM, range: -55...55, suffix: "cm")
                 AngleControl(title: "脚掌抬升目标", value: leg.footLiftTargetCM, range: -30...45, suffix: "cm")
-                Text("IK 会根据脚掌目标自动计算髋部和膝部角度。目标会受腿长与关节活动范围限制。")
+                AngleControl(title: "髋部外展", value: leg.hipAbductionDegrees, range: -55...55)
+                AngleControl(title: "髋部旋转", value: leg.hipRotationDegrees, range: -55...55)
+                Text("IK 会根据脚掌目标自动计算髋部和膝部角度；髋部外展、旋转和脚踝仍可单独微调。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
