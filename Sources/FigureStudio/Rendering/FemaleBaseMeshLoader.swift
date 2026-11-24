@@ -25,6 +25,26 @@ enum FemaleBaseMeshLoader {
 
             let source = GLTFSCNSceneSource(asset: asset)
             let scene = source.defaultScene
+            guard let scene else {
+                NSLog("Female base mesh import completed without a default scene.")
+                DispatchQueue.main.async { completion(nil) }
+                return
+            }
+
+            var geometryCount = scene.rootNode.geometry == nil ? 0 : 1
+            var skinnedMeshCount = 0
+            scene.rootNode.enumerateChildNodes { node, _ in
+                if node.geometry != nil { geometryCount += 1 }
+                if node.skinner != nil { skinnedMeshCount += 1 }
+            }
+            guard geometryCount > 0 else {
+                NSLog("Female base mesh scene contains no renderable geometry.")
+                DispatchQueue.main.async { completion(nil) }
+                return
+            }
+            NSLog("Female base mesh ready: %d geometry nodes, %d skinned meshes.",
+                  geometryCount, skinnedMeshCount)
+
             DispatchQueue.main.async {
                 retainedAsset = asset
                 completion(scene)

@@ -402,6 +402,15 @@ enum FigureSceneBuilder {
         profile: BodyProfile,
         displayStyle: FigureDisplayStyle
     ) {
+        var geometryCount = modelRoot.geometry == nil ? 1 : 0
+        modelRoot.enumerateChildNodes { node, _ in
+            if node.geometry != nil { geometryCount += 1 }
+        }
+        guard geometryCount > 0 else {
+            NSLog("Figure Studio: refusing to attach an empty realistic model; keeping procedural fallback visible.")
+            return
+        }
+
         scene.rootNode.childNode(withName: "realisticFemaleMeshRoot", recursively: false)?.removeFromParentNode()
         scene.rootNode.childNode(withName: "proceduralFigureRoot", recursively: false)?.isHidden = true
 

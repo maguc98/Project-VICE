@@ -425,7 +425,8 @@ private struct FigureViewport: UIViewRepresentable {
         view.backgroundColor = UIColor(red: 0.94, green: 0.95, blue: 0.96, alpha: 1)
         view.allowsCameraControl = true
         view.autoenablesDefaultLighting = false
-        view.antialiasingMode = .multisampling4X
+        // 2x MSAA is a better memory/performance balance for A14-class devices.
+        view.antialiasingMode = .multisampling2X
         view.rendersContinuously = false
 
         let coordinator = context.coordinator
@@ -434,6 +435,11 @@ private struct FigureViewport: UIViewRepresentable {
         coordinator.lightingStyle = lightingStyle
         coordinator.pose = pose
         coordinator.cameraView = cameraView
+        // Mark this initial scene as current so the first SwiftUI update does not
+        // allocate and replace an identical SceneKit scene while GLB loading is in flight.
+        coordinator.lastBuiltProfile = profile
+        coordinator.lastBuiltDisplayStyle = displayStyle
+        coordinator.lastBuiltLightingStyle = lightingStyle
         coordinator.applyCamera(to: view)
         coordinator.loadRealisticMesh(for: view)
         return view
