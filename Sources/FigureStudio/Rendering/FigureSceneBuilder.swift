@@ -380,11 +380,13 @@ enum FigureSceneBuilder {
                 let material = sourceMaterial.copy() as! SCNMaterial
                 switch displayStyle {
                 case .realistic:
+                    // Preserve source texture maps and use a gentle warm tint instead of
+                    // flattening skin, eyes and fine facial materials into one colour.
                     material.lightingModel = .physicallyBased
-                    material.diffuse.contents = UIColor(red: 0.76, green: 0.59, blue: 0.49, alpha: 1)
+                    material.multiply.contents = UIColor(red: 1.0, green: 0.94, blue: 0.88, alpha: 1)
                     material.roughness.contents = 0.62
                     material.metalness.contents = 0
-                    material.specular.contents = UIColor(white: 0.22, alpha: 1)
+                    material.specular.contents = UIColor(white: 0.24, alpha: 1)
                 case .silhouette:
                     material.lightingModel = .constant
                     material.diffuse.contents = UIColor(white: 0.025, alpha: 1)

@@ -77,6 +77,18 @@ struct ContentView: View {
                     }
                     .buttonStyle(.bordered)
 
+                    Menu {
+                        Picker("视角", selection: $cameraView) {
+                            ForEach(FigureCameraView.allCases) { item in
+                                Text(item.title).tag(item)
+                            }
+                        }
+                    } label: {
+                        Label(cameraView.title, systemImage: "viewfinder")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+
                     Button {
                         exportHighResolutionImage()
                     } label: {
@@ -444,6 +456,7 @@ private struct FigureViewport: UIViewRepresentable {
             if let modelRoot = coordinator.modelRoot {
                 FigureSceneBuilder.attachRealisticBaseMesh(modelRoot, to: scene,
                                                            profile: profile, displayStyle: displayStyle)
+                coordinator.applyCamera(to: view)
                 coordinator.rig?.applyProfile(profile)
                 coordinator.rig?.apply(pose)
                 coordinator.rig?.setSkeletonVisible(displayStyle == .skeleton)
@@ -527,6 +540,7 @@ private struct FigureViewport: UIViewRepresentable {
                     profile: self.profile ?? .defaultProfile,
                     displayStyle: self.displayStyle ?? .realistic
                 )
+                self.applyCamera(to: view)
                 self.rig?.applyProfile(self.profile ?? .defaultProfile)
                 self.rig?.apply(self.pose)
                 self.rig?.setSkeletonVisible(self.displayStyle == .skeleton)

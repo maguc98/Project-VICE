@@ -6,7 +6,7 @@ import simd
 /// Loads a fresh copy of the bundled GLB for each viewport or export.
 /// The source asset remains bundled locally; no network access is needed at runtime.
 enum FemaleBaseMeshLoader {
-    private static var retainedAssets: [GLTFAsset] = []
+    private static var retainedAsset: GLTFAsset?
 
     static func load(completion: @escaping (SCNScene?) -> Void) {
         guard let url = Bundle.main.url(forResource: "FemaleBase", withExtension: "glb") else {
@@ -26,7 +26,7 @@ enum FemaleBaseMeshLoader {
             let source = GLTFSCNSceneSource(asset: asset)
             let scene = source.defaultScene
             DispatchQueue.main.async {
-                retainedAssets.append(asset)
+                retainedAsset = asset
                 completion(scene)
             }
         }

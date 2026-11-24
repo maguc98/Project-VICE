@@ -11,7 +11,7 @@ Native iOS 3D female-figure reference studio for artists.
 - iPhone 12 mini (A14) is the baseline performance target.
 
 ## Realistic base model and license
-The current default base is the **Female Base Mesh — 3D Person, Rigged A-Pose** from Innerscene, distributed under **CC0 1.0 Universal**. The model is bundled as `Resources/FemaleBase.glb` and loaded locally with GLTFKit2. Its MakeHuman-style skin rig includes spine, bilateral arms and legs, individual fingers and toes.
+The current default base is the **Female Base Mesh — 3D Person, Rigged A-Pose** from [Innerscene](https://www.innerscene.com/tools/library/3d-parts/female-base-mesh-3d-person-rigged-a-pose-dba97ed5), distributed under **CC0 1.0 Universal**. The model is bundled as `Resources/FemaleBase.glb` and loaded locally with GLTFKit2. Its MakeHuman-style skin rig includes spine, bilateral arms and legs, individual fingers and toes.
 
 The model is an anatomical 3D base mesh, not a photographic scan or a medically validated anatomy model. The app currently applies global stature/width/depth proportion scaling; detailed local morph controls for bust, waist, pelvis and limb circumference still require a dedicated morph-target pass.
 
