@@ -20,20 +20,21 @@ struct MeasurementItem: Identifiable {
     let range: ClosedRange<Double>
 }
 
+/// One female reference figure. Values are editable measurements in centimetres.
 struct BodyProfile: Codable {
-    var stature = 175.0
-    var headHeight = 23.0
-    var shoulderWidth = 44.0
-    var chest = 96.0
-    var waist = 78.0
+    var stature = 165.0
+    var headHeight = 22.0
+    var shoulderWidth = 38.0
+    var chest = 86.0
+    var waist = 68.0
     var pelvis = 94.0
-    var upperArm = 32.0
-    var forearm = 26.0
-    var handLength = 19.0
-    var thigh = 48.0
-    var lowerLeg = 43.0
-    var footLength = 26.0
-    var footWidth = 10.0
+    var upperArm = 29.0
+    var forearm = 24.0
+    var handLength = 17.5
+    var thigh = 43.0
+    var lowerLeg = 39.0
+    var footLength = 24.0
+    var footWidth = 9.0
 
     static let defaultProfile = BodyProfile()
 
