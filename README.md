@@ -20,7 +20,7 @@ The default dimensions are a starting reference, not a restriction. The user can
 ## Current milestone
 **Milestone 0 — foundation:** app shell, female reference measurement defaults, initial viewport scaffold, and CI build workflow.
 
-The initial viewport is a proportion-study scaffold made from primitive volumes, not a finished anatomical model. Connected anatomical topology and measurement-driven deformation are the next milestone.
+The current viewport now uses a continuous ring-built torso surface and proportion-driven tapered limb segments. This is an early anatomical blockout, not a finished anatomical model: hands, feet, head, and limb joints are still simplified, and the torso topology still needs anatomical refinement.
 
 ## Build
 Install Xcode and XcodeGen, then run:
