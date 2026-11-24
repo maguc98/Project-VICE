@@ -379,10 +379,42 @@ enum FigureSceneBuilder {
     }
 
     static func updateRealisticBaseMesh(_ modelRoot: SCNNode, profile: BodyProfile) {
-        let bounds = modelRoot.boundingBox
-        let minimum = bounds.min
-        let maximum = bounds.max
-        let sourceHeight = max(maximum.y - minimum.y, 0.01)
+        // Cache the bind-pose bounds once. Bone scaling during profile edits can
+        // otherwise change boundingBox and feed the previous edit back into the next.
+        let boundsKey = "figureStudio.bindPoseBounds"
+        let cachedBounds = modelRoot.userData?[boundsKey] as? [NSNumber]
+        let minimum: SCNVector3
+        let maximum: SCNVector3
+        if let cachedBounds, cachedBounds.count == 6 {
+            minimum = SCNVector3(cachedBounds[0].floatValue,
+                                 cachedBounds[1].floatValue,
+                                 cachedBounds[2].floatValue)
+            maximum = SCNVector3(cachedBounds[3].floatValue,
+                                 cachedBounds[4].floatValue,
+                                 cachedBounds[5].floatValue)
+        } else {
+            let bounds = modelRoot.boundingBox
+            minimum = bounds.min
+            maximum = bounds.max
+        }
+
+        let coordinates = [minimum.x, minimum.y, minimum.z,
+                           maximum.x, maximum.y, maximum.z]
+        let sourceHeight = maximum.y - minimum.y
+        guard coordinates.allSatisfy(\.isFinite), sourceHeight.isFinite, sourceHeight > 0.1 else {
+            NSLog("Figure Studio: invalid model bounds; skipping automatic stature scaling.")
+            return
+        }
+
+        if cachedBounds == nil || cachedBounds?.count != 6 {
+            let userData = modelRoot.userData ?? NSMutableDictionary()
+            userData.setObject([
+                NSNumber(value: minimum.x), NSNumber(value: minimum.y), NSNumber(value: minimum.z),
+                NSNumber(value: maximum.x), NSNumber(value: maximum.y), NSNumber(value: maximum.z)
+            ], forKey: boundsKey as NSString)
+            modelRoot.userData = userData
+        }
+
         let statureScale = Float(profile.stature / 100.0) / sourceHeight
         let shoulderFactor = Float(profile.shoulderWidth / 38.0)
         let pelvisFactor = Float(profile.pelvis / 94.0)
