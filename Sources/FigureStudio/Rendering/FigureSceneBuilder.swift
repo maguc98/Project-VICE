@@ -169,15 +169,17 @@ enum FigureSceneBuilder {
         let delta = b - a
         let length = simd_length(delta)
         guard length > 0.001 else { return }
-        let geometry = SCNCylinder(radius: startRadius, height: CGFloat(length))
+        let geometry = SCNCone(topRadius: endRadius, bottomRadius: startRadius, height: CGFloat(length))
         geometry.radialSegmentCount = 24
         geometry.firstMaterial = material
         let node = SCNNode(geometry: geometry)
         node.name = name
         node.position = SCNVector3((start.x + end.x) * 0.5, (start.y + end.y) * 0.5, (start.z + end.z) * 0.5)
         node.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: simd_normalize(delta))
-        node.scale.x = Float(endRadius / max(startRadius, 0.001))
-        node.scale.z = Float(endRadius / max(startRadius, 0.001))
         root.addChildNode(node)
+        addEllipsoid("\(name)JointStart", at: start,
+                     scale: SCNVector3(startRadius, startRadius, startRadius), material: material, to: root)
+        addEllipsoid("\(name)JointEnd", at: end,
+                     scale: SCNVector3(endRadius, endRadius, endRadius), material: material, to: root)
     }
 }
