@@ -7,10 +7,12 @@
 - [ ] First CI build and simulator validation
 
 ## M1 — Female anatomical base mesh
-- Build one anatomically plausible female base figure; no male model or model selector.
-- Replace primitive volumes with connected, smooth human topology.
-- Implement measurement-driven deformation with silhouette and landmark constraints.
-- Validate proportions from front, side, and three-quarter views.
+- [x] Establish one female reference figure; no male model or model selector.
+- [x] Replace the torso's separate primitive volumes with a continuous ring-built surface.
+- [x] Drive torso silhouette and limb segment lengths from editable measurements.
+- [ ] Refine torso landmarks, breast/chest transition, shoulder, pelvis, knees, and ankles.
+- [ ] Replace simplified head, hands, feet, and limb joints with anatomical forms.
+- [ ] Validate proportions from front, side, and three-quarter views.
 
 ## M2 — Rig and posing
 - Hierarchical skeleton, IK/FK controls, hand and finger controls.
