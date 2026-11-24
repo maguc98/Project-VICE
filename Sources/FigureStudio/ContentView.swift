@@ -5,6 +5,7 @@ struct ContentView: View {
     @Binding var profile: BodyProfile
     @State private var selectedSection: MeasurementSection = .body
     @State private var pose = FigurePose()
+    @AppStorage("figureStudio.savedPose") private var savedPoseData: Data = Data()
 
     var body: some View {
         NavigationStack {
@@ -24,7 +25,20 @@ struct ContentView: View {
                 .padding(.top, 16)
 
                 if selectedSection == .pose {
-                    PoseControlPanel(pose: $pose)
+                    PoseControlPanel(
+                        pose: $pose,
+                        hasSavedPose: !savedPoseData.isEmpty,
+                        onSave: {
+                            if let data = try? JSONEncoder().encode(pose) {
+                                savedPoseData = data
+                            }
+                        },
+                        onLoad: {
+                            if let saved = try? JSONDecoder().decode(FigurePose.self, from: savedPoseData) {
+                                pose = saved
+                            }
+                        }
+                    )
                 } else {
                     List {
                         ForEach(profile.measurements(for: selectedSection)) { item in
@@ -76,57 +90,56 @@ private struct MeasurementRow: View {
 
 private struct PoseControlPanel: View {
     @Binding var pose: FigurePose
+    let hasSavedPose: Bool
+    let onSave: () -> Void
+    let onLoad: () -> Void
 
     var body: some View {
         Form {
             Section("手臂姿势") {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("肩部抬起")
-                        Spacer()
-                        Text("\(pose.armRaiseDegrees, specifier: "%.0f")°")
-                            .monospacedDigit().foregroundStyle(.secondary)
-                    }
-                    Slider(value: $pose.armRaiseDegrees, in: -35...150, step: 1)
-                    HStack {
-                        Text("肘部弯曲")
-                        Spacer()
-                        Text("\(pose.elbowBendDegrees, specifier: "%.0f")°")
-                            .monospacedDigit().foregroundStyle(.secondary)
-                    }
-                    Slider(value: $pose.elbowBendDegrees, in: 0...145, step: 1)
-                }
+                AngleControl(title: "双侧肩部抬起", value: $pose.armRaiseDegrees, range: -35...150)
+                AngleControl(title: "双侧肘部弯曲", value: $pose.elbowBendDegrees, range: 0...145)
             }
-            Section("下肢姿势") {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("髋部前后摆动")
-                        Spacer()
-                        Text("\(pose.hipFlexionDegrees, specifier: "%.0f")°")
-                            .monospacedDigit().foregroundStyle(.secondary)
-                    }
-                    Slider(value: $pose.hipFlexionDegrees, in: -90...90, step: 1)
-                    HStack {
-                        Text("髋部外展")
-                        Spacer()
-                        Text("\(pose.hipAbductionDegrees, specifier: "%.0f")°")
-                            .monospacedDigit().foregroundStyle(.secondary)
-                    }
-                    Slider(value: $pose.hipAbductionDegrees, in: -45...45, step: 1)
-                    HStack {
-                        Text("膝部弯曲")
-                        Spacer()
-                        Text("\(pose.kneeBendDegrees, specifier: "%.0f")°")
-                            .monospacedDigit().foregroundStyle(.secondary)
-                    }
-                    Slider(value: $pose.kneeBendDegrees, in: 0...135, step: 1)
-                }
+            Section("左腿") {
+                AngleControl(title: "髋部前后摆动", value: $pose.leftHipFlexionDegrees, range: -90...90)
+                AngleControl(title: "髋部外展", value: $pose.leftHipAbductionDegrees, range: -45...45)
+                AngleControl(title: "膝部弯曲", value: $pose.leftKneeBendDegrees, range: 0...135)
+                AngleControl(title: "脚踝活动", value: $pose.leftAnkleFlexionDegrees, range: -45...45)
             }
-            Section {
-                Button("恢复自然站姿") { pose = FigurePose() }
+            Section("右腿") {
+                AngleControl(title: "髋部前后摆动", value: $pose.rightHipFlexionDegrees, range: -90...90)
+                AngleControl(title: "髋部外展", value: $pose.rightHipAbductionDegrees, range: -45...45)
+                AngleControl(title: "膝部弯曲", value: $pose.rightKneeBendDegrees, range: 0...135)
+                AngleControl(title: "脚踝活动", value: $pose.rightAnkleFlexionDegrees, range: -45...45)
+            }
+            Section("姿势管理") {
+                Button("保存当前姿势", action: onSave)
+                Button("读取已保存姿势", action: onLoad)
+                    .disabled(!hasSavedPose)
+                Button("恢复自然站姿", role: .destructive) { pose = FigurePose() }
             }
         }
         .scrollContentBackground(.hidden)
+    }
+}
+
+private struct AngleControl: View {
+    let title: String
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack {
+                Text(title)
+                Spacer()
+                Text("\(value, specifier: "%.0f")°")
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+            }
+            Slider(value: $value, in: range, step: 1)
+        }
+        .padding(.vertical, 2)
     }
 }
 

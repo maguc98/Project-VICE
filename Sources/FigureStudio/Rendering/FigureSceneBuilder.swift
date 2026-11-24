@@ -108,8 +108,10 @@ enum FigureSceneBuilder {
             let hipPivot = SCNNode()
             hipPivot.name = side < 0 ? "leftHipPivot" : "rightHipPivot"
             hipPivot.position = hipPosition
-            hipPivot.eulerAngles.x = -Float(pose.hipFlexionDegrees * .pi / 180)
-            hipPivot.eulerAngles.z = side * Float(pose.hipAbductionDegrees * .pi / 180)
+            let hipFlexion = side < 0 ? pose.leftHipFlexionDegrees : pose.rightHipFlexionDegrees
+            let hipAbduction = side < 0 ? pose.leftHipAbductionDegrees : pose.rightHipAbductionDegrees
+            hipPivot.eulerAngles.x = -Float(hipFlexion * .pi / 180)
+            hipPivot.eulerAngles.z = side * Float(hipAbduction * .pi / 180)
             root.addChildNode(hipPivot)
 
             let kneeLocal = SCNVector3(-side * 0.015 * hipFactor * h, -thighLength, 0.015 * h)
@@ -119,7 +121,8 @@ enum FigureSceneBuilder {
             let kneePivot = SCNNode()
             kneePivot.name = side < 0 ? "leftKneePivot" : "rightKneePivot"
             kneePivot.position = kneeLocal
-            kneePivot.eulerAngles.x = Float(pose.kneeBendDegrees * .pi / 180)
+            let kneeBend = side < 0 ? pose.leftKneeBendDegrees : pose.rightKneeBendDegrees
+            kneePivot.eulerAngles.x = Float(kneeBend * .pi / 180)
             hipPivot.addChildNode(kneePivot)
             addEllipsoid("kneecap", at: SCNVector3Zero,
                          scale: SCNVector3(0.085 * h, 0.095 * h, 0.085 * h), material: skin, to: kneePivot)
@@ -131,6 +134,8 @@ enum FigureSceneBuilder {
             let anklePivot = SCNNode()
             anklePivot.name = side < 0 ? "leftAnklePivot" : "rightAnklePivot"
             anklePivot.position = ankleLocal
+            let ankleFlexion = side < 0 ? pose.leftAnkleFlexionDegrees : pose.rightAnkleFlexionDegrees
+            anklePivot.eulerAngles.x = -Float(ankleFlexion * .pi / 180)
             kneePivot.addChildNode(anklePivot)
             addEllipsoid("ankleLandmark", at: SCNVector3Zero,
                          scale: SCNVector3(0.055 * h, 0.060 * h, 0.055 * h), material: skin, to: anklePivot)
