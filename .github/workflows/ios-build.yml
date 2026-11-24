@@ -19,6 +19,31 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Fetch CC0 female reference mesh
+        run: |
+          set -euo pipefail
+          mkdir -p Resources
+          curl -L --fail --retry 3 --retry-delay 2 \
+            "https://files.innerscene.com/library/female-base-mesh-3d-person-rigged-a-pose-dba97ed5/c5dce4aeeb1e549cec36/female-base-mesh-base_female.glb" \
+            -o Resources/FemaleBase.glb
+          python3 - <<'PY'
+          import json
+          import struct
+          from pathlib import Path
+          data = Path("Resources/FemaleBase.glb").read_bytes()
+          if data[:4] != b"glTF":
+              raise SystemExit("FemaleBase.glb is not a valid GLB file")
+          json_size = struct.unpack_from("<I", data, 12)[0]
+          model = json.loads(data[20:20 + json_size].decode("utf-8").rstrip("\\x00 "))
+          nodes = model.get("nodes", [])
+          print("CC0 FEMALE BASE MESH: nodes =", len(nodes), "skins =", len(model.get("skins", [])))
+          for skin in model.get("skins", []):
+              print("SKIN JOINTS:")
+              for index in skin.get("joints", []):
+                  if isinstance(index, int) and index < len(nodes):
+                      print(f"  {index}: {nodes[index].get('name', '<unnamed>')}")
+          PY
+
       - name: Generate project
         run: xcodegen generate
 
