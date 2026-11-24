@@ -420,7 +420,21 @@ enum FigureSceneBuilder {
         modelRoot.enumerateChildNodes { node, _ in
             guard let source = node.geometry else { return }
             let geometry = source.copy() as! SCNGeometry
-            geometry.materials = source.materials.map { sourceMaterial in
+
+            // Keep an untouched copy of imported materials. Display modes are rebuilt
+            // from this cache so silhouette/wireframe tinting cannot leak into realism.
+            let originalMaterialsKey = "figureStudio.originalMaterials"
+            let originalMaterials: [SCNMaterial]
+            if let cached = node.userData?[originalMaterialsKey] as? [SCNMaterial] {
+                originalMaterials = cached
+            } else {
+                originalMaterials = source.materials.map { $0.copy() as! SCNMaterial }
+                let userData = node.userData ?? NSMutableDictionary()
+                userData.setObject(originalMaterials, forKey: originalMaterialsKey as NSString)
+                node.userData = userData
+            }
+
+            geometry.materials = originalMaterials.map { sourceMaterial in
                 let material = sourceMaterial.copy() as! SCNMaterial
                 switch displayStyle {
                 case .realistic:
