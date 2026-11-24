@@ -6,8 +6,6 @@ import simd
 /// Loads a fresh copy of the bundled GLB for each viewport or export.
 /// The source asset remains bundled locally; no network access is needed at runtime.
 enum FemaleBaseMeshLoader {
-    private static var retainedAsset: GLTFAsset?
-
     static func load(completion: @escaping (SCNScene?) -> Void) {
         guard let url = Bundle.main.url(forResource: "FemaleBase", withExtension: "glb") else {
             DispatchQueue.main.async { completion(nil) }
@@ -45,11 +43,30 @@ enum FemaleBaseMeshLoader {
             NSLog("Female base mesh ready: %d geometry nodes, %d skinned meshes.",
                   geometryCount, skinnedMeshCount)
 
+            // Retain the GLTF buffers on the imported root itself. A single global
+            // asset reference is unsafe when the viewport and image export load in parallel.
+            let userData = scene.rootNode.userData ?? NSMutableDictionary()
+            userData.setObject(asset, forKey: "figureStudio.retainedGLTFAsset" as NSString)
+            scene.rootNode.userData = userData
+
             DispatchQueue.main.async {
-                retainedAsset = asset
                 completion(scene)
             }
         }
+    }
+
+    /// Wraps the imported scene root while preserving its metadata and asset lifetime.
+    static func makeModelRoot(from scene: SCNScene) -> SCNNode {
+        let root = SCNNode()
+        root.name = "realisticFemaleMeshRoot"
+        if let sourceUserData = scene.rootNode.userData {
+            root.userData = sourceUserData.mutableCopy() as? NSMutableDictionary
+        }
+        for child in Array(scene.rootNode.childNodes) {
+            child.removeFromParentNode()
+            root.addChildNode(child)
+        }
+        return root
     }
 }
 

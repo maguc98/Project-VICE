@@ -208,11 +208,7 @@ struct ContentView: View {
                 lightingStyle: exportLightingStyle
             )
             if let loadedScene {
-                let root = SCNNode()
-                for child in Array(loadedScene.rootNode.childNodes) {
-                    child.removeFromParentNode()
-                    root.addChildNode(child)
-                }
+                let root = FemaleBaseMeshLoader.makeModelRoot(from: loadedScene)
                 FigureSceneBuilder.attachRealisticBaseMesh(
                     root, to: scene, profile: exportProfile, displayStyle: exportDisplayStyle
                 )
@@ -533,12 +529,7 @@ private struct FigureViewport: UIViewRepresentable {
                     return
                 }
 
-                let root = SCNNode()
-                root.name = "realisticFemaleMeshRoot"
-                for child in Array(loadedScene.rootNode.childNodes) {
-                    child.removeFromParentNode()
-                    root.addChildNode(child)
-                }
+                let root = FemaleBaseMeshLoader.makeModelRoot(from: loadedScene)
                 self.modelRoot = root
                 self.rig = FemaleFigureRig(root: root)
                 FigureSceneBuilder.attachRealisticBaseMesh(
