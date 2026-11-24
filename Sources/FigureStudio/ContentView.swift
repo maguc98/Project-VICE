@@ -43,7 +43,7 @@ struct ContentView: View {
             .navigationTitle("人体工坊")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("重置") { profile = .defaultProfile }
+                    Button("重置") { profile = .defaultProfile; pose = FigurePose() }
                 }
             }
         }
