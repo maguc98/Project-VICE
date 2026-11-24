@@ -330,6 +330,19 @@ enum FigureSceneBuilder {
     }
 
 
+
+    static func makeSnapshot(scene: SCNScene, width: Int, height: Int) -> UIImage? {
+        guard let device = MTLCreateSystemDefaultDevice() else { return nil }
+        let renderer = SCNRenderer(device: device, options: nil)
+        renderer.scene = scene
+        renderer.pointOfView = scene.rootNode.childNode(withName: "figureCamera", recursively: false)
+        return renderer.snapshot(
+            atTime: 0,
+            with: CGSize(width: width, height: height),
+            antialiasingMode: .multisampling4X
+        )
+    }
+
     /// Replaces the procedural blockout with the bundled, skinned female base mesh.
     static func attachRealisticBaseMesh(
         _ modelRoot: SCNNode,

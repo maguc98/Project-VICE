@@ -1,34 +1,45 @@
 # Development roadmap
 
 ## M0 — Foundation
-- [x] Repository reset and native app skeleton
-- [x] Female reference measurement data model in centimetres
-- [x] Interactive SceneKit viewport scaffold
-- [ ] First CI build and simulator validation
+- [x] Native iOS app shell and XcodeGen project
+- [x] Female-only reference profile and centimetre measurement model
+- [x] SceneKit orbit viewport and offline rendering pipeline
+- [x] CI simulator build, device archive and unsigned IPA artifact
 
-## M1 — Female anatomical base mesh
-- [x] One female reference figure; no male model or model selector
-- [x] Continuous ring-built torso surface
-- [x] Smooth interpolation between torso profile rings
-- [x] Editable chest projection and posterior hip/gluteal projection
-- [x] Named shoulder, elbow, knee, and ankle landmarks
-- [x] Individually named finger and toe geometry blockout
-- [ ] Refine anatomical landmarks, torso topology, and limb attachment transitions
-- [ ] Validate front, side, and three-quarter silhouettes on device
+## M1 — Realistic female base
+- [x] Bundle licensed CC0 rigged female GLB model
+- [x] Load the base mesh offline with GLTFKit2
+- [x] Use its skin-weighted skeleton in the viewport
+- [x] Retain procedural figure as fallback
+- [ ] Local morph targets for bust, waist, pelvis/gluteal volume and limb circumference
+- [ ] Validate natural body shape, joint deformations and front/side/rear silhouettes on iPhone
 
-## M2 — Rig and posing
-- [x] Hierarchical shoulder and elbow pivot groups for both arms
-- [ ] Full-body skeleton and joint constraints
-- [x] Live shoulder raise and elbow bend controls
-- [ ] IK/FK controls and individual finger articulation
-- [ ] Pose library, mirror pose, reset, and local JSON save/load
+## M2 — Full-body rig and posing
+- [x] Independent left/right shoulder, elbow, forearm and wrist controls
+- [x] Individual finger curl controls for both hands
+- [x] Independent hip, knee, ankle and toe controls
+- [x] FK/IK target modes for arms and legs
+- [x] Spine and head posing
+- [x] Pose presets, mirror, named local save/load/delete
+- [ ] Validate joint axes, ranges and skinning deformation on physical device
+- [ ] Improve reach limits and joint constraints using measured bind-pose lengths
 
 ## M3 — Artist tools
-- [ ] Orbit/pan/zoom camera, focal length, orthographic view
-- [ ] Anatomy overlays, lighting presets, silhouette and contour modes
-- [ ] High-resolution transparent PNG export
+- [x] PBR presentation and studio/soft/dramatic lighting choices
+- [x] Silhouette and wireframe display modes
+- [x] High-resolution 1800×2400 PNG export
+- [ ] Dynamic skeleton/bone overlay and anatomical landmark guides
+- [ ] Dedicated orthographic front/side/back camera presets
+- [ ] Optional transparent background and clean image crop presets
 
-## Performance targets
-- iPhone 12 mini (A14) is the baseline device.
-- Keep mesh rebuilds lightweight and avoid unnecessary scene recreation during slider movement.
-- Offline operation; no account or network requirement for core modeling.
+## M4 — Performance and quality
+- [ ] Profile on iPhone 12 mini (A14), optimize draw calls and memory
+- [ ] Smooth pose transitions and keyframe capture
+- [ ] Local geometry morph sliders for all requested body measurements
+- [ ] Final visual QA for front, profile, back, hands and feet
+- [ ] Signed device IPA and installation test on iPhone 12 mini
+
+## Constraints
+- The CC0 base mesh is a reusable anatomical reference model, not a photographic scan or medical model.
+- A successful CI archive proves compilation and packaging, not that every movement looks correct on a physical device.
+- The final distribution artifact is unsigned; it must be signed with the user's own certificate/profile.

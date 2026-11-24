@@ -168,19 +168,35 @@ struct ContentView: View {
     }
 
     private func exportHighResolutionImage() {
-        guard let image = FigureSceneBuilder.makeSnapshot(
-            profile: profile,
-            pose: pose,
-            displayStyle: displayStyle,
-            lightingStyle: lightingStyle,
-            width: 1800,
-            height: 2400
-        ) else {
-            showExportError = true
-            return
+        let exportProfile = profile
+        let exportPose = pose
+        let exportDisplayStyle = displayStyle
+        let exportLightingStyle = lightingStyle
+        FemaleBaseMeshLoader.load { loadedScene in
+            let scene = FigureSceneBuilder.makeScene(
+                profile: exportProfile,
+                pose: exportPose,
+                displayStyle: exportDisplayStyle,
+                lightingStyle: exportLightingStyle
+            )
+            if let loadedScene {
+                let root = SCNNode()
+                for child in Array(loadedScene.rootNode.childNodes) {
+                    child.removeFromParentNode()
+                    root.addChildNode(child)
+                }
+                FigureSceneBuilder.attachRealisticBaseMesh(
+                    root, to: scene, profile: exportProfile, displayStyle: exportDisplayStyle
+                )
+                FemaleFigureRig(root: root).apply(exportPose)
+            }
+            guard let image = FigureSceneBuilder.makeSnapshot(scene: scene, width: 1800, height: 2400) else {
+                showExportError = true
+                return
+            }
+            shareImage = image
+            showShareSheet = true
         }
-        shareImage = image
-        showShareSheet = true
     }
 }
 
@@ -221,7 +237,7 @@ private struct PoseControlPanel: View {
     var body: some View {
         Form {
             Section("姿势库") {
-                Picker("腿部控制", selection: $pose.rigMode) {
+                Picker("肢体控制", selection: $pose.rigMode) {
                     ForEach(FigureRigMode.allCases) { mode in
                         Text(mode.title).tag(mode)
                     }
@@ -290,10 +306,19 @@ private struct PoseControlPanel: View {
 
     @ViewBuilder
     private func armSection(title: String, arm: Binding<ArmPose>) -> some View {
-        Section(title) {
-            AngleControl(title: "肩部前屈", value: arm.shoulderFlexionDegrees, range: -100...150)
-            AngleControl(title: "肩部外展", value: arm.shoulderAbductionDegrees, range: -100...100)
-            AngleControl(title: "肘部弯曲", value: arm.elbowFlexionDegrees, range: 0...145)
+        Section(title + (pose.rigMode == .ik ? " · IK 目标" : " · FK 关节")) {
+            if pose.rigMode == .fk {
+                AngleControl(title: "肩部前屈", value: arm.shoulderFlexionDegrees, range: -100...150)
+                AngleControl(title: "肩部外展", value: arm.shoulderAbductionDegrees, range: -100...100)
+                AngleControl(title: "肘部弯曲", value: arm.elbowFlexionDegrees, range: 0...145)
+            } else {
+                AngleControl(title: "手部横向伸展", value: arm.handReachTargetCM, range: -45...45, suffix: "cm")
+                AngleControl(title: "手部垂直抬升", value: arm.handLiftTargetCM, range: -55...75, suffix: "cm")
+                AngleControl(title: "手部前后移动", value: arm.handDepthTargetCM, range: -40...40, suffix: "cm")
+                Text("IK 会根据手部目标计算肩部和肘部角度，腕部和手指仍可独立控制。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             AngleControl(title: "前臂旋转", value: arm.forearmRotationDegrees, range: -90...90)
             AngleControl(title: "手腕屈伸", value: arm.wristFlexionDegrees, range: -75...75)
             AngleControl(title: "手腕侧偏", value: arm.wristDeviationDegrees, range: -35...35)

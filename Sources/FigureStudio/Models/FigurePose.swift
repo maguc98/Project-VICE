@@ -15,6 +15,10 @@ struct ArmPose: Codable, Equatable {
     var forearmRotationDegrees = 0.0
     var wristFlexionDegrees = 0.0
     var wristDeviationDegrees = 0.0
+    /// IK target offsets relative to the neutral wrist, in centimetres.
+    var handReachTargetCM = 0.0
+    var handLiftTargetCM = 0.0
+    var handDepthTargetCM = 0.0
     /// Thumb, index, middle, ring, little finger; each value drives the finger joints.
     var fingerCurlDegrees = Array(repeating: 0.0, count: 5)
 
@@ -22,7 +26,8 @@ struct ArmPose: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case shoulderFlexionDegrees, shoulderAbductionDegrees, elbowFlexionDegrees
-        case forearmRotationDegrees, wristFlexionDegrees, wristDeviationDegrees, fingerCurlDegrees
+        case forearmRotationDegrees, wristFlexionDegrees, wristDeviationDegrees
+        case handReachTargetCM, handLiftTargetCM, handDepthTargetCM, fingerCurlDegrees
     }
 
     init(from decoder: Decoder) throws {
@@ -33,6 +38,9 @@ struct ArmPose: Codable, Equatable {
         forearmRotationDegrees = try c.decodeIfPresent(Double.self, forKey: .forearmRotationDegrees) ?? 0
         wristFlexionDegrees = try c.decodeIfPresent(Double.self, forKey: .wristFlexionDegrees) ?? 0
         wristDeviationDegrees = try c.decodeIfPresent(Double.self, forKey: .wristDeviationDegrees) ?? 0
+        handReachTargetCM = try c.decodeIfPresent(Double.self, forKey: .handReachTargetCM) ?? 0
+        handLiftTargetCM = try c.decodeIfPresent(Double.self, forKey: .handLiftTargetCM) ?? 0
+        handDepthTargetCM = try c.decodeIfPresent(Double.self, forKey: .handDepthTargetCM) ?? 0
         let decoded = try c.decodeIfPresent([Double].self, forKey: .fingerCurlDegrees) ?? []
         fingerCurlDegrees = Array((decoded + Array(repeating: 0, count: 5)).prefix(5))
     }
