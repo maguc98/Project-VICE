@@ -178,8 +178,8 @@ enum FigureSceneBuilder {
         node.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: simd_normalize(delta))
         root.addChildNode(node)
         addEllipsoid("\(name)JointStart", at: start,
-                     scale: SCNVector3(startRadius, startRadius, startRadius), material: material, to: root)
+                     scale: SCNVector3(Float(startRadius), Float(startRadius), Float(startRadius)), material: material, to: root)
         addEllipsoid("\(name)JointEnd", at: end,
-                     scale: SCNVector3(endRadius, endRadius, endRadius), material: material, to: root)
+                     scale: SCNVector3(Float(endRadius), Float(endRadius), Float(endRadius)), material: material, to: root)
     }
 }
