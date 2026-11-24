@@ -97,6 +97,31 @@ private struct PoseControlPanel: View {
                     Slider(value: $pose.elbowBendDegrees, in: 0...145, step: 1)
                 }
             }
+            Section("下肢姿势") {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("髋部前后摆动")
+                        Spacer()
+                        Text("\(pose.hipFlexionDegrees, specifier: "%.0f")°")
+                            .monospacedDigit().foregroundStyle(.secondary)
+                    }
+                    Slider(value: $pose.hipFlexionDegrees, in: -90...90, step: 1)
+                    HStack {
+                        Text("髋部外展")
+                        Spacer()
+                        Text("\(pose.hipAbductionDegrees, specifier: "%.0f")°")
+                            .monospacedDigit().foregroundStyle(.secondary)
+                    }
+                    Slider(value: $pose.hipAbductionDegrees, in: -45...45, step: 1)
+                    HStack {
+                        Text("膝部弯曲")
+                        Spacer()
+                        Text("\(pose.kneeBendDegrees, specifier: "%.0f")°")
+                            .monospacedDigit().foregroundStyle(.secondary)
+                    }
+                    Slider(value: $pose.kneeBendDegrees, in: 0...135, step: 1)
+                }
+            }
             Section {
                 Button("恢复自然站姿") { pose = FigurePose() }
             }
@@ -123,7 +148,7 @@ private struct FigureViewport: UIViewRepresentable {
         // Preserve the user's orbit-camera position while the body proportions update.
         let oldCameraPosition = view.pointOfView?.position
         let oldCameraOrientation = view.pointOfView?.orientation
-        let scene = FigureSceneBuilder.makeScene(profile: profile)
+        let scene = FigureSceneBuilder.makeScene(profile: profile, pose: pose)
         view.scene = scene
         if let camera = scene.rootNode.childNodes.first(where: { $0.camera != nil }) {
             if let oldCameraPosition { camera.position = oldCameraPosition }

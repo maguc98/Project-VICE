@@ -100,28 +100,46 @@ enum FigureSceneBuilder {
             addFingers(side: side, wrist: wristLocal, scale: h, material: skin, root: elbowPivot)
         }
 
-        // Legs include visible knee and ankle landmarks, with tapered thigh/shin segments.
+        // Lower-body articulation: hip drives the full leg; knee drives the shin and foot.
         let thighLength = Float(profile.thigh / 43.0) * 0.53 * h
         let shinLength = Float(profile.lowerLeg / 39.0) * 0.49 * h
         for side: Float in [-1, 1] {
-            let hip = SCNVector3(side * 0.175 * hipFactor * h, 1.08 * h, 0)
-            let knee = SCNVector3(side * 0.16 * hipFactor * h, hip.y - thighLength, 0.015 * h)
-            let ankle = SCNVector3(side * 0.16 * hipFactor * h, knee.y - shinLength, 0.025 * h)
-            addTaperedSegment("thigh", from: hip, to: knee,
-                              startRadius: 0.145 * h, endRadius: 0.092 * h, material: skin, root: root)
-            addEllipsoid("kneecap", at: knee,
-                         scale: SCNVector3(0.085 * h, 0.095 * h, 0.085 * h), material: skin, to: root)
-            addTaperedSegment("lowerLeg", from: knee, to: ankle,
-                              startRadius: 0.082 * h, endRadius: 0.050 * h, material: skin, root: root)
-            addEllipsoid("ankleLandmark", at: ankle,
-                         scale: SCNVector3(0.055 * h, 0.060 * h, 0.055 * h), material: skin, to: root)
+            let hipPosition = SCNVector3(side * 0.175 * hipFactor * h, 1.08 * h, 0)
+            let hipPivot = SCNNode()
+            hipPivot.name = side < 0 ? "leftHipPivot" : "rightHipPivot"
+            hipPivot.position = hipPosition
+            hipPivot.eulerAngles.x = -Float(pose.hipFlexionDegrees * .pi / 180)
+            hipPivot.eulerAngles.z = side * Float(pose.hipAbductionDegrees * .pi / 180)
+            root.addChildNode(hipPivot)
 
-            addEllipsoid("foot", at: SCNVector3(ankle.x, ankle.y - 0.045 * h, 0.105 * h),
+            let kneeLocal = SCNVector3(-side * 0.015 * hipFactor * h, -thighLength, 0.015 * h)
+            addTaperedSegment("thigh", from: SCNVector3Zero, to: kneeLocal,
+                              startRadius: 0.145 * h, endRadius: 0.092 * h, material: skin, root: hipPivot)
+
+            let kneePivot = SCNNode()
+            kneePivot.name = side < 0 ? "leftKneePivot" : "rightKneePivot"
+            kneePivot.position = kneeLocal
+            kneePivot.eulerAngles.x = Float(pose.kneeBendDegrees * .pi / 180)
+            hipPivot.addChildNode(kneePivot)
+            addEllipsoid("kneecap", at: SCNVector3Zero,
+                         scale: SCNVector3(0.085 * h, 0.095 * h, 0.085 * h), material: skin, to: kneePivot)
+
+            let ankleLocal = SCNVector3(0, -shinLength, 0.010 * h)
+            addTaperedSegment("lowerLeg", from: SCNVector3Zero, to: ankleLocal,
+                              startRadius: 0.082 * h, endRadius: 0.050 * h, material: skin, root: kneePivot)
+
+            let anklePivot = SCNNode()
+            anklePivot.name = side < 0 ? "leftAnklePivot" : "rightAnklePivot"
+            anklePivot.position = ankleLocal
+            kneePivot.addChildNode(anklePivot)
+            addEllipsoid("ankleLandmark", at: SCNVector3Zero,
+                         scale: SCNVector3(0.055 * h, 0.060 * h, 0.055 * h), material: skin, to: anklePivot)
+            addEllipsoid("foot", at: SCNVector3(0, -0.045 * h, 0.105 * h),
                          scale: SCNVector3(Float(profile.footWidth / 9.0) * 0.095 * h, 0.055 * h,
                                            Float(profile.footLength / 24.0) * 0.205 * h),
-                         material: skin, to: root)
-            addToes(side: side, ankle: ankle, widthFactor: Float(profile.footWidth / 9.0),
-                    lengthFactor: Float(profile.footLength / 24.0), scale: h, material: skin, root: root)
+                         material: skin, to: anklePivot)
+            addToes(side: side, ankle: SCNVector3Zero, widthFactor: Float(profile.footWidth / 9.0),
+                    lengthFactor: Float(profile.footLength / 24.0), scale: h, material: skin, root: anklePivot)
         }
 
         let camera = SCNCamera()
